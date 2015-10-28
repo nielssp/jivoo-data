@@ -24,6 +24,13 @@ interface Expression {
    * @return bool True if more than 0 clauses, false otherwise
    */
   public function hasClauses();
+  
+  /**
+   * Get clauses.
+   * @return array A list of clauses in the form of arrays of the format
+   * array('glue' => ..., 'clause' => ..., 'vars' => array(...)) where the glue
+   */
+  public function getClauses();
 
   /**
    * Add clause with AND operator
