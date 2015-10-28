@@ -5,7 +5,7 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Models\Condition;
 
-use Jivoo\Data\Query;
+use Jivoo\Data\Query\Expression;
 
 /**
  * Quotes strings, model names, and field names in expressions.

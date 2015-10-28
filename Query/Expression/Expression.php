@@ -11,33 +11,22 @@ namespace Jivoo\Data\Query;
  * @method Expression or(Expression|string $clause, mixed $vars,... ) OR operator
  */
 interface Expression {
+  public function toString(Quoter $quoter);
+
   /**
    * Implements methods {@see Condition::and()} and {@see Condition::or()}
    * @param string $method Method name ('and' or 'or')
    * @param mixed[] $args List of parameters
-   * @return self Self.
+   * @return Expression Expression.
    */
   public function __call($method, $args);
-
-  /**
-   * If this condition has any clauses
-   * @return bool True if more than 0 clauses, false otherwise
-   */
-  public function hasClauses();
-  
-  /**
-   * Get clauses.
-   * @return array A list of clauses in the form of arrays of the format
-   * array('glue' => ..., 'clause' => ..., 'vars' => array(...)) where the glue
-   */
-  public function getClauses();
 
   /**
    * Add clause with AND operator
    * @param Expression|string $clause Clause
    * @param mixed $vars,... Additional values to replace placeholders in
    * $clause with
-   * @return self Self.
+   * @return Expression Expression.
    */
   public function where($clause);
 
@@ -46,7 +35,7 @@ interface Expression {
    * @param Expression|string $clause Clause
    * @param mixed $vars,... Additional values to replace placeholders in
    * $clause with
-   * @return self Self.
+   * @return Expression Expression.
    */
   public function andWhere($clause);
 
@@ -55,7 +44,7 @@ interface Expression {
    * @param Expression|string $clause Clause
    * @param mixed $vars,... Additional values to replace placeholders in
    * $clause with
-   * @return self Self.
+   * @return Expression Expression.
    */
   public function orWhere($clause);
 }
