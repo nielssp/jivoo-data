@@ -8,7 +8,7 @@ namespace Jivoo\Data\Query;
 /**
  * An undecided selection.
  */
-interface Selection extends Selectable, Updatable, Deletable {
+interface Selection extends Expression {
   /**
    * List of arrays describing ordering.
    *

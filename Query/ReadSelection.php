@@ -5,10 +5,12 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Query;
 
+use Jivoo\Data\Selectable;
+
 /**
  * A read selection.
  */
-interface ReadSelection extends Selection {
+interface ReadSelection extends Selection, Selectable {
   /**
    * @var bool Distinct.
    */

@@ -3,15 +3,16 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\Data;
+namespace Jivoo\Data\Query\Builders;
 
 /**
- * An interface for models and selections.
+ * A delete selection.
  */
-interface Deletable extends Expression {
+class DeleteSelectionBuilder extends SelectionBase {
   /**
-   * Delete records in selection.
-   * @return int Number of deleted records.
+   * {@inheritdoc}
    */
-  public function delete();
+  public function delete() {
+    $this->model->deleteSelection($this);
+  }
 }
