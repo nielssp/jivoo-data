@@ -14,6 +14,12 @@ use Jivoo\Data\Query\ReadSelection;
  */
 interface Model extends Selectable, Updatable, Deletable, DataSource {
   /**
+   * Get name of model. 
+   * @return string Name.
+   */
+  public function getName();
+  
+  /**
    * Create a record.
    * @param array $data Associative array of record data.
    * @param string[]|null $allowedFields List of allowed fields (null for all

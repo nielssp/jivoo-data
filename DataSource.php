@@ -16,7 +16,7 @@ interface DataSource {
   /**
    * Insert data directly into model.
    * @param array $data Associative array of record data.
-   * @param bool $replace Whether to replace rows on conflict.
+   * @param bool $replace Whether to replace records on conflict.
    * @return int|null Last insert id if any.
    */
   public function insert($data, $replace = false);
@@ -25,7 +25,7 @@ interface DataSource {
    * Insert multiple data records directly into model. Each record-array MUST cotain the
    * same columns and order of columns.
    * @param array[] $records List of associative arrays of record data.
-   * @param bool $replace Whether to replace rows on conflict.
+   * @param bool $replace Whether to replace records on conflict.
    * @return int|null Last insert id if any.
    */
   public function insertMultiple($records, $replace = false);
