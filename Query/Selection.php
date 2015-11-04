@@ -29,11 +29,6 @@ interface Selection extends Expression {
   public function getLimit();
   
   /**
-   * @var Expression Select condition.
-   */
-  public function getExpression();
-  
-  /**
    * @var Model
    */
   public function getModel();

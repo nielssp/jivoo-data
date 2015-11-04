@@ -29,7 +29,7 @@ interface Schema {
   public function getType($field);
   
   /**
-   * Get fields of primary key.
+   * Get fields of primary key. Should return same result as `getKey('PRIMARY')`. 
    * @return string[] List of field names or empty array if no primary key
    */
   public function getPrimaryKey();

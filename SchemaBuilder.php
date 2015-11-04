@@ -109,7 +109,7 @@ class SchemaBuilder implements Schema {
    * {@inheritdoc}
    */
   public function getName() {
-    return $this->_name;
+    return $this->name;
   }
 
   
@@ -145,38 +145,19 @@ class SchemaBuilder implements Schema {
     }
     return $this->keys['PRIMARY']['columns'];
   }
-  
-  /**
-   * Check if the column is part of the primary key.
-   * @param string $column Column name.
-   * @return boolean True if part of primary key, false otherwise.
-   */
-  public function isPrimaryKey($column) {
-    if (!isset($this->keys['PRIMARY'])) {
-      return false;
-    }
-    return in_array($column, $this->keys['PRIMARY']['columns']);
-  }
 
   /**
    * Add a unique index to schema.
-   * @param string $index Index name.
    * @param string|string[] $columns An array of column names or a single column
    * name.
-   * @param string $columns,... Additional column names (if $columns is a single
-   * column name).
+   * @param string $name Optional key name.
    */
-  public function addUnique($name, $columns) {
+  public function addUnique($columns, $name = null) {
     if (!is_array($columns)) {
-      $params = func_get_args();
-      if (count($params) > 2) {
-        array_shift($params);
-        $columns = $params;
-      }
-      else {
-        $columns = array($columns);
-      }
+      $columns = array($columns);
     }
+    if (!isset($name))
+      $name = implode('_', $columns);
     if (isset($this->keys[$name])) {
       $this->keys[$name]['columns'] = array_merge($this->keys[$name]['columns'], $columns);
     }
@@ -190,23 +171,16 @@ class SchemaBuilder implements Schema {
 
   /**
    * Add an index to schema.
-   * @param string $index Index name.
    * @param string|string[] $columns An array of column names or a single column
    * name.
-   * @param string $columns,... Additional column names (if $columns is a single
-   * column name).
+   * @param string $name Optional key name.
    */
-  public function addIndex($name, $columns) {
+  public function addKey($columns, $name = null) {
     if (!is_array($columns)) {
-      $params = func_get_args();
-      if (count($params) > 2) {
-        array_shift($params);
-        $columns = $params;
-      }
-      else {
-        $columns = array($columns);
-      }
+      $columns = array($columns);
     }
+    if (!isset($name))
+      $name = implode('_', $columns);
     if (isset($this->keys[$name])) {
       $columns = array_merge($this->keys[$name]['columns'], $columns);
     }
@@ -227,13 +201,6 @@ class SchemaBuilder implements Schema {
   public function getKeys() {
     return $this->keys;
   }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function indexExists($name) {
-    return isset($this->keys[$name]);
-  }
   
   /**
    * Remove an index.
@@ -246,7 +213,18 @@ class SchemaBuilder implements Schema {
   /**
    * {@inheritdoc}
    */
-  public function getIndex($name) {
-    return $this->keys[$name];
+  public function getKey($key) {
+  	if (isset($this->keys[$key]))
+      return $this->keys[$key]['columns'];
+  	return null;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isUnique($key) {
+  	if (isset($this->keys[$key]))
+      return $this->keys[$key]['unique'];
+  	return false;
   }
 }
