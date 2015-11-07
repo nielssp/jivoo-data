@@ -27,9 +27,4 @@ interface Selection extends Expression {
    * @var int|null Limit.
   */
   public function getLimit();
-  
-  /**
-   * @var Model
-   */
-  public function getModel();
 }

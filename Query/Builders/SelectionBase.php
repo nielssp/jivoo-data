@@ -10,6 +10,8 @@ use Jivoo\Models\Condition\ConditionBuilder;
 use Jivoo\InvalidPropertyException;
 use Jivoo\InvalidMethodException;
 use Jivoo\Data\Query\Selection;
+use Jivoo\Data\DataSource;
+use Jivoo\Data\Query\Expression\E;
 
 /**
  * A basic selection. Base class for other selections.
@@ -52,8 +54,8 @@ abstract class SelectionBase implements Selection {
    * Construct basic selection.
    * @param ModelBase $model Target of selection.
    */
-  public function __construct(ModelBase $model) {
-    $this->where = new ConditionBuilder();
+  public function __construct(DataSource $source) {
+    $this->where = new E();
     $this->model = $model;
   }
 
