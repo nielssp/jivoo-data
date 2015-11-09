@@ -30,7 +30,9 @@ abstract class ArrayDataSource implements DataSource {
    */
   public function read(ReadSelection $selection) {
     $data = $this->getData();
+    $predicate = E::toPredicate($selection);
     // TODO: implement
+    // JOIN
     // WHERE
     // GROUP BY
     // HAVING
