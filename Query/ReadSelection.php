@@ -10,7 +10,7 @@ use Jivoo\Data\Selectable;
 /**
  * A read selection.
  */
-interface ReadSelection extends Selection, Selectable {
+interface ReadSelection extends Selection {
   /**
    * @var bool Distinct.
    */

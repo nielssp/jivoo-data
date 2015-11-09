@@ -5,9 +5,7 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data;
 
-use Jivoo\Core\Utilities;
 use Jivoo\Models\Validation\ValidatorBuilder;
-use Jivoo\InvalidPropertyException;
 
 /**
  * Represents a database table schema.

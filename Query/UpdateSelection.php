@@ -8,7 +8,7 @@ namespace Jivoo\Data\Query;
 /**
  * An update selection.
  */
-interface UpdateSelection extends Selection, Updatable {
+interface UpdateSelection extends Selection {
   /**
    * @var array Data.
    */

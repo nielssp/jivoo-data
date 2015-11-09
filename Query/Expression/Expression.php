@@ -7,10 +7,8 @@ namespace Jivoo\Data\Query\Expression;
 
 /**
  * A condition for selecting rows in a database table
- * @method Expression and(Expression|string $clause, mixed $vars,... ) AND operator
- * @method Expression or(Expression|string $clause, mixed $vars,... ) OR operator
  */
-interface Expression {
+interface Expression {  
   public function toString(Quoter $quoter);
 
   /**
