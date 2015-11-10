@@ -5,9 +5,7 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Query\Expression;
 
-use Jivoo\Models\DataType;
-use Jivoo\Models\BasicModel;
-use Jivoo\InvalidPropertyException;
+use Jivoo\Data\DataType;
 use Jivoo\InvalidMethodException;
 use Jivoo\Data\Query\Expression;
 
@@ -15,22 +13,35 @@ use Jivoo\Data\Query\Expression;
  * Expression builder.
  */
 class E implements Expression {
-  /**
-   * @var array[] A list of clauses
-   */
-  private $clauses = array();
+  private $string = '';
+  
+  private $vars = array();
 
   /**
    * Construct condition. The function {@see where} is an alias.
-   * @param Condition|string $clause Clause.
+   * @param Condition|string $expr Expression.
    * @param mixed $vars,... Additional values to replace placeholders in
-   * $clause with.
+   * $expr with.
    */
-  public function __construct($clause = null) {
-    if (isset($clause) and !empty($clause)) {
+  public function __construct($expr = null) {
+    if (isset($expr) and !empty($expr)) {
       $args = func_get_args();
       call_user_func_array(array($this, 'andWhere'), $args);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getString() {
+    return $this->string;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getVars() {
+    return $this->vars;
   }
 
   /**
@@ -46,19 +57,11 @@ class E implements Expression {
     throw new InvalidMethodException(tr('Invalid method: %1', $method));
   }
 
-  /**
-   * Check if property is set
-   * @param string $property Property name
-   * @return bool True if set, false otherwise
-   */
-  public function __isset($property) {
-    return isset($this->$property);
-  }
 
   /**
    * {@inheritdoc}
    */
-  public function where($clause) {
+  public function where($expr) {
     $args = func_get_args();
     return call_user_func_array(array($this, 'andWhere'), $args);
   }
@@ -66,26 +69,32 @@ class E implements Expression {
   /**
    * {@inheritdoc}
    */
-  public function andWhere($clause) {
-    if (empty($clause)) {
+  public function andWhere($expr) {
+    if (empty($expr)) {
       return $this;
     }
-    $args = func_get_args();
-    array_shift($args);
-    $this->clauses[] = array('AND', $clause, $args);
+    $vars = func_get_args();
+    array_shift($vars);
+    $this->vars = array_merge($this->vars, $vars);
+    if ($this->string != '')
+      $this->string .= ' AND ';
+    $this->string .= $expr;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function orWhere($clause) {
-    if (empty($clause)) {
+  public function orWhere($expr) {
+    if (empty($expr)) {
       return $this;
     }
-    $args = func_get_args();
-    array_shift($args);
-    $this->clauses[] = array('OR', $clause, $args);
+    $vars = func_get_args();
+    array_shift($vars);
+    $this->vars = array_merge($this->vars, $vars);
+    if ($this->string != '')
+      $this->string .= ' OR ';
+    $this->string .= $expr;
     return $this;
   }
   

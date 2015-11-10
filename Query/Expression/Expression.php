@@ -8,8 +8,10 @@ namespace Jivoo\Data\Query\Expression;
 /**
  * A condition for selecting rows in a database table
  */
-interface Expression {  
-  public function toString(Quoter $quoter);
+interface Expression {
+  public function getString();
+  
+  public function getVars();
 
   /**
    * Implements methods {@see Condition::and()} and {@see Condition::or()}
@@ -21,28 +23,28 @@ interface Expression {
 
   /**
    * Add clause with AND operator
-   * @param Expression|string $clause Clause
+   * @param Expression|string $expr Expression
    * @param mixed $vars,... Additional values to replace placeholders in
-   * $clause with
+   * $expr with
    * @return Expression Expression.
    */
-  public function where($clause);
+  public function where($expr);
 
   /**
    * Add clause with AND operator
-   * @param Expression|string $clause Clause
+   * @param Expression|string $expr Expression
    * @param mixed $vars,... Additional values to replace placeholders in
-   * $clause with
+   * $expr with
    * @return Expression Expression.
    */
-  public function andWhere($clause);
+  public function andWhere($expr);
 
   /**
    * Add clause with OR operator
-   * @param Expression|string $clause Clause
+   * @param Expression|string $expr Expression
    * @param mixed $vars,... Additional values to replace placeholders in
-   * $clause with
+   * $expr with
    * @return Expression Expression.
    */
-  public function orWhere($clause);
+  public function orWhere($expr);
 }
