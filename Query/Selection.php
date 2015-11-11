@@ -6,25 +6,24 @@
 namespace Jivoo\Data\Query;
 
 /**
- * An undecided selection.
+ * A record selection with a predicate, an ordering and a limit.
  */
-interface Selection extends Expression {
+interface Selection {
   /**
-   * List of arrays describing ordering.
-   *
-   * Each array is of the format:
-   * <code>
-   * array(
-   *   'column' => ..., // Column name (string)
-   *   'descending' => .... // Whether or not to order in descending order (bool)
-   * )
-   * </code>
-   * @var array[]
+   * @return Expression
+   */
+  public function getPredicate();
+
+  /**
+   * List of 2-tuples describing ordering. Each tuple consists of a string
+   * (the field name) and a bool (true if descending order, false if ascending).
+   * @return array[]
    */
   public function getOrdering();
   
   /**
-   * @var int|null Limit.
+   * Optional selection limit.
+   * @return int|null Limit.
   */
   public function getLimit();
 }

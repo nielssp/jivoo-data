@@ -31,23 +31,31 @@ interface DataSource {
   public function insertMultiple($records, $replace = false);
 
   /**
-   *
-   * @param Selection $selection
-   * @return array
+   * Retrieve the selected records.
+   * @param Selection $selection Record selection.
+   * @return Record[]|Traversable Selected records as an array or iterator.
    */
   public function read(ReadSelection $selection);
 
   /**
-   *
-   * @param Selection $selection
+   * Update the selected records.
+   * @param Selection $selection Update selection.
    * @return int Number of updated records if availabble.
    */
   public function update(UpdateSelection $selection);
   
   /**
-   * 
-   * @param Selection $selection
+   * Delete the selected records.
+   * @param Selection $selection Selection.
    * @return int Number of deleted records if availabble.
    */
   public function delete(Selection $selection);
+  
+  /**
+   * Join two data sources.
+   * @param DataSource $other Other data sorce.
+   * @return DataSource|null A compatible data source or null if join not
+   * possible.
+   */
+  public function joinWith(DataSource $other);
 }

@@ -5,35 +5,29 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Query;
 
-use Jivoo\Data\Selectable;
-
 /**
  * A read selection.
  */
 interface ReadSelection extends Selection {
   /**
-   * @var bool Distinct.
+   * @return bool Distinct.
    */
   public function isDistinct();
   
   /**
-   * @var string|null Alias for source.
+   * @return string|null Alias for source.
    */
   public function getAlias();
   
   /**
-   * An arrays describing grouping.
-   * 
-   * Each array is of the following format:
-   * <code>
-   * array(
-   *   'columns' => ... // List of columns
-   *   'condition' => ... // Join condition ({@see Condition})
-   * )
-   * </code>
-   * @return array
+   * @return string[] List of grouped columns.
    */
   public function getGrouping();
+  
+  /**
+   * @return Predicate Grouping predicate.
+   */
+  public function getGroupPredicate();
   
   /**
    * return int Offset
@@ -49,7 +43,7 @@ interface ReadSelection extends Selection {
    *   'source' => ..., // Data source to join with ({@see DataSource})
    *   'type' => ..., // Type of join: 'INNER', 'RIGHT' or 'LEFT'
    *   'alias' => ..., // Alias for other data source (string|null)
-   *   'condition' => ... // Join condition ({@see Condition})
+   *   'predicate' => ... // Join predicate ({@see Expression})
    * );
    * </code>
    * @return array[]
@@ -57,33 +51,19 @@ interface ReadSelection extends Selection {
   public function getJoins();
 
   /**
-   * List of arrays describing columns.
+   * List of projected fields.
    *
    * Each array is of the following format:
    * <code>
    * array(
-   *   'expression' => ..., // Expression (string)
-   *   'alias' => ... // Alias (string|null)
+   *   'expression' => ..., // Expression ({@see Expression})
+   *   'alias' => ... // Optional alias (string|null)
+   *   'type' => ... // Optional type hint (DataType|null)
+   *   'source' => ... // Optional source (DataSource|null)
+   *   'record' => ... // Optional record field (string|null)
    * )
    * </code>
    * @return array[]
   */
-  public function getFields();
-
-  /**
-   * List of arrays describing columns.
-   *
-   * Each array is of the following format:
-   * <code>
-   * array(
-   *   'alias' => ... // Alias (string)
-   *   'expression' => ..., // Expression (string)
-   *   'type' => ... // Type (DataType|null)
-   *   'model' => ... // Model (BasicModel|null)
-   *   'record' => ... // Record field (string|null)
-   * )
-   * </code>
-   * @return array[]
-   */
-  public function getAdditionalFields();
+  public function getProjection();
 }
