@@ -20,9 +20,15 @@ abstract class ArrayDataSource implements DataSource {
   public abstract function getData();
 
   /**
-   * @param array[] $data List of records.
+   * @param mixed $key
    */
-  public abstract function setData($data);
+  public abstract function deleteKey($key);
+
+  /**
+   * @param mixed $key
+   * @param array $record
+   */
+  public abstract function updateKey($key, $record);
 
 
   /**
@@ -30,7 +36,9 @@ abstract class ArrayDataSource implements DataSource {
    */
   public function read(ReadSelection $selection) {
     $data = $this->getData();
-    $predicate = E::toPredicate($selection);
+    $predicate = $selection->getPredicate();
+    if (count($selection->getJoins()) > 0)
+      throw new \Exception('unsupported operation');
     // TODO: implement
     // JOIN
     // WHERE
@@ -45,7 +53,21 @@ abstract class ArrayDataSource implements DataSource {
    * {@inheritdoc}
    */
   public function update(UpdateSelection $selection) {
-    // TODO: implement
+    $data = $this->getData();
+    $data = self::sortAll($data, $selection->getOrdering());
+    $updates = $selection->getData();
+    $limit = $selection->getLimit();
+    $predicate = $selection->getPredicate();
+    $count = 0;
+    foreach ($data as $key => $record) {
+      if ($predicate($record)) {
+        $this->updateKey($key, array_merge($record, $updates));
+        $count++;
+        if (isset($limit) and $count >= $limit)
+          break;
+      }
+    }
+    return $count;
   }
   
   /**
@@ -55,14 +77,23 @@ abstract class ArrayDataSource implements DataSource {
     $data = $this->getData();
     $data = self::sortAll($data, $selection->getOrdering());
     $limit = $selection->getLimit();
-    $predicate = E::toPredicate($selection);
-    // TODO: implement
+    $predicate = $selection->getPredicate();
+    $count = 0;
+    foreach ($data as $key => $record) {
+      if ($predicate($record)) {
+        $this->deleteKey($key);
+        $count++;
+        if (isset($limit) and $count >= $limit)
+          break;
+      }
+    }
+    return $count;
   }
   
   public static function sortAll($data, $orderings) {
     $orderings = array_reverse($orderings);
     foreach ($orderings as $ordering)
-      $data = self::sort($data, $ordering['column'], $ordering['descending']);
+      $data = self::sort($data, $ordering[0], $ordering[1]);
     return $data;
   }
   

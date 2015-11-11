@@ -25,7 +25,7 @@ interface ReadSelection extends Selection {
   public function getGrouping();
   
   /**
-   * @return Predicate Grouping predicate.
+   * @return Predicate|null Grouping predicate.
    */
   public function getGroupPredicate();
   

@@ -16,7 +16,7 @@ interface Updatable extends Expression {
    * @param string|array $field Field name or associative array of field names
    * and values
    * @param string $value Value
-   * @return UpdateSelection An update selection.
+   * @return Updatable An update selection.
    */
   public function set($field, $value = null);
 
