@@ -12,28 +12,16 @@ use Jivoo\InvalidMethodException;
 use Jivoo\Data\Query\Selection;
 use Jivoo\Data\DataSource;
 use Jivoo\Data\Query\Expression\E;
+use Jivoo\Data\Query\Expression;
 
 /**
  * A basic selection. Base class for other selections.
- * @property-read array[] $orderBy List of arrays describing ordering.
- * @property-read int|null $limit Row limit or null for no limit.
- * @property-read Condition $where Select condition.
- * @property-read Model $model Target of selection.
  */
-abstract class SelectionBase implements Selection {
+abstract class SelectionBase implements Selectable, Selection {
   /**
-   * List of arrays describing ordering.
-   *
-   * Each array is of the format:
-   * <code>
-   * array(
-   *   'column' => ..., // Column name (string)
-   *   'descending' => .... // Whether or not to order in descending order (bool)
-   * )
-   * </code>
    * @var array[]
    */
-  protected $orderBy = array();
+  protected $ordering = array();
 
   /**
    * @var int|null Limit.
@@ -41,45 +29,48 @@ abstract class SelectionBase implements Selection {
   protected $limit = null;
 
   /**
-   * @var Condition Select condition.
+   * @var Expression
    */
-  protected $where = null;
+  protected $predicate = null;
 
   /**
-   * @var Model
+   * @var DataSource
    */
-  protected $model = null;
+  protected $source = null;
 
   /**
    * Construct basic selection.
    * @param ModelBase $model Target of selection.
    */
   public function __construct(DataSource $source) {
-    $this->where = new E();
-    $this->model = $model;
+    $this->predicate = new ExpressionBuilder();
+    $this->source = $source;
   }
 
-  /**
-   * Get value of property.
-   * @param string $property Property name.
-   * @return mixed Value.
-   * @throws InvalidPropertyException If property undefined.
-   */
-  public function __get($property) {
-    if (isset($this->$property)) {
-      return $this->$property;
-    }
-    throw new InvalidPropertyException(tr('Invalid property: %1', $property));
-  }
 
   /**
-   * Check if property is set
-   * @param string $property Property name
-   * @return bool True if set, false otherwise
+   * {@inheritdoc}
    */
-  public function __isset($property) {
-    return isset($this->$property);
+  public function getPredicate() {
+    return $this->predicate;
   }
+
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOrdering() {
+    return $this->ordering;
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getLimit() {
+    return $this->limit;
+  }
+  
 
   /**
    * {@inheritdoc}
@@ -87,15 +78,16 @@ abstract class SelectionBase implements Selection {
   public function __call($method, $args) {
     switch ($method) {
       case 'and':
-        call_user_func_array(array($this->where, 'andWhere'), $args);
+        $this->predicate = call_user_func_array(array($this->predicate, 'andWhere'), $args);
         return $this;
       case 'or':
-        call_user_func_array(array($this->where, 'orWhere'), $args);
+        $this->predicate = call_user_func_array(array($this->predicate, 'orWhere'), $args);
         return $this;
     }
-    if (is_callable(array($this->model, $method))) {
+    // TODO: document this
+    if (is_callable(array($this->source, $method))) {
       array_push($args, $this);
-      return call_user_func_array(array($this->model, $method), $args);
+      return call_user_func_array(array($this->source, $method), $args);
     }
     throw new InvalidMethodException(tr('Invalid method: %1', $method));
   }
@@ -112,17 +104,9 @@ abstract class SelectionBase implements Selection {
   /**
    * {@inheritdoc}
    */
-  public function hasClauses() {
-    return $this->where
-    ->hasClauses();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function where($clause) {
     $args = func_get_args();
-    call_user_func_array(array($this->where, 'where'), $args);
+    $this->predicate = call_user_func_array(array($this->predicate, 'where'), $args);
     return $this;
   }
 
@@ -131,7 +115,7 @@ abstract class SelectionBase implements Selection {
    */
   public function andWhere($clause) {
     $args = func_get_args();
-    call_user_func_array(array($this->where, 'andWhere'), $args);
+    $this->predicate = call_user_func_array(array($this->predicate, 'andWhere'), $args);
     return $this;
   }
 
@@ -140,7 +124,7 @@ abstract class SelectionBase implements Selection {
    */
   public function orWhere($clause) {
     $args = func_get_args();
-    call_user_func_array(array($this->where, 'orWhere'), $args);
+    $this->predicate = call_user_func_array(array($this->predicate, 'orWhere'), $args);
     return $this;
   }
 
@@ -149,9 +133,9 @@ abstract class SelectionBase implements Selection {
    */
   public function orderBy($column) {
     if (!isset($column))
-      $this->orderBy = array();
+      $this->ordering = array();
     else
-      $this->orderBy[] = array('column' => $column, 'descending' => false);
+      $this->ordering[] = array($column, false);
     return $this;
   }
 
@@ -159,7 +143,7 @@ abstract class SelectionBase implements Selection {
    * {@inheritdoc}
    */
   public function orderByDescending($column) {
-    $this->orderBy[] = array('column' => $column, 'descending' => true);
+    $this->ordering[] = array($column, true);
     return $this;
   }
 
@@ -167,8 +151,8 @@ abstract class SelectionBase implements Selection {
    * {@inheritdoc}
    */
   public function reverseOrder() {
-    foreach ($this->orderBy as $key => $orderBy) {
-      $this->orderBy[$key]['descending'] = !$orderBy['descending'];
+    foreach ($this->ordering as $key => $column) {
+      $this->ordering[$key][1] = !$column[1];
     }
     return $this;
   }
@@ -179,10 +163,10 @@ abstract class SelectionBase implements Selection {
    * @return SelectionBuilder Selection.
    */
   public function toSelection() {
-    $selection = new SelectionBuilder($this->model);
-    $selection->where = $this->where;
+    $selection = new SelectionBuilder($this->source);
+    $selection->predicate = $this->predicate;
     $selection->limit = $this->limit;
-    $selection->orderBy = $this->orderBy;
+    $selection->ordering = $this->ordering;
     return $selection;
   }
 }

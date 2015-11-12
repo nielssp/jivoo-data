@@ -6,9 +6,9 @@
 namespace Jivoo\Data\Query;
 
 /**
- * An interface for models and selections.
+ * An interface for updatable models and selections.
  */
-interface Updatable extends Expression {  
+interface Updatable extends Selectable {  
   /**
    * Assign value to field. If $field is an associative array, then multiple
    * fields are assigned. If $field contains an equals sign ('=') then $field
@@ -16,7 +16,7 @@ interface Updatable extends Expression {
    * @param string|array $field Field name or associative array of field names
    * and values
    * @param string $value Value
-   * @return Updatable An update selection.
+   * @return Updatable An updatable selection.
    */
   public function set($field, $value = null);
 

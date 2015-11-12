@@ -8,100 +8,25 @@ namespace Jivoo\Data\Query\Expression;
 use Jivoo\Data\DataType;
 use Jivoo\InvalidMethodException;
 use Jivoo\Data\Query\Expression;
+use Jivoo\Data\Query\Builders\ExpressionBuilder;
 
 /**
- * Expression builder.
+ * Expression utilities.
  */
-class E implements Expression {
-  private $string = '';
+class E {
+  private function __construct() {}
   
-  private $vars = array();
-
   /**
-   * Construct condition. The function {@see where} is an alias.
-   * @param Condition|string $expr Expression.
+   * Construct and expression.
+   * @param Expression|string $expr Expression
    * @param mixed $vars,... Additional values to replace placeholders in
    * $expr with.
+   * @return ExpressionBuilder Expression builder.
    */
-  public function __construct($expr = null) {
-    if (isset($expr) and !empty($expr)) {
-      $args = func_get_args();
-      call_user_func_array(array($this, 'andWhere'), $args);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getString() {
-    return $this->string;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getVars() {
-    return $this->vars;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __call($method, $args) {
-    switch ($method) {
-      case 'and':
-        return call_user_func_array(array($this, 'andWhere'), $args);
-      case 'or':
-        return call_user_func_array(array($this, 'orWhere'), $args);
-    }
-    throw new InvalidMethodException(tr('Invalid method: %1', $method));
-  }
-
-
-  /**
-   * {@inheritdoc}
-   */
-  public function where($expr) {
-    $args = func_get_args();
-    return call_user_func_array(array($this, 'andWhere'), $args);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function andWhere($expr) {
-    if (empty($expr)) {
-      return $this;
-    }
+  public static function e($expr) {
     $vars = func_get_args();
     array_shift($vars);
-    $this->vars = array_merge($this->vars, $vars);
-    if ($this->string != '')
-      $this->string .= ' AND ';
-    $this->string .= $expr;
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function orWhere($expr) {
-    if (empty($expr)) {
-      return $this;
-    }
-    $vars = func_get_args();
-    array_shift($vars);
-    $this->vars = array_merge($this->vars, $vars);
-    if ($this->string != '')
-      $this->string .= ' OR ';
-    $this->string .= $expr;
-    return $this;
-  }
-  
-  public static function e($expression) {
-    $vars = func_get_args();
-    array_shift($vars);
-    return new E($expression, $vars);
+    return new ExpressionBuilder($expr, $vars);
   }
 
   /**

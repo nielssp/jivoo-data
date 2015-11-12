@@ -11,6 +11,7 @@ use Jivoo\Models\Condition\ConditionBuilder;
 use Jivoo\Models\DataType;
 use Jivoo\Models\BasicModel;
 use Jivoo\Models\ModelBase;
+use Jivoo\Data\Query\Readable;
 
 /**
  * A read selection.
@@ -21,7 +22,7 @@ use Jivoo\Models\ModelBase;
  * @property-read array[] $fields List of arrays describing fields.
  * @property-read array[] $additionalFields List of arrays describing fields.
  */
-class ReadSelectionBuilder extends SelectionBase implements ReadSelection {
+class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelection {
   /**
    * @var bool Distinct.
    */
@@ -115,7 +116,7 @@ class ReadSelectionBuilder extends SelectionBase implements ReadSelection {
         'expression' => $expression,
         'alias' => null
       ));
-      return $this->model->readCustom($this, $alias);
+      return $this->source->readCustom($this, $alias);
     }
     $this->fields = array();
     if (is_array($expression)) {
@@ -140,7 +141,7 @@ class ReadSelectionBuilder extends SelectionBase implements ReadSelection {
         'alias' => $alias
       );
     }
-    $result = $this->model->readCustom($this);
+    $result = $this->source->readCustom($this);
     $this->fields = array();
     return $result;
   }
@@ -154,7 +155,7 @@ class ReadSelectionBuilder extends SelectionBase implements ReadSelection {
       'expression' => $expression,
       'type' => $type
     );
-    $this->model->addVirtual($field, $type);
+    $this->source->addVirtual($field, $type);
     return $this;
   }
   
@@ -251,21 +252,21 @@ class ReadSelectionBuilder extends SelectionBase implements ReadSelection {
    * {@inheritdoc}
    */
   public function first() {
-    return $this->model->firstSelection($this);
+    return $this->source->firstSelection($this);
   }
 
   /**
    * {@inheritdoc}
    */
   public function last() {
-    return $this->model->lastSelection($this);
+    return $this->source->lastSelection($this);
   }
 
   /**
    * {@inheritdoc}
    */
   public function count() {
-    return $this->model->countSelection($this);
+    return $this->source->countSelection($this);
   }
   
   /**
@@ -274,7 +275,7 @@ class ReadSelectionBuilder extends SelectionBase implements ReadSelection {
    * @return int Row number.
    */
   public function rowNumber(Record $record) {
-    return $this->model->rowNumberSelection($this, $record);
+    return $this->source->rowNumberSelection($this, $record);
   }
 
   /**
@@ -299,6 +300,6 @@ class ReadSelectionBuilder extends SelectionBase implements ReadSelection {
    * {@inheritdoc}
    */
   function getIterator() {
-    return $this->model->getIterator($this);
+    return $this->source->getIterator($this);
   }
 }

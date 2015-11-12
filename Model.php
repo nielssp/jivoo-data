@@ -5,19 +5,25 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data;
 
-use Jivoo\Data\Query\Selection;
-use Jivoo\Data\Query\UpdateSelection;
-use Jivoo\Data\Query\ReadSelection;
+use Jivoo\Data\Query\Readable;
+use Jivoo\Data\Query\Updatable;
+use Jivoo\Data\Query\Deletable;
 
 /**
- * A CRUD data source.
+ * A selectable data source with a schema.
  */
-interface Model extends Selectable, Updatable, Deletable, DataSource {
+interface Model extends Readable, Updatable, Deletable, DataSource {
   /**
    * Get name of model. 
    * @return string Name.
    */
   public function getName();
+  
+  /**
+   * Get schema for model.
+   * @return Schema Schema.
+   */
+  public function getShema();
   
   /**
    * Create a record.

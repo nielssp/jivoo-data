@@ -5,15 +5,24 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Query\Builders;
 
+use Jivoo\Data\Query\UpdateSelection;
+use Jivoo\Data\Query\Updatable;
+
 /**
  * An update selection.
- * @property-read array $sets An associative array of field names and values.
  */
-class UpdateSelectionBuilder extends BasicSelectionBase implements UpdateSelection {
+class UpdateSelectionBuilder extends SelectionBase implements Updatable, UpdateSelection {
   /**
    * @var array Associative array of field names and values
    */
-  protected $sets = array();
+  protected $data = array();
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getData() {
+    return $data;
+  }
 
   /**
    * {@inheritdoc}
@@ -21,7 +30,7 @@ class UpdateSelectionBuilder extends BasicSelectionBase implements UpdateSelecti
   public function set($field, $value = null) {
     if (is_array($field)) {
       foreach ($field as $f => $val) {
-        $this->set($f, $val);
+        $this->data($f, $val);
       }
     }
     else {
@@ -31,7 +40,7 @@ class UpdateSelectionBuilder extends BasicSelectionBase implements UpdateSelecti
           $value = array_slice($value, 1);
         }
       }
-      $this->sets[$field] = $value;
+      $this->data[$field] = $value;
     }
     return $this;
   }
@@ -40,6 +49,6 @@ class UpdateSelectionBuilder extends BasicSelectionBase implements UpdateSelecti
    * {@inheritdoc}
    */
   public function update() {
-    $this->model->updateSelection($this);
+    $this->source->update($this);
   }
 }

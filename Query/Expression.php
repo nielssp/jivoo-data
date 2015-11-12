@@ -5,6 +5,9 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Query;
 
+use Jivoo\Data\Query\Expression\Quoter;
+use Jivoo\Data\Record;
+
 /**
  * A record expression.
  */
@@ -15,4 +18,11 @@ interface Expression {
    * @return mixed Result of expression.
    */
   public function __invoke(Record $record);
+  
+  /**
+   * Convert expression to a string.
+   * @param Quoter $quoter String quoter.
+   * @return string SQL expression.
+   */
+  public function toString(Quoter $quoter);
 }

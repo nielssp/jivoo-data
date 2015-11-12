@@ -5,14 +5,16 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Query\Builders;
 
+use Jivoo\Data\Query\Deletable;
+
 /**
  * A delete selection.
  */
-class DeleteSelectionBuilder extends SelectionBase {
+class DeleteSelectionBuilder extends SelectionBase implements Deletable {
   /**
    * {@inheritdoc}
    */
   public function delete() {
-    $this->model->deleteSelection($this);
+    $this->source->delete($this);
   }
 }

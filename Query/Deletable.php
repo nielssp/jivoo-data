@@ -3,14 +3,14 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\Data;
+namespace Jivoo\Data\Query;
 
 /**
- * An interface for models and selections.
+ * An interface for deletable models and selections.
  */
-interface Deletable extends Expression {
+interface Deletable extends Selectable {
   /**
-   * Delete records in selection.
+   * Delete selected records.
    * @return int Number of deleted records.
    */
   public function delete();
