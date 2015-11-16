@@ -3,12 +3,13 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\Data\Query\Expression;
+namespace Jivoo\Data\Query;
 
 use Jivoo\Data\DataType;
-use Jivoo\InvalidMethodException;
 use Jivoo\Data\Query\Expression;
 use Jivoo\Data\Query\Builders\ExpressionBuilder;
+use Jivoo\Data\Model;
+use Jivoo\Data\Query\Expression\Quoter;
 
 /**
  * Expression utilities.
@@ -30,7 +31,7 @@ class E {
   }
 
   /**
-   * Escape string for use with the SQL LIKE operator.
+   * Escape string for use with the LIKE operator.
    * @param string $string String.
    * @return string Escaped string.
    */
@@ -53,6 +54,7 @@ class E {
    * [anyFieldName] // A column/field name
    * "any string" // A string
    * ? // Any scalar value.
+   * %e %expr %expression // A subexpression (instance of {@see Expression})
    * %m %model // A table/model object or name
    * %c %column %field // A column/field name
    * %_ // A placeholder placeholder, can also be a type, e.g. where(..., 'id = %_', $type, $value)
@@ -96,28 +98,34 @@ class E {
       $value = $vars[$i];
       $i++;
       $type = null;
-      if (isset($matches[3]) and $matches[3] == '_') {
-        if (!is_string($value)) {
-          assume($value instanceof DataType);
-          $value = $value->placeholder;
+      if (isset($matches[3])) {
+        if ($matches[3] == '_') {
+          if (!is_string($value)) {
+            assume($value instanceof DataType);
+            $value = $value->placeholder;
+          }
+          $matches[3] = ltrim($value, '%');
+          $value = $vars[$i];
+          $i++;
         }
-        $matches[3] = ltrim($value, '%');
-        $value = $vars[$i];
-        $i++;
-      }
-      if (isset($matches[3]) and ($matches[3] == 'm' or $matches[3] == 'model')) {
-        if (!is_string($value)) {
-          assume($value instanceof BasicModel);
-          $value = $value->getName();
+        if ($matches[3] == 'e' or $matches[3] == 'expr' or $matches[3] == 'expression') {
+          assume($value instanceof Expression);
+          return '(' . $value->toString($quoter) . ')';
         }
-        return $quoter->quoteModel($value);
+        if ($matches[3] == 'm' or $matches[3] == 'model') {
+          if (!is_string($value)) {
+            assume($value instanceof Model);
+            $value = $value->getName();
+          }
+          return $quoter->quoteModel($value);
+        }
+        if ($matches[3] == 'c' or $matches[3] == 'column' or $matches[3] == 'field') {
+          assume(is_string($value));
+          return $quoter->quoteField($value);
+        }
+        if ($matches[3] != '()')
+          $type = DataType::fromPlaceholder($matches[3]);
       }
-      if (isset($matches[3]) and ($matches[3] == 'c' or $matches[3] == 'column' or $matches[3] == 'field')) {
-        assume(is_string($value));
-        return $quoter->quoteField($value);
-      }
-      if (isset($matches[3]) and $matches[3] != '()')
-        $type = DataType::fromPlaceholder($matches[3]);
       if (!isset($type))
         $type = DataType::detectType($value);
       if (isset($matches[4]) or (isset($matches[3]) and $matches[3] == '()')) {
@@ -128,26 +136,5 @@ class E {
       }
       return $quoter->quoteLiteral($type, $value);
     }, $format);
-  }
-  
-  public function toString(Quoter $quoter) {
-    $sqlString = '';
-    foreach ($this->clauses as $clause) {
-      if ($sqlString != '') {
-        $sqlString .= ' ' . $clause[0] . ' ';
-      }
-      if ($clause['clause'] instanceof Expression) {
-        if ($clause['clause']->hasClauses()) {
-          if ($clause['clause'] instanceof NotCondition) {
-            $sqlString .= 'NOT ';
-          }
-          $sqlString .= '(' . $clause[1]->toString($quoter) . ')';
-        }
-      }
-      else {
-        $sqlString .= self::interpolate($clause[1], $clause[2], $quoter);
-      }
-    }
-    return $sqlString;
   }
 }
