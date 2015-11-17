@@ -48,6 +48,11 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
   protected $groupBy = null;
   
   /**
+   * @var Predicate
+   */
+  private $groupPredicate = null;
+  
+  /**
    * @var int Offset
    */
   protected $offset = 0;
@@ -61,7 +66,7 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
    *   'source' => ..., // Data source to join with ({@see DataSource})
    *   'type' => ..., // Type of join: 'INNER', 'RIGHT' or 'LEFT'
    *   'alias' => ..., // Alias for other data source (string|null)
-   *   'condition' => ... // Join condition ({@see Condition})
+   *   'predicate' => ... // Join predicate ({@see Expression})
    * );
    * </code>
    * @var array[]
@@ -98,6 +103,55 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
    * @var array[]
    */
   protected $additionalFields = array();
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function isDistinct() {
+    return $this->distinct;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAlias() {
+    return $this->alias;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getGrouping() {
+    return $this->groupBy;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getGroupPredicate() {
+    return $this->groupPredicate;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOffset() {
+    return $this->offset;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getJoins() {
+    return $this->joins;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getProjection() {
+    return $this->fields;
+  }
 
   /**
    * {@inheritdoc}
@@ -182,34 +236,30 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
   /**
    * {@inheritdoc}
    */
-  public function groupBy($columns, $condition = null) {
+  public function groupBy($columns, $predicate = null) {
     if (!is_array($columns)) {
       $columns = array($columns);
     }
-    if (!($condition instanceof ConditionBuilder)) {
-      $condition = new ConditionBuilder($condition);
+    if (!($predicate instanceof Predicate)) {
+      $predicate = new ExpressionBuilder($predicate);
     }
-//     if (isset($this->groupBy)) {
-//       $columns = array_merge($this->groupBy['columns'], $columns);
-//       if ($this->groupBy['condition']->hasClauses())
-//         $condition = where($this->groupBy['condition'])->and($condition);
-//     }
-    $this->groupBy = array('columns' => $columns, 'condition' => $condition,);
+    $this->groupBy = $columns;
+    $this->groupPredicate = $predicate;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function innerJoin(Model $dataSource, $condition = null, $alias = null) {
-    if (!($condition instanceof ConditionBuilder)) {
-      $condition = new ConditionBuilder($condition);
+  public function innerJoin(Model $dataSource, $predicate = null, $alias = null) {
+    if (!($predicate instanceof Predicate)) {
+      $predicate = new ExpressionBuilder($predicate);
     }
     $this->joins[] = array(
       'source' => $dataSource,
       'type' => 'INNER',
       'alias' => $alias,
-      'condition' => $condition
+      'predicate' => $predicate
     );
     return $this;
   }
@@ -217,12 +267,12 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
   /**
    * {@inheritdoc}
    */
-  public function leftJoin(Model $dataSource, $condition, $alias = null) {
-    if (!($condition instanceof ConditionBuilder)) {
-      $condition = new ConditionBuilder($condition);
+  public function leftJoin(Model $dataSource, $predicate, $alias = null) {
+    if (!($condition instanceof Predicate)) {
+      $predicate = new ExpressionBuilder($predicate);
     }
     $this->joins[] = array('source' => $dataSource, 'type' => 'LEFT',
-      'alias' => $alias, 'condition' => $condition
+      'alias' => $alias, 'condition' => $predicate
     );
     return $this;
   }
@@ -230,12 +280,12 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
   /**
    * {@inheritdoc}
    */
-  public function rightJoin(Model $dataSource, $condition, $alias = null) {
-    if (!($condition instanceof ConditionBuilder)) {
-      $condition = new ConditionBuilder($condition);
+  public function rightJoin(Model $dataSource, $predicate, $alias = null) {
+    if (!($condition instanceof Predicate)) {
+      $predicate = new ExpressionBuilder($predicate);
     }
     $this->joins[] = array('source' => $dataSource, 'type' => 'RIGHT',
-      'alias' => $alias, 'condition' => $condition
+      'alias' => $alias, 'condition' => $predicate
     );
     return $this;
   }
