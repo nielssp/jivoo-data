@@ -18,7 +18,7 @@ use Jivoo\InvalidPropertyException;
  * @property-read int $size Size: BIG, SMALL, TINY or 0 (integers only).
  * @property-read bool $signed Signed (integers only).
  * @property-read bool $unsigned Opposite of signed (integers only).
- * @property-read bool $autoIncrement Auto increment (integers only).
+ * @property-read bool $serial Serial: automatically increment (integers only).
  * @property-read string $placeholder Placeholder of data type.
  */
 class DataType {
@@ -45,8 +45,8 @@ class DataType {
 
   /** @var int Flag: Unsigned (integers only). */
   const UNSIGNED = 0x02;
-  /** @var int Flag: Auto increment (integers only). */
-  const AUTO_INCREMENT = 0x04;
+  /** @var int Flag: Serial: automatically increment (integers only). */
+  const SERIAL = 0x04;
   /** @var int Flag: Tiny integer (8 bit) (integers only). */
   const TINY = 0x10;
   /** @var int Flag: Small integer (16 bit) (integers only). */
@@ -62,8 +62,8 @@ class DataType {
   private $length = null;
   /** @var bool Signed. */
   private $signed = true;
-  /** @var bool Auto increment. */
-  private $autoIncrement = false;
+  /** @var bool Serial. */
+  private $serial = false;
   /** @var mixed Default value. */
   private $default = null;
   /** @var int Integer size. */
@@ -87,7 +87,7 @@ class DataType {
     $this->null = $null;
     if ($type == self::INTEGER) {
       $this->signed = ($flags & self::UNSIGNED) == 0;
-      $this->autoIncrement = ($flags & self::AUTO_INCREMENT) != 0;
+      $this->serial = ($flags & self::SERIAL) != 0;
       $this->size = $flags & 0x30;
     }
   }
@@ -128,7 +128,7 @@ class DataType {
       switch ($property) {
         case 'size':
         case 'signed':
-        case 'autoIncrement':
+        case 'serial':
           return $this->$property;
         case 'unsigned':
           return !$this->signed;
@@ -154,8 +154,8 @@ class DataType {
     switch ($this->type) {
       case self::INTEGER:
         $s = '';
-        if ($this->autoIncrement)
-          $s .= 'Auto ';
+        if ($this->serial)
+          $s .= 'Serial ';
         if ($this->unsigned)
           $s .= 'Unsigned ';
         else
@@ -239,12 +239,12 @@ class DataType {
    */
   public function createValidationRules(ValidatorField $validator) {
     $validator = $validator->ruleDataType;
-    if (!$this->null and $this->type != self::INTEGER and !$this->autoIncrement)
+    if (!$this->null and $this->type != self::INTEGER and !$this->serial)
       $validator->null = false;
     switch ($this->type) {
       case self::INTEGER:
         $validator->integer = true;
-        if (!$this->null and !$this->autoIncrement)
+        if (!$this->null and !$this->serial)
           $validator->presence = true;
         if ($this->signed) {
           switch ($this->size) {
@@ -425,7 +425,7 @@ class DataType {
   
   /**
    * Create integer type.
-   * @param int $flags Combination of: UNSIGNED, AUTO_INCREMENT, BIG, SMALL, TINY.
+   * @param int $flags Combination of: UNSIGNED, SERIAL, BIG, SMALL, TINY.
    * @param bool $null Whether or not type is nullable.
    * @param int|null $default Default value.
    * @return DataType Type object.

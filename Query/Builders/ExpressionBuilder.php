@@ -42,24 +42,7 @@ class ExpressionBuilder implements Expression, Boolean {
   }
   
   public function toString(Quoter $quoter) {
-    $sqlString = '';
-    foreach ($this->clauses as $clause) {
-      if ($sqlString != '') {
-        $sqlString .= ' ' . $clause[0] . ' ';
-      }
-      if ($clause['clause'] instanceof Expression) {
-        if ($clause['clause']->hasClauses()) {
-          if ($clause['clause'] instanceof NotCondition) {
-            $sqlString .= 'NOT ';
-          }
-          $sqlString .= '(' . $clause[1]->toString($quoter) . ')';
-        }
-      }
-      else {
-        $sqlString .= self::interpolate($clause[1], $clause[2], $quoter);
-      }
-    }
-    return $sqlString;
+    return self::interpolate($this->expr, $this->vars, $quoter);
   }
 
   /**
