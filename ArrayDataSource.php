@@ -36,17 +36,25 @@ abstract class ArrayDataSource implements DataSource {
    */
   public function read(ReadSelection $selection) {
     $data = $this->getData();
-    $predicate = $selection->getPredicate();
     if (count($selection->getJoins()) > 0)
       throw new \Exception('unsupported operation');
-    // TODO: implement
-    // JOIN
-    // WHERE
-    // GROUP BY
-    // HAVING
-    // ORDER BY
-    // LIMIT
-    // SELECT/PROJECTION
+    $predicate = $selection->getPredicate();
+    $data = new PredicateArray($data, $predicate);
+    $grouping = $selection->getGrouping();
+    if (count($grouping)) {
+      $data = self::sortAll($data, $grouping);
+      $predicate = $selection->getGroupPredicate();
+      if (isset($predicate))
+        $data = new PredicateArray($data, $predicate);
+    }
+    $data = self::sortAll($data, $selection->getOrdering());
+    $limit = $selection->getLimit();
+    $offset = $selection->getOffset();
+    if (isset($limit)) {
+      $data = array_slice($data, $offset, $limit);
+    }
+    // TODO: implement projection
+    return $data;
   }
 
   /**
