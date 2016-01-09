@@ -8,7 +8,24 @@ namespace Jivoo\Data\Query\Expression;
 use Jivoo\Core\Parse\ParseInput;
 
 /**
- * A parser for expressions.
+ * A parser for simple SQL-like comparison expressions.
+ * 
+ * <code>
+ * expression ::= ["not"] comparison
+ * comparison ::= column operator atomic
+ *              | column "is" "null"
+ * operator   ::= "like" | "in" | "!=" | "<>" | ">=" | "<=" | "!<" | "!>" | "=" | "<" | ">"
+ * column     ::= [table "."] (field | name)
+ * table      ::= model | name
+ * field      ::= "[" name "]"
+ * model      ::= "{" name "}"
+ * atomic     ::= number
+ *              | "true"
+ *              | "false"
+ *              | "null"
+ *              | string
+ *              | placeholder
+ * </code>
  */
 class ExpressionParser {
 
@@ -19,10 +36,33 @@ class ExpressionParser {
    */
   public static function scan($expression) {
     $lexer = new RegexLexer(true, 'i');
-    $lexer->keyword = 'and|not|or|like';
+    $lexer->not = 'not';
+    $lexer->keyword = 'true|false|null';
+    $lexer->is = 'is';
+    $lexer->operator = 'like|in|!=|<>|>=|<=|!<|!>|=|<|>';
+    $lexer->dot = '\.';
     $lexer->name = '[a-z][a-z0-9]+';
-    $lexer->float = '[0-9]+.[0-9]+';
-    $lexer->integer = '[0-9]+';
+    $lexer->model = '\{(.+?)\}';
+    $lexer->field = '\[(.+?)\]';
+    $lexer->number = '-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?';
+    $lexer->string = '"((?:[^"\\\\]|\\\\.)*)"';
+    $lexer->placeholder = '((\?)|%([a-z_\\\\]+))(\(\))?';
+    
+    $lexer->map('model', function($value, $matches) {
+      return $matches[1];
+    });
+
+    $lexer->map('field', function($value, $matches) {
+      return $matches[1];
+    });
+    
+    $lexer->map('number', function($value) {
+      return intval($value);
+    });
+    
+    $lexer->map('string', function($value, $matches) {
+      return stripslashes($matches[1]);
+    });
     
     return new ParseInput($lexer($expression));
   }
@@ -32,6 +72,7 @@ class ExpressionParser {
    * @return ast
    */
   public static function parseExpression(ParseInput $input) {
+    self::acceptToken($input, 'not');
   }
   
   public static function parsePrefix(ParseInput $input) {
