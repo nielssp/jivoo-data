@@ -36,9 +36,11 @@ class ExpressionParser {
    */
   public static function scan($expression) {
     $lexer = new RegexLexer(true, 'i');
-    $lexer->not = 'not';
-    $lexer->keyword = 'true|false|null';
     $lexer->is = 'is';
+    $lexer->not = 'not';
+    $lexer->true = 'true';
+    $lexer->false = 'false';
+    $lexer->null = 'null';
     $lexer->operator = 'like|in|!=|<>|>=|<=|!<|!>|=|<|>';
     $lexer->dot = '\.';
     $lexer->name = '[a-z][a-z0-9]+';
@@ -72,10 +74,29 @@ class ExpressionParser {
    * @return ast
    */
   public static function parseExpression(ParseInput $input) {
-    self::acceptToken($input, 'not');
+    if ($input->acceptToken('not')) {
+      // TODO
+    }
+    $expr = self::parseComparison($input);
+    return $expr;
   }
   
-  public static function parsePrefix(ParseInput $input) {
+  public static function parseComparison(ParseInput $input) {
+    $column = self::parseColumn($input);
+    if ($input->acceptToken('is')) {
+      $input->expectToken('null');
+      return; // TODO
+    }
+    $op = $input->expectToken('operator');
+    $right = $this->parseAtomic($input);
+    return; // TODO
+  }
+  
+  public static function parseAtomic(ParseInput $input) {
+    
+  }
+  
+  public static function parseColumn(ParseInput $input) {
   }
 }
 
