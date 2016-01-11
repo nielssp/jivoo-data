@@ -6,26 +6,33 @@
 namespace Jivoo\Data\Query\Expression;
 
 use Jivoo\Data\Query\Expression;
+use Jivoo\Data\Record;
 
 /**
  * An infix operator.
  */
-interface Infix extends Expression {
+class Infix extends Expression {
+  public $left;
+  public $operator;
+  public $right;
+  
+  public function __construct(Expression $left, $operator, Expression $right = null) {
+    $this->left = $left;
+    $this->operator = $operator;
+    $this->right = $right;
+  }
+  
   /**
-   * Get the operator.
-   * @return string Operator.
+   * {@inheritDoc}
    */
-  public function getOperator();
+  public function __invoke(Record $record) {
+    
+  }
 
   /**
-   * Left operand.
-   * @return Expression
+   * {@inheritDoc}
    */
-  public function getLeft();
-
-  /**
-   * Right operand.
-   * @return Expression
-   */
-  public function getRight();
+  public function toString(Quoter $quoter) {
+    
+  }
 }

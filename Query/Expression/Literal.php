@@ -6,20 +6,32 @@
 namespace Jivoo\Data\Query\Expression;
 
 use Jivoo\Data\Query\Expression;
+use Jivoo\Data\DataType;
+use Jivoo\Data\Record;
 
 /**
  * A literal.
  */
-interface Literal extends Expression {
+class Literal extends Expression {
+  public $type;
+  public $value;
+  
+  public function __construct(DataType $type, $value) {
+    $this->type = $type;
+    $this->value = $value;
+  }
+  
   /**
-   * Type of literal.
-   * @return DataType
+   * {@inheritDoc}
    */
-  public function getType();
+  public function __invoke(Record $record) {
+    
+  }
 
   /**
-   * Value.
-   * @return mixed
+   * {@inheritDoc}
    */
-  public function getValue();
+  public function toString(Quoter $quoter) {
+    
+  }
 }

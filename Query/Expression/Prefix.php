@@ -6,20 +6,31 @@
 namespace Jivoo\Data\Query\Expression;
 
 use Jivoo\Data\Query\Expression;
+use Jivoo\Data\Record;
 
 /**
  * A prefix operator.
  */
-interface Prefix extends Expression {
+class Prefix extends Expression {
+  public $operator;
+  public $operand;
+  
+  public function __construct($operator, Expression $operand) {
+    $this->operator = $operator;
+    $this->operand = $operand;
+  }
+  
   /**
-   * Get the operator.
-   * @return string Operator.
+   * {@inheritDoc}
    */
-  public function getOperator();
+  public function __invoke(Record $record) {
+    
+  }
 
   /**
-   * Operand.
-   * @return Expression
+   * {@inheritDoc}
    */
-  public function getOperand();
+  public function toString(Quoter $quoter) {
+    
+  }
 }

@@ -6,6 +6,7 @@
 namespace Jivoo\Data\Query\Expression;
 
 use Jivoo\Core\Parse\ParseInput;
+use Jivoo\Data\DataType;
 
 /**
  * A parser for simple SQL-like comparison expressions.
@@ -22,9 +23,9 @@ use Jivoo\Core\Parse\ParseInput;
  * atomic     ::= number
  *              | "true"
  *              | "false"
- *              | "null"
  *              | string
  *              | placeholder
+ *              | column
  * </code>
  */
 class ExpressionParser {
@@ -59,7 +60,7 @@ class ExpressionParser {
     });
     
     $lexer->map('number', function($value) {
-      return intval($value);
+      return floatval($value);
     });
     
     $lexer->map('string', function($value, $matches) {
@@ -74,29 +75,46 @@ class ExpressionParser {
    * @return ast
    */
   public static function parseExpression(ParseInput $input) {
-    if ($input->acceptToken('not')) {
-      // TODO
-    }
+    $not = $input->acceptToken('not');
     $expr = self::parseComparison($input);
+    if ($not)
+      $expr = new Prefix('not', $expr);
     return $expr;
   }
   
   public static function parseComparison(ParseInput $input) {
-    $column = self::parseColumn($input);
+    $left = $this->parseAtomic($input);
     if ($input->acceptToken('is')) {
       $input->expectToken('null');
-      return; // TODO
+      return new Infix($left, 'is', null);
     }
     $op = $input->expectToken('operator');
     $right = $this->parseAtomic($input);
-    return; // TODO
+    return new Infix($left, $op[1], $right);
   }
   
   public static function parseAtomic(ParseInput $input) {
-    
+    if ($input->acceptToken('number', $token)) {
+      return new Literal(DataType::float(), $token[1]);
+    }
+    if ($input->acceptToken('true')) {
+      return new Literal(DataType::boolean(), true);
+    }
+    if ($input->acceptToken('false')) {
+      return new Literal(DataType::boolean(), false);
+    }
+    if ($input->acceptToken('string', $token)) {
+      return new Literal(DataType::text(), $token[1]);
+    }
   }
   
   public static function parseColumn(ParseInput $input) {
+    if ($input->acceptToken('model', $mToken)) {
+      $input->expectToken('dot');
+      if (!$input->acceptToken($type, $fToken))
+        $fToken = $input->expectToken('name');
+      
+    }
   }
 }
 
