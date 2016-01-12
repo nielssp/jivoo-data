@@ -10,6 +10,8 @@ use Jivoo\Data\Query\Expression;
 use Jivoo\Data\Query\Boolean;
 use Jivoo\Data\Record;
 use Jivoo\Data\Query\Expression\Quoter;
+use Jivoo\Data\Query\Expression\ExpressionParser;
+use Jivoo\Core\Parse\ParseInput;
 
 /**
  * Expression builder.
@@ -36,7 +38,8 @@ class ExpressionBuilder implements Expression, Boolean {
   
   public function __invoke(Record $record) {
     if (!isset($this->ast)) {
-      // TODO: parse and create AST
+      $tokens = ExpressionParser::lex($this->expr, $this->vars);
+      $this->ast = ExpressionParser::parseExpression($tokens);
     }
     return $this->ast->__invoke($record);
   }

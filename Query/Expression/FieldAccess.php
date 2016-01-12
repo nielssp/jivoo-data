@@ -6,34 +6,35 @@
 namespace Jivoo\Data\Query\Expression;
 
 use Jivoo\Data\Query\Expression;
+use Jivoo\Data\DataType;
 use Jivoo\Data\Record;
 
 /**
- * A prefix operator.
+ * A literal.
  */
-class Prefix implements Expression {
-  public $operator;
-  public $operand;
+class FieldAccess implements Expression {
+  public $field;
+  public $model;
   
-  public function __construct($operator, Expression $operand) {
-    $this->operator = $operator;
-    $this->operand = $operand;
+  public function __construct($field, $model = null) {
+    $this->field = $field;
+    $this->model = $model;
   }
   
   /**
    * {@inheritDoc}
    */
   public function __invoke(Record $record) {
-    if ($this->operator == 'not') {
-      return !$this->operand->__invoke($record);
-    }
-    trigger_error(E_USER_ERROR, 'undefined operator: ' . $this->operator);
+    $field = $this->field;
+    return $record->$field;
   }
 
   /**
    * {@inheritDoc}
    */
   public function toString(Quoter $quoter) {
-    return $this->operator . ' ' . $this->operand->toString($quoter);
+    if (isset($this->model))
+      return $quoter->quoteModel($this->model) . '.' . $quoter->quoteField($this->field);
+    return $quoter->quoteField($this->field);
   }
 }

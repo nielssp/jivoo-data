@@ -11,7 +11,7 @@ use Jivoo\Data\Record;
 /**
  * An infix operator.
  */
-class Infix extends Expression {
+class Infix implements Expression {
   public $left;
   public $operator;
   public $right;
@@ -26,13 +26,40 @@ class Infix extends Expression {
    * {@inheritDoc}
    */
   public function __invoke(Record $record) {
-    
+    $left = $this->left->__invoke($record);
+    $right = $this->right->__invoke($record);
+    switch ($this->operator) {
+      //"like" | "in" | "!=" | "<>" | ">=" | "<=" | "!<" | "!>" | "=" | "<" | ">"
+      case 'like':
+        return $left == $right; // TODO: should be case insensitive?
+      case 'in':
+        return in_array($left, $right);
+      case '!=':
+        return $left != $right;
+      case '<>':
+        return $left != $right; // ??
+      case '>=':
+        return $left >= $right;
+      case '<=':
+        return $left <= $right;
+      case '!<':
+        return !($left < $right);
+      case '!>':
+        return !($left > $right);
+      case '=':
+        return $left == $right;
+      case '<':
+        return $left < $right;
+      case '>':
+        return $left > $right;
+    }
+    trigger_error(E_USER_ERROR, 'undefined operator: ' . $this->operator);
   }
 
   /**
    * {@inheritDoc}
    */
   public function toString(Quoter $quoter) {
-    
+    return $this->left->toString($quoter) . ' ' . $this->operator . ' ' . $this->right->toString($quoter);
   }
 }

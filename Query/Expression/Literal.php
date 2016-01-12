@@ -12,7 +12,7 @@ use Jivoo\Data\Record;
 /**
  * A literal.
  */
-class Literal extends Expression {
+class Literal implements Expression {
   public $type;
   public $value;
   
@@ -25,13 +25,13 @@ class Literal extends Expression {
    * {@inheritDoc}
    */
   public function __invoke(Record $record) {
-    
+    return $this->value;
   }
 
   /**
    * {@inheritDoc}
    */
   public function toString(Quoter $quoter) {
-    
+    return $quoter->quoteLiteral($this->type, $this->value);
   }
 }

@@ -6,34 +6,35 @@
 namespace Jivoo\Data\Query\Expression;
 
 use Jivoo\Data\Query\Expression;
+use Jivoo\Data\DataType;
 use Jivoo\Data\Record;
 
 /**
- * A prefix operator.
+ * A literal.
  */
-class Prefix implements Expression {
-  public $operator;
-  public $operand;
+class ArrayLiteral implements Expression {
+  public $type;
+  public $values;
   
-  public function __construct($operator, Expression $operand) {
-    $this->operator = $operator;
-    $this->operand = $operand;
+  public function __construct(DataType $type, $values) {
+    $this->type = $type;
+    $this->values = $values;
   }
   
   /**
    * {@inheritDoc}
    */
   public function __invoke(Record $record) {
-    if ($this->operator == 'not') {
-      return !$this->operand->__invoke($record);
-    }
-    trigger_error(E_USER_ERROR, 'undefined operator: ' . $this->operator);
+    return $this->values;
   }
 
   /**
    * {@inheritDoc}
    */
   public function toString(Quoter $quoter) {
-    return $this->operator . ' ' . $this->operand->toString($quoter);
+    $values = $this->values;
+    foreach ($values as $key => $v)
+      $values[$key] = $quoter->quoteLiteral($this->type, $v);
+    return '(' . implode(', ', $values) . ')';
   }
 }
