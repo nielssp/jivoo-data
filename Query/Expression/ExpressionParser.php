@@ -8,6 +8,7 @@ namespace Jivoo\Data\Query\Expression;
 use Jivoo\Core\Parse\ParseInput;
 use Jivoo\Data\DataType;
 use Jivoo\Core\Parse\RegexLexer;
+use Jivoo\Data\Query\Expression;
 
 /**
  * A parser for simple SQL-like comparison expressions.
@@ -46,7 +47,7 @@ class ExpressionParser {
     $lexer->null = 'null';
     $lexer->operator = 'like|in|!=|<>|>=|<=|!<|!>|=|<|>';
     $lexer->dot = '\.';
-    $lexer->name = '[a-z][a-z0-9]+';
+    $lexer->name = '[a-z][a-z0-9]*';
     $lexer->model = '\{(.+?)\}';
     $lexer->modelPlaceholder = '%(model|m)';
     $lexer->field = '\[(.+?)\]';
@@ -129,12 +130,13 @@ class ExpressionParser {
         if ($matches[3] != '()')
           $type = DataType::fromPlaceholder($matches[3]);
       }
-      if (!isset($type))
+      if (!isset($type)) {
         $type = DataType::detectType($value);
+      }
       if (isset($matches[4]) or (isset($matches[3]) and $matches[3] == '()')) {
         assume(is_array($value));
         foreach ($value as $key => $v)
-          $value[$key] = $quoter->quoteLiteral($type, $v);
+          $value[$key] = $v;
         return new ArrayLiteral($type, $value);
       }
       return new Literal($type, $value);
@@ -157,13 +159,13 @@ class ExpressionParser {
   }
   
   public static function parseComparison(ParseInput $input) {
-    $left = $this->parseAtomic($input);
+    $left = self::parseAtomic($input);
     if ($input->acceptToken('is')) {
       $input->expectToken('null');
       return new Infix($left, 'is', null);
     }
     $op = $input->expectToken('operator');
-    $right = $this->parseAtomic($input);
+    $right = self::parseAtomic($input);
     return new Infix($left, $op[1], $right);
   }
   
@@ -181,14 +183,14 @@ class ExpressionParser {
         $fToken = $input->expectToken('name');
       return new FieldAccess($fToken[1], $mToken[1]);
     }
-    if ($input->acceptToken('name', $first) or $input->acceptToken('field', $first)) {
-      if ($input->acceptToken('dot')) {
-        if (!$input->acceptToken('field', $fToken))
-          $fToken = $input->expectToken('name');
-        return new FieldAccess($fToken[1], $first[1]);
-      }
-      return new FieldAccess($first[1]);
+    if (!$input->acceptToken('field', $first))
+      $first = $input->expectToken('name');
+    if ($input->acceptToken('dot')) {
+      if (!$input->acceptToken('field', $fToken))
+        $fToken = $input->expectToken('name');
+      return new FieldAccess($fToken[1], $first[1]);
     }
+    return new FieldAccess($first[1]);
   }
 }
 
