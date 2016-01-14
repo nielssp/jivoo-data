@@ -45,7 +45,7 @@ class ExpressionParser {
     $lexer->not = 'not';
     $lexer->bool = 'true|false';
     $lexer->null = 'null';
-    $lexer->operator = 'like|in|!=|<>|>=|<=|!<|!>|=|<|>';
+    $lexer->operator = 'like|in|!=|<>|>=|<=|!<|!>|=|<|>|and|or';
     $lexer->dot = '\.';
     $lexer->name = '[a-z][a-z0-9]*';
     $lexer->model = '\{(.+?)\}';

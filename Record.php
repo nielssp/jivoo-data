@@ -31,6 +31,15 @@ interface Record extends \ArrayAccess {
    */
   public function getData();
 
+  /**
+   * Add data to record.
+   * @param array $data Associative array of field names and values.
+   * @param string[]|null $allowedFields List of allowed fields (null for all
+   * fields allowed), fields that are not allowed (or not in the model) will be
+   * ignored.
+   */
+  public function addData($data, $allowedFields = null);
+
   /** 
    * Get associated model.
    * @return BasicModel Associated model.
@@ -71,18 +80,6 @@ interface Record extends \ArrayAccess {
    * @throws \Jivoo\InvalidPropertyException If the field does not exist.
    */
   public function set($field, $value);
-
-  /** @return Model Associated model */
-//   public function getModel();
-
-  /**
-   * Add data to record.
-   * @param array $data Associative array of field names and values.
-   * @param string[]|null $allowedFields List of allowed fields (null for all
-   * fields allowed), fields that are not allowed (or not in the model) will be
-   * ignored.
-   */
-  public function addData($data, $allowedFields = null);
 
   /**
    * Get virtual data.

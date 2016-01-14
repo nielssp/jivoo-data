@@ -52,6 +52,10 @@ class Infix implements Expression {
         return $left < $right;
       case '>':
         return $left > $right;
+      case 'and':
+        return $left and $right;
+      case 'or':
+        return $left or $right;
     }
     trigger_error(E_USER_ERROR, 'undefined operator: ' . $this->operator);
   }
