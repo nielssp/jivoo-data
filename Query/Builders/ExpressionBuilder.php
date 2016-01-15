@@ -35,7 +35,10 @@ class ExpressionBuilder implements Expression, Boolean {
       $this->vars = $vars;
     }
   }
-  
+
+  /**
+   * {@inheritdoc}
+   */
   public function __invoke(Record $record) {
     if (!isset($this->ast)) {
       $tokens = ExpressionParser::lex($this->expr, $this->vars);
@@ -43,7 +46,10 @@ class ExpressionBuilder implements Expression, Boolean {
     }
     return $this->ast->__invoke($record);
   }
-  
+
+  /**
+   * {@inheritdoc}
+   */
   public function toString(Quoter $quoter) {
     return self::interpolate($this->expr, $this->vars, $quoter);
   }
