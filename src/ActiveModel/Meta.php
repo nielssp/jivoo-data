@@ -73,8 +73,7 @@ class Meta implements Record {
   /**
    * {@inheritdoc}
    */
-  public function addData($data, $allowedFields = null) {
-    assume(is_array($data));
+  public function addData(array $data, $allowedFields = null) {
     if (is_array($allowedFields)) {
       $allowedFields = array_flip($allowedFields);
       $data = array_intersect_key($data, $allowedFields);

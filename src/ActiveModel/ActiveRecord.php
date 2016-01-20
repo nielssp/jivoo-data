@@ -10,6 +10,7 @@ use Jivoo\Models\ActionRecord;
 use Jivoo\Routing\Linkable;
 use Jivoo\InvalidMethodException;
 use Jivoo\InvalidPropertyException;
+use Jivoo\Assume;
 
 /**
  * An active record, see also {@see ActiveModel}.
@@ -150,8 +151,7 @@ class ActiveRecord implements Record, ActionRecord, Linkable {
   /**
    * {@inheritdoc}
    */
-  public function addData($data, $allowedFields = null) {
-    assume(is_array($data));
+  public function addData(array $data, $allowedFields = null) {
     if (!isset($allowedFields))
       $allowedFields = $this->model->getFields();
     if (is_array($allowedFields)) {

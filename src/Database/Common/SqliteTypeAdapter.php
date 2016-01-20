@@ -8,7 +8,7 @@ namespace Jivoo\Data\Database\Common;
 use Jivoo\Data\Database\MigrationTypeAdapter;
 use Jivoo\Data\Database\SchemaBuilder;
 use Jivoo\Models\DataType;
-use Jivoo\Core\Utilities;
+use Jivoo\Utilities;
 use Jivoo\Models\Condition\ConditionBuilder;
 use Jivoo\Data\Database\TypeException;
 

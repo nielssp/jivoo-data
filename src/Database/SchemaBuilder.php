@@ -7,7 +7,7 @@ namespace Jivoo\Data\Database;
 
 use Jivoo\Models\Schema;
 use Jivoo\Models\DataType;
-use Jivoo\Core\Utilities;
+use Jivoo\Utilities;
 use Jivoo\Models\Validation\ValidatorBuilder;
 use Jivoo\InvalidPropertyException;
 

@@ -10,6 +10,7 @@ use Jivoo\Data\Query\Expression;
 use Jivoo\Data\Query\Builders\ExpressionBuilder;
 use Jivoo\Data\Model;
 use Jivoo\Data\Query\Expression\Quoter;
+use Jivoo\Assume;
 
 /**
  * Expression utilities.
@@ -78,7 +79,7 @@ class E {
   public static function interpolate($format, $vars, Quoter $quoter) {
     if ($format instanceof self)
       return $format->toString($quoter);
-    assume(is_string($format));
+    Assume::isString($format);
     $boolean = DataType::boolean();
     $true = $quoter->quoteLiteral($boolean, true);
     $false = $quoter->quoteLiteral($boolean, false);
@@ -101,7 +102,7 @@ class E {
       if (isset($matches[3])) {
         if ($matches[3] == '_') {
           if (!is_string($value)) {
-            assume($value instanceof DataType);
+            Assume::that($value instanceof DataType);
             $value = $value->placeholder;
           }
           $matches[3] = ltrim($value, '%');
@@ -109,18 +110,18 @@ class E {
           $i++;
         }
         if ($matches[3] == 'e' or $matches[3] == 'expr' or $matches[3] == 'expression') {
-          assume($value instanceof Expression);
+          Assume::that($value instanceof Expression);
           return '(' . $value->toString($quoter) . ')';
         }
         if ($matches[3] == 'm' or $matches[3] == 'model') {
           if (!is_string($value)) {
-            assume($value instanceof Model);
+            Assume::that($value instanceof Model);
             $value = $value->getName();
           }
           return $quoter->quoteModel($value);
         }
         if ($matches[3] == 'c' or $matches[3] == 'column' or $matches[3] == 'field') {
-          assume(is_string($value));
+          Assume::isString($value);
           return $quoter->quoteField($value);
         }
         if ($matches[3] != '()')
@@ -129,7 +130,7 @@ class E {
       if (!isset($type))
         $type = DataType::detectType($value);
       if (isset($matches[4]) or (isset($matches[3]) and $matches[3] == '()')) {
-        assume(is_array($value));
+        Assume::isArray($value);
         foreach ($value as $key => $v)
           $value[$key] = $quoter->quoteLiteral($type, $v);
         return '(' . implode(', ', $value) . ')';

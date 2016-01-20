@@ -6,7 +6,7 @@
 namespace Jivoo\Data\Database\Common;
 
 use Jivoo\Data\Database\Table;
-use Jivoo\Core\App;
+use Jivoo\App;
 use Jivoo\Models\Schema;
 use Jivoo\Models\Condition\ConditionBuilder;
 use Jivoo\Models\Selection\ReadSelectionBuilder;

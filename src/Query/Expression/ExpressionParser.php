@@ -5,10 +5,11 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Query\Expression;
 
-use Jivoo\Core\Parse\ParseInput;
+use Jivoo\Parse\ParseInput;
 use Jivoo\Data\DataType;
-use Jivoo\Core\Parse\RegexLexer;
+use Jivoo\Parse\RegexLexer;
 use Jivoo\Data\Query\Expression;
+use Jivoo\Assume;
 
 /**
  * A parser for simple SQL-like comparison expressions.
@@ -39,7 +40,7 @@ class ExpressionParser {
    * @param string $expression
    * @return ParseInput
    */
-  public static function lex($expression, $vars) {
+  public static function lex($expression, $vars = array()) {
     $lexer = new RegexLexer(true, 'i');
     $lexer->is = 'is';
     $lexer->not = 'not';
@@ -94,7 +95,7 @@ class ExpressionParser {
       $value = $vars[$i];
       $i++;
       if (!is_string($value)) {
-        assume($value instanceof Model);
+        Assume::that($value instanceof Model);
         $value = $value->getName();
       }
       return $value;
@@ -103,7 +104,7 @@ class ExpressionParser {
     $lexer->map('fieldPlaceholder', function($value, $matches) use(&$i, $vars) {
       $value = $vars[$i];
       $i++;
-      assume(is_string($value));
+      Assume::that(is_string($value));
       return $value;
     });
     $lexer->mapType('fieldPlaceholder', 'field');
@@ -116,7 +117,7 @@ class ExpressionParser {
       if (isset($matches[3])) {
         if ($matches[3] == '_') {
           if (!is_string($value)) {
-            assume($value instanceof DataType);
+            Assume::that($value instanceof DataType);
             $value = $value->placeholder;
           }
           $matches[3] = ltrim($value, '%');
@@ -124,7 +125,7 @@ class ExpressionParser {
           $i++;
         }
         if ($matches[3] == 'e' or $matches[3] == 'expr' or $matches[3] == 'expression') {
-          assume($value instanceof Expression);
+          Assume::that($value instanceof Expression);
           return $value;
         }
         if ($matches[3] != '()')
@@ -134,7 +135,7 @@ class ExpressionParser {
         $type = DataType::detectType($value);
       }
       if (isset($matches[4]) or (isset($matches[3]) and $matches[3] == '()')) {
-        assume(is_array($value));
+        Assume::isArray($value);
         foreach ($value as $key => $v)
           $value[$key] = $v;
         return new ArrayLiteral($type, $value);

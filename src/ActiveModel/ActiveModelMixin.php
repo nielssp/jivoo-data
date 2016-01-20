@@ -5,9 +5,9 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\ActiveModel;
 
-use Jivoo\Core\Module;
-use Jivoo\Core\EventListener;
-use Jivoo\Core\App;
+use Jivoo\Module;
+use Jivoo\EventListener;
+use Jivoo\App;
 
 /**
  * A mixin for active models.

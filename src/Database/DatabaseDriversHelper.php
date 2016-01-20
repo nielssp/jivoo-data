@@ -6,8 +6,8 @@
 namespace Jivoo\Data\Database;
 
 use Jivoo\Helpers\Helper;
-use Jivoo\Core\Json;
-use Jivoo\Core\JsonException;
+use Jivoo\Json;
+use Jivoo\JsonException;
 
 /**
  * Helper for listing database drivers.

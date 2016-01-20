@@ -5,7 +5,7 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\ActiveModel;
 
-use Jivoo\Core\Utilities;
+use Jivoo\Utilities;
 use Jivoo\Data\Database\SchemaBuilder;
 use Jivoo\Models\DataType;
 

@@ -11,7 +11,7 @@ use Jivoo\Data\Query\Boolean;
 use Jivoo\Data\Record;
 use Jivoo\Data\Query\Expression\Quoter;
 use Jivoo\Data\Query\Expression\ExpressionParser;
-use Jivoo\Core\Parse\ParseInput;
+use Jivoo\Parse\ParseInput;
 
 /**
  * Expression builder.

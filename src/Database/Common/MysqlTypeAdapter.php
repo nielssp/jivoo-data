@@ -8,8 +8,8 @@ namespace Jivoo\Data\Database\Common;
 use Jivoo\Data\Database\MigrationTypeAdapter;
 use Jivoo\Models\DataType;
 use Jivoo\Data\Database\SchemaBuilder;
-use Jivoo\Core\Utilities;
-use Jivoo\Core\Json;
+use Jivoo\Utilities;
+use Jivoo\Json;
 use Jivoo\Data\Database\TypeException;
 
 /**

@@ -7,7 +7,7 @@ namespace Jivoo\Data\Database\Common;
 
 use Jivoo\Data\Database\LoadableDatabase;
 use Jivoo\Data\Database\MigrationTypeAdapter;
-use Jivoo\Core\Utilities;
+use Jivoo\Utilities;
 use Jivoo\Models\DataType;
 use Jivoo\Models\BasicModel;
 use Jivoo\Models\Condition\Quoter;

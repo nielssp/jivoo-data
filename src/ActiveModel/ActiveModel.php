@@ -5,11 +5,11 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\ActiveModel;
 
-use Jivoo\Core\EventListener;
-use Jivoo\Core\Event;
+use Jivoo\EventListener;
+use Jivoo\Event;
 use Jivoo\Models\ModelBase;
-use Jivoo\Core\App;
-use Jivoo\Core\Utilities;
+use Jivoo\App;
+use Jivoo\Utilities;
 use Jivoo\Models\Selection\UpdateSelectionBuilder;
 use Jivoo\Models\Selection\DeleteSelectionBuilder;
 use Jivoo\Models\Selection\ReadSelectionBuilder;
@@ -22,7 +22,7 @@ use Jivoo\Models\Selection\SelectionBuilder;
 use Jivoo\Models\Selection\ReadSelection;
 use Jivoo\Models\RecordBuilder;
 use Jivoo\Data\Database\InvalidTableException;
-use Jivoo\Core\Assume;
+use Jivoo\Assume;
 use Jivoo\Data\Database\Loader;
 use Jivoo\InvalidMethodException;
 
@@ -969,15 +969,15 @@ abstract class ActiveModel extends ModelBase implements EventListener {
           $this->unsetAssociation($record, $association);
           return;
         }
-        assume($value instanceof ActiveRecord);
-        assume($value->getModel() == $association['model']);
+        Assume::that($value instanceof ActiveRecord);
+        Assume::that($value->getModel() == $association['model']);
         $key = $association['otherKey'];
         $otherId = $association['model']->primaryKey;
         $record->$key = $value->$otherId;
         return;
       case 'hasOne':
-        assume($value instanceof ActiveRecord);
-        assume($value->getModel() == $association['model']);
+        Assume::that($value instanceof ActiveRecord);
+        Assume::that($value->getModel() == $association['model']);
         $this->unsetAssociation($record, $association);
         $key = $association['thisKey'];
         $id = $this->primaryKey;
@@ -996,8 +996,8 @@ abstract class ActiveModel extends ModelBase implements EventListener {
           $value = array($value);
         $this->unsetAssociation($record, $association);
         foreach ($value as $item) {
-          assume($item instanceof ActiveRecord);
-          assume($item->getModel() == $association['model']);
+          Assume::that($item instanceof ActiveRecord);
+          Assume::that($item->getModel() == $association['model']);
           $item->$key = $idValue;
           if (!$item->isNew())
             $item->save();

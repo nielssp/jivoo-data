@@ -5,7 +5,7 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data;
 
-use Jivoo\Core\Assume;
+use Jivoo\Assume;
 
 /**
  * Used for creating enum types.

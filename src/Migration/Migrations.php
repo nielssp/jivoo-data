@@ -5,12 +5,13 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Migration;
 
-use Jivoo\Core\LoadableModule;
+use Jivoo\LoadableModule;
 use Jivoo\Data\Database\SchemaBuilder;
 use Jivoo\Models\DataType;
-use Jivoo\Core\Utilities;
+use Jivoo\Utilities;
 use Jivoo\Data\Database\MigratableDatabase;
 use Jivoo\Autoloader;
+use Jivoo\Assume;
 
 /**
  * Schema and data migration module.
@@ -91,7 +92,7 @@ class Migrations extends LoadableModule {
    */
   public function attachDatabase($name, $migrationDir) {
     $db = $this->m->Databases->$name->getConnection();
-    assume($db instanceof MigratableDatabase);
+    Assume::that($db instanceof MigratableDatabase);
     $this->migrationDirs[$name] = $migrationDir;
     $this->connections[$name] = $db;
     if ($this->config['automigrate'] and isset($this->m->Setup)) {

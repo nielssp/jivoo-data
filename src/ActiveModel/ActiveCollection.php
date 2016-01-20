@@ -14,6 +14,7 @@ use Jivoo\Models\Selection\BasicSelection;
 use Jivoo\Models\Selection\ReadSelection;
 use Jivoo\Models\Selection\SelectionBuilder;
 use Jivoo\Models\Condition\Condition;
+use Jivoo\Assume;
 
 /**
  * A special model representing an association collection as result from for
@@ -109,7 +110,7 @@ class ActiveCollection extends ModelBase {
       return $this->source;
     $selection->alias($this->alias);
     if (isset($this->join)) {
-      assume($selection instanceof ReadSelection);
+      Assume::that($selection instanceof ReadSelection);
       $selection = $selection
         ->leftJoin($this->join, $this->otherPrimary . '= J.' . $this->otherKey, 'J')
         ->where('J.' . $this->thisKey . ' = ?', $this->recordId);

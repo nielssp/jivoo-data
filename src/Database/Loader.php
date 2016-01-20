@@ -5,16 +5,16 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Database;
 
-use Jivoo\Core\Utilities;
-use Jivoo\Core\Module;
-use Jivoo\Core\App;
-use Jivoo\Core\Assume;
-use Jivoo\Core\Store\Document;
+use Jivoo\Utilities;
+use Jivoo\Module;
+use Jivoo\App;
+use Jivoo\Assume;
+use Jivoo\Store\Document;
 use Jivoo\InvalidPropertyException;
-use Jivoo\Core\Json;
+use Jivoo\Json;
 use Psr\Log\LoggerAwareInterface as LoggerAware;
 use Psr\Log\LoggerInterface as Logger;
-use Jivoo\Core\Log\NullLogger;
+use Jivoo\Log\NullLogger;
 
 /**
  * Connects to databases.
@@ -168,7 +168,7 @@ class Loader implements LoggerAware {
    */
   public function readSchema($namespace, $dir) {
     $dbSchema = new DatabaseSchemaBuilder();
-    assume(is_dir($dir));
+    Assume::that(is_dir($dir));
     $files = scandir($dir);
     if ($files !== false) {
       foreach ($files as $file) {

@@ -8,7 +8,7 @@ namespace Jivoo\Data;
 use Jivoo\Data\Query\Selection;
 use Jivoo\Data\Query\UpdateSelection;
 use Jivoo\Data\Query\ReadSelection;
-use Jivoo\Core\Assume;
+use Jivoo\Assume;
 
 /**
  * An array data source.
