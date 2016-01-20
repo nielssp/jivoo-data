@@ -1,0 +1,6 @@
+{
+  "name": "MySQLi",
+  "phpExtensions": ["mysqli"],
+  "required": ["server", "username", "database"],
+  "optional": ["password", "tablePrefix"]
+}

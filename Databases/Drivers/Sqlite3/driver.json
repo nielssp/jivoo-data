@@ -1,0 +1,6 @@
+{
+  "name": "SQLite3",
+  "phpExtensions": ["sqlite3"],
+  "required": ["filename"],
+  "optional": ["tablePrefix"]
+}

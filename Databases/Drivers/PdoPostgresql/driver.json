@@ -1,0 +1,6 @@
+{
+  "name": "PostgreSQL (PDO)",
+  "phpExtensions": ["pdo_pgsql"],
+  "required": ["server", "username", "database"],
+  "optional": ["password", "tablePrefix"]
+}

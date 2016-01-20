@@ -1,0 +1,6 @@
+{
+  "name": "SQLite (PDO)",
+  "phpExtensions": ["pdo_sqlite"],
+  "required": ["filename"],
+  "optional": ["tablePrefix"]
+}

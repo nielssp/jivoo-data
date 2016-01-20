@@ -1,0 +1,6 @@
+{
+  "name": "MySQL (PDO)",
+  "phpExtensions": ["pdo_mysql"],
+  "required": ["server", "username", "database"],
+  "optional": ["password", "tablePrefix"]
+}
