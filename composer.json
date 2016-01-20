@@ -1,0 +1,34 @@
+{
+  "name": "jivoo/data",
+  "description": "Jivoo query, migration, and ORM library.",
+  "license": "MIT",
+  "type": "library",
+  "homepage": "http://nielssp.dk",
+  "authors": [
+    {
+      "name": "Niels Sonnich Poulsen",
+      "email": "niels@nielssp.dk",
+      "homepage": "http://nielssp.dk",
+      "role": "Developer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {"Jivoo\\Data\\": "src/"}
+  },
+  "autoload-dev": {
+    "psr-4": {"Jivoo\\Data\\": "tests/"}
+  },
+  "require": {
+    "php": ">=5.4.0",
+    "ext-json": "*",
+    "psr/log": "1.0",
+    "psr/cache": "1.0",
+    "jivoo/core": "^0.25",
+    "composer/semver": "^1.2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "5.0.*",
+    "squizlabs/php_codesniffer": "2.*",
+    "apigen/apigen": "dev-master"
+  }
+}
