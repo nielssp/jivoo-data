@@ -3,7 +3,7 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\ActiveModels;
+namespace Jivoo\Data\ActiveModel;
 
 use Jivoo\Core\EventListener;
 use Jivoo\Core\Event;
@@ -14,16 +14,16 @@ use Jivoo\Models\Selection\UpdateSelectionBuilder;
 use Jivoo\Models\Selection\DeleteSelectionBuilder;
 use Jivoo\Models\Selection\ReadSelectionBuilder;
 use Jivoo\Models\Validation\ValidatorBuilder;
-use Jivoo\Databases\ResultSetIterator;
+use Jivoo\Data\Database\ResultSetIterator;
 use Jivoo\Models\DataType;
 use Jivoo\Models\Condition\ConditionBuilder;
 use Jivoo\Models\Selection\BasicSelectionBase;
 use Jivoo\Models\Selection\SelectionBuilder;
 use Jivoo\Models\Selection\ReadSelection;
 use Jivoo\Models\RecordBuilder;
-use Jivoo\Databases\InvalidTableException;
+use Jivoo\Data\Database\InvalidTableException;
 use Jivoo\Core\Assume;
-use Jivoo\Databases\Loader;
+use Jivoo\Data\Database\Loader;
 use Jivoo\InvalidMethodException;
 
 /**
@@ -241,7 +241,7 @@ abstract class ActiveModel extends ModelBase implements EventListener {
     }
 
     if (isset($this->record))
-      Utilities::assumeSubclassOf($this->record, 'Jivoo\ActiveModels\ActiveRecord');
+      Utilities::assumeSubclassOf($this->record, 'Jivoo\Data\ActiveModel\ActiveRecord');
     
     $this->attachEventListener($this);
     foreach ($this->mixins as $mixin => $options) {
@@ -249,13 +249,13 @@ abstract class ActiveModel extends ModelBase implements EventListener {
         $mixin = $options;
         $options = array();
       }
-      if (class_exists('Jivoo\ActiveModels\\' . $mixin . 'Mixin'))
-        $mixin = 'Jivoo\ActiveModels\\' . $mixin . 'Mixin';
+      if (class_exists('Jivoo\Data\ActiveModel\\' . $mixin . 'Mixin'))
+        $mixin = 'Jivoo\Data\ActiveModel\\' . $mixin . 'Mixin';
       else if (class_exists($mixin . 'Mixin'))
         $mixin .= 'Mixin';
       else if (!class_exists($mixin))
         throw new InvalidMixinException('Mixin class not found: ' . $mixin);
-      Assume::isSubclassOf($mixin, 'Jivoo\ActiveModels\ActiveModelMixin');
+      Assume::isSubclassOf($mixin, 'Jivoo\Data\ActiveModel\ActiveModelMixin');
       $mixin = new $mixin($this->app, $this, $options);
       $this->attachEventListener($mixin);
       $this->mixinObjects[] = $mixin;

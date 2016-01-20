@@ -3,11 +3,11 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\Databases\Drivers\PdoMysql;
+namespace Jivoo\Data\Database\Drivers\PdoMysql;
 
-use Jivoo\Databases\Common\MysqlTypeAdapter;
-use Jivoo\Databases\Common\PdoDatabase;
-use Jivoo\Databases\ConnectionException;
+use Jivoo\Data\Database\Common\MysqlTypeAdapter;
+use Jivoo\Data\Database\Common\PdoDatabase;
+use Jivoo\Data\Database\ConnectionException;
 
 /**
  * PDO MySQL database driver.

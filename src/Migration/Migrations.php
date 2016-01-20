@@ -3,13 +3,13 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\Migrations;
+namespace Jivoo\Data\Migration;
 
 use Jivoo\Core\LoadableModule;
-use Jivoo\Databases\SchemaBuilder;
+use Jivoo\Data\Database\SchemaBuilder;
 use Jivoo\Models\DataType;
 use Jivoo\Core\Utilities;
-use Jivoo\Databases\MigratableDatabase;
+use Jivoo\Data\Database\MigratableDatabase;
 use Jivoo\Autoloader;
 
 /**
@@ -105,7 +105,7 @@ class Migrations extends LoadableModule {
             $this->finalize($name);
           }
           else {
-            $this->m->Setup->trigger('Jivoo\Migrations\MigrationUpdater');
+            $this->m->Setup->trigger('Jivoo\Data\Migration\MigrationUpdater');
           }
         }
       }
@@ -221,7 +221,7 @@ class Migrations extends LoadableModule {
   public function run($dbName, $migrationName) {
     $db = $this->getDatabase($dbName);
     $this->logger->info('Initializing migration ' . $migrationName);
-    Utilities::assumeSubclassOf($migrationName, 'Jivoo\Migrations\Migration');
+    Utilities::assumeSubclassOf($migrationName, 'Jivoo\Data\Migration\Migration');
 
     // The migration schema keeps track of the state of the database
     if (!isset($this->migrationSchemas[$dbName]))

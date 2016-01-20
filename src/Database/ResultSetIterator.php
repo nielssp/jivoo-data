@@ -3,7 +3,7 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\Databases;
+namespace Jivoo\Data\Database;
 
 use Jivoo\Models\ModelBase;
 use Jivoo\Models\RecordIterator;
@@ -92,7 +92,7 @@ class ResultSetIterator implements RecordIterator {
   
   /**
    * Convert result set to array.
-   * @return \Jivoo\Databases\Record[] Array of records.
+   * @return \Jivoo\Data\Database\Record[] Array of records.
    */
   public function toArray() {
     while ($this->resultSet->hasRows())

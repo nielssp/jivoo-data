@@ -3,7 +3,7 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\Databases;
+namespace Jivoo\Data\Database;
 
 use Jivoo\Models\Form;
 use Jivoo\Setup\InstallerSnippet;
@@ -15,7 +15,7 @@ class DatabaseInstaller extends InstallerSnippet {
   /**
    * {@inheritdoc}
    */
-  protected $helpers = array('Html', 'Form', 'Notify', 'Jivoo\Databases\DatabaseDrivers');
+  protected $helpers = array('Html', 'Form', 'Notify', 'Jivoo\Data\Database\DatabaseDrivers');
 
   /**
    * {@inheritdoc}
@@ -109,7 +109,7 @@ class DatabaseInstaller extends InstallerSnippet {
     if (isset($data)) {
       $form->addData($data['driver']);
       if ($form->isValid()) {
-        $class = 'Jivoo\Databases\Drivers\\' . $driver['driver'] . '\\' . $driver['driver'] . 'Database';
+        $class = 'Jivoo\Data\Database\Drivers\\' . $driver['driver'] . '\\' . $driver['driver'] . 'Database';
         try {
           new $class(new DatabaseSchemaBuilder(), $form->getData());
           $options = array_flip(

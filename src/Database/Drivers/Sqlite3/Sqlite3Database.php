@@ -3,12 +3,12 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\Databases\Drivers\Sqlite3;
+namespace Jivoo\Data\Database\Drivers\Sqlite3;
 
-use Jivoo\Databases\Common\SqlDatabaseBase;
-use Jivoo\Databases\Common\SqliteTypeAdapter;
-use Jivoo\Databases\QueryException;
-use Jivoo\Databases\ConnectionException;
+use Jivoo\Data\Database\Common\SqlDatabaseBase;
+use Jivoo\Data\Database\Common\SqliteTypeAdapter;
+use Jivoo\Data\Database\QueryException;
+use Jivoo\Data\Database\ConnectionException;
 
 /**
  * SQLite3 database driver.

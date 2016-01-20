@@ -3,9 +3,9 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\Databases\Common;
+namespace Jivoo\Data\Database\Common;
 
-use Jivoo\Databases\QueryException;
+use Jivoo\Data\Database\QueryException;
 
 /**
  * A generic PDO SQL database.

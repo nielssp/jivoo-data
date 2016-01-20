@@ -3,13 +3,13 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\Databases\Drivers\PdoPostgresql;
+namespace Jivoo\Data\Database\Drivers\PdoPostgresql;
 
-use Jivoo\Databases\Common\PostgresqlTypeAdapter;
-use Jivoo\Databases\Common\PdoDatabase;
-use Jivoo\Databases\QueryException;
-use Jivoo\Databases\ConnectionException;
-use Jivoo\Databases\Jivoo\Databases;
+use Jivoo\Data\Database\Common\PostgresqlTypeAdapter;
+use Jivoo\Data\Database\Common\PdoDatabase;
+use Jivoo\Data\Database\QueryException;
+use Jivoo\Data\Database\ConnectionException;
+use Jivoo\Data\Database\Jivoo\Data\Database;
 
 /**
  * PDO PostgreSQL database driver.

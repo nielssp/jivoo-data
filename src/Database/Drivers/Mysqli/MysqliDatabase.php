@@ -3,12 +3,12 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\Databases\Drivers\Mysqli;
+namespace Jivoo\Data\Database\Drivers\Mysqli;
 
-use Jivoo\Databases\Common\SqlDatabaseBase;
-use Jivoo\Databases\Common\MysqlTypeAdapter;
-use Jivoo\Databases\ConnectionException;
-use Jivoo\Databases\QueryException;
+use Jivoo\Data\Database\Common\SqlDatabaseBase;
+use Jivoo\Data\Database\Common\MysqlTypeAdapter;
+use Jivoo\Data\Database\ConnectionException;
+use Jivoo\Data\Database\QueryException;
 
 /**
  * MySQLi database driver.

@@ -3,11 +3,11 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\Migrations;
+namespace Jivoo\Data\Migration;
 
 use Jivoo\Setup\InstallerSnippet;
 use Jivoo\Setup\AsyncTaskBase;
-use Jivoo\Databases\MigratableDatabase;
+use Jivoo\Data\Database\MigratableDatabase;
 
 /**
  * Migration updater. Migrates tables. 
@@ -20,7 +20,7 @@ class MigrationUpdater extends InstallerSnippet {
   protected $dbName = 'default'; // TODO: set this somewhere
   
   /**
-   * @var \Jivoo\Databases\Database Database being migrated.
+   * @var \Jivoo\Data\Database\Database Database being migrated.
    */
   protected $db = null; 
 

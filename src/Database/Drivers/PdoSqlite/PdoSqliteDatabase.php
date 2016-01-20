@@ -3,11 +3,11 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\Databases\Drivers\PdoSqlite;
+namespace Jivoo\Data\Database\Drivers\PdoSqlite;
 
-use Jivoo\Databases\Common\PdoDatabase;
-use Jivoo\Databases\Common\SqliteTypeAdapter;
-use Jivoo\Databases\ConnectionException;
+use Jivoo\Data\Database\Common\PdoDatabase;
+use Jivoo\Data\Database\Common\SqliteTypeAdapter;
+use Jivoo\Data\Database\ConnectionException;
 
 /**
  * PDO SQLite database driver.

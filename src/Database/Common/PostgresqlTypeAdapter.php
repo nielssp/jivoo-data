@@ -3,14 +3,14 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\Databases\Common;
+namespace Jivoo\Data\Database\Common;
 
-use Jivoo\Databases\MigrationTypeAdapter;
+use Jivoo\Data\Database\MigrationTypeAdapter;
 use Jivoo\Models\DataType;
-use Jivoo\Databases\SchemaBuilder;
+use Jivoo\Data\Database\SchemaBuilder;
 use Jivoo\Core\Utilities;
 use Jivoo\Core\Json;
-use Jivoo\Databases\TypeException;
+use Jivoo\Data\Database\TypeException;
 
 /**
  * Type adapter for PostgreSQL database drivers.

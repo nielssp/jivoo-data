@@ -3,9 +3,9 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\Databases\Common;
+namespace Jivoo\Data\Database\Common;
 
-use Jivoo\Databases\Table;
+use Jivoo\Data\Database\Table;
 use Jivoo\Core\App;
 use Jivoo\Models\Schema;
 use Jivoo\Models\Condition\ConditionBuilder;
@@ -14,8 +14,8 @@ use Jivoo\Models\Selection\UpdateSelectionBuilder;
 use Jivoo\Models\Selection\DeleteSelectionBuilder;
 use Jivoo\Models\RecordBuilder;
 use Jivoo\Models\Condition\NotCondition;
-use Jivoo\Databases\InvalidTableException;
-use Jivoo\Databases\QueryException;
+use Jivoo\Data\Database\InvalidTableException;
+use Jivoo\Data\Database\QueryException;
 
 /**
  * A table in an SQL database.
@@ -250,7 +250,7 @@ class SqlTable extends Table {
     }
     if (!empty($selection->joins)) {
       foreach ($selection->joins as $join) {
-        $joinSource = $join['source']->asInstanceOf('Jivoo\Databases\Common\SqlTable');
+        $joinSource = $join['source']->asInstanceOf('Jivoo\Data\Database\Common\SqlTable');
         if (!isset($joinSource)) {
           throw new InvalidTableException(tr(
             'Unable to join SqlTable with data source of type "%1"',

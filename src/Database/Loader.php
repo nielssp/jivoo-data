@@ -3,7 +3,7 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\Databases;
+namespace Jivoo\Data\Database;
 
 use Jivoo\Core\Utilities;
 use Jivoo\Core\Module;
@@ -175,7 +175,7 @@ class Loader implements LoggerAware {
         $split = explode('.', $file);
         if (isset($split[1]) and $split[1] == 'php') {
           $class = rtrim($namespace, '\\') . '\\' . $split[0];
-          Assume::isSubclassOf($class, 'Jivoo\Databases\SchemaBuilder');
+          Assume::isSubclassOf($class, 'Jivoo\Data\Database\SchemaBuilder');
           $dbSchema->addSchema(new $class());
         }
       }
@@ -220,8 +220,8 @@ class Loader implements LoggerAware {
       }
     }
     try {
-      $class = 'Jivoo\Databases\Drivers\\' . $driver  . '\\' . $driver . 'Database';
-      Assume::isSubclassOf($class, 'Jivoo\Databases\LoadableDatabase');
+      $class = 'Jivoo\Data\Database\Drivers\\' . $driver  . '\\' . $driver . 'Database';
+      Assume::isSubclassOf($class, 'Jivoo\Data\Database\LoadableDatabase');
       if (!isset($schema))
         $schema = new DynamicDatabaseSchema();
       $object = new $class($schema, $config);

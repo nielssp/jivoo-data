@@ -3,10 +3,10 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\Migrations;
+namespace Jivoo\Data\Migration;
 
-use Jivoo\Databases\MigratableDatabase;
-use Jivoo\Databases\SchemaBuilder;
+use Jivoo\Data\Database\MigratableDatabase;
+use Jivoo\Data\Database\SchemaBuilder;
 use Jivoo\Models\DataType;
 
 /**

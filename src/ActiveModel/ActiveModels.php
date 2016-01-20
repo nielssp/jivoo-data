@@ -3,7 +3,7 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\ActiveModels;
+namespace Jivoo\Data\ActiveModel;
 
 use Jivoo\Core\LoadableModule;
 use Jivoo\Core\Event;
@@ -62,7 +62,7 @@ class ActiveModels extends LoadableModule {
    * @return True if successfull, false if table not found.
    */
   public function addActiveModel($class) {
-    if (is_subclass_of($class, 'Jivoo\ActiveModels\ActiveModel')) {
+    if (is_subclass_of($class, 'Jivoo\Data\ActiveModel\ActiveModel')) {
       $model = new $class($this->app, $this->m->Databases);
       $this->m->Models->setModel($model->getName(), $model);
       $this->models[$model->getName()] = $model;
