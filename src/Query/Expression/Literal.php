@@ -12,26 +12,32 @@ use Jivoo\Data\Record;
 /**
  * A literal.
  */
-class Literal implements Expression {
-  public $type;
-  public $value;
-  
-  public function __construct(DataType $type, $value) {
-    $this->type = $type;
-    $this->value = $value;
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  public function __invoke(Record $record) {
-    return $this->value;
-  }
+class Literal implements Expression
+{
 
-  /**
-   * {@inheritDoc}
-   */
-  public function toString(Quoter $quoter) {
-    return $quoter->quoteLiteral($this->type, $this->value);
-  }
+    public $type;
+
+    public $value;
+
+    public function __construct(DataType $type, $value)
+    {
+        $this->type = $type;
+        $this->value = $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __invoke(Record $record)
+    {
+        return $this->value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toString(Quoter $quoter)
+    {
+        return $quoter->quoteLiteral($this->type, $this->value);
+    }
 }

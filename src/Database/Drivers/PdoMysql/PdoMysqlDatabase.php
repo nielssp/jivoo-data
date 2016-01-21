@@ -12,29 +12,33 @@ use Jivoo\Data\Database\ConnectionException;
 /**
  * PDO MySQL database driver.
  */
-class PdoMysqlDatabase extends PdoDatabase {
-  /**
-   * {@inheritdoc}
-   */
-  public function init($options = array()) {
-    $this->setTypeAdapter(new MysqlTypeAdapter($this));
-    if (isset($options['tablePrefix'])) {
-      $this->tablePrefix = $options['tablePrefix'];
+class PdoMysqlDatabase extends PdoDatabase
+{
+
+    /**
+     * {@inheritdoc}
+     */
+    public function init($options = array())
+    {
+        $this->setTypeAdapter(new MysqlTypeAdapter($this));
+        if (isset($options['tablePrefix'])) {
+            $this->tablePrefix = $options['tablePrefix'];
+        }
+        try {
+            if (isset($options['password'])) {
+                $this->pdo = new \PDO(
+                    'mysql:host=' . $options['server'] . ';dbname=' . $options['database'],
+                    $options['username'],
+                    $options['password']
+                );
+            } else {
+                $this->pdo = new \PDO(
+                    'mysql:host=' . $options['server'] . ';dbname=' . $options['database'],
+                    $options['username']
+                );
+            }
+        } catch (\PDOException $exception) {
+            throw new ConnectionException($exception->getMessage(), 0, $exception);
+        }
     }
-    try {
-      if (isset($options['password'])) {
-        $this->pdo = new \PDO(
-          'mysql:host=' . $options['server'] . ';dbname=' . $options['database'],
-          $options['username'], $options['password']);
-      }
-      else {
-        $this->pdo = new \PDO(
-          'mysql:host=' . $options['server'] . ';dbname=' . $options['database'],
-          $options['username']);
-      }
-    }
-    catch (\PDOException $exception) {
-      throw new ConnectionException($exception->getMessage(), 0, $exception);
-    }
-  }
 }

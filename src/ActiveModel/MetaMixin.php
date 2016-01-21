@@ -13,64 +13,70 @@ use Jivoo\Models\InvalidModelException;
  * The settings are:
  * <code>
  * array(
- *   'model' => // the meta data model, e.g. 'UserMeta'
- *   'recordKey' => // the foreign key in the above model, e.g. 'userId'
+ * 'model' => // the meta data model, e.g. 'UserMeta'
+ * 'recordKey' => // the foreign key in the above model, e.g. 'userId'
  * )
  * </code>
  */
-class MetaMixin extends ActiveModelMixin {
-  /**
-   * {@inheritdoc}
-   */
-  protected $options = array(
-    'model' => null,
-    'recordKey' => null
-  );
+class MetaMixin extends ActiveModelMixin
+{
 
-  /**
-   * @var Model Meta data model.
-   */
-  private $other;
+    /**
+     * {@inheritdoc}
+     */
+    protected $options = array(
+        'model' => null,
+        'recordKey' => null
+    );
 
-  /**
-   * {@inheritdoc}
-   */
-  public function init() {
-    if (!isset($this->options['model']))
-      $this->options['model'] = $this->model->getName() . 'Meta';
-    if (!isset($this->options['recordKey']))
-      $this->options['recordKey'] = lcfirst($this->model->getName()) . 'Id';
-    $this->model->addVirtual('meta');
-    $other = $this->options['model'];
-    $db = $this->model->getDatabase();
-    if (!isset($db->$other)) {
-      throw new InvalidModelException(tr(
-        'Model %1 not found in %2', $other, $this->model->getName()
-      ));
+    /**
+     * @var Model Meta data model.
+     */
+    private $other;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function init()
+    {
+        if (! isset($this->options['model'])) {
+            $this->options['model'] = $this->model->getName() . 'Meta';
+        }
+        if (! isset($this->options['recordKey'])) {
+            $this->options['recordKey'] = lcfirst($this->model->getName()) . 'Id';
+        }
+        $this->model->addVirtual('meta');
+        $other = $this->options['model'];
+        $db = $this->model->getDatabase();
+        if (! isset($db->$other)) {
+            throw new InvalidModelException(tr('Model %1 not found in %2', $other, $this->model->getName()));
+        }
+        $this->other = $db->$other;
     }
-    $this->other = $db->$other;
-  }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function afterLoad(ActiveModelEvent $event) {
-    $recordKey = $this->options['recordKey'];
-    $event->record->meta = new Meta($this->other, $recordKey, $event->record);
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function afterLoad(ActiveModelEvent $event)
+    {
+        $recordKey = $this->options['recordKey'];
+        $event->record->meta = new Meta($this->other, $recordKey, $event->record);
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function afterCreate(ActiveModelEvent $event) {
-    $recordKey = $this->options['recordKey'];
-    $event->record->meta = new Meta($this->other, $recordKey, $event->record);
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function afterCreate(ActiveModelEvent $event)
+    {
+        $recordKey = $this->options['recordKey'];
+        $event->record->meta = new Meta($this->other, $recordKey, $event->record);
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function afterSave(ActiveModelEvent $event) {
-    $event->record->meta->save();
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function afterSave(ActiveModelEvent $event)
+    {
+        $event->record->meta->save();
+    }
 }

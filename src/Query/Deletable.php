@@ -8,10 +8,13 @@ namespace Jivoo\Data\Query;
 /**
  * An interface for deletable models and selections.
  */
-interface Deletable extends Selectable {
-  /**
-   * Delete selected records.
-   * @return int Number of deleted records.
-   */
-  public function delete();
+interface Deletable extends Selectable
+{
+
+    /**
+     * Delete selected records.
+     *
+     * @return int Number of deleted records.
+     */
+    public function delete();
 }

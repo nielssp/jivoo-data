@@ -6,24 +6,30 @@
 namespace Jivoo\Data\ActiveModel;
 
 /**
- * Mixin for automatically updating time stamps on records when they are 
- * created and updated. Assumes existence of DateTime-fields "updated"
+ * Mixin for automatically updating time stamps on records when they are
+ * created and updated.
+ * Assumes existence of DateTime-fields "updated"
  * and "created".
  */
-class TimestampsMixin extends ActiveModelMixin {
-  /**
-   * {@inheritdoc}
-   */
-  public function beforeValidate(ActiveModelEvent $event) {
-    if (!$event->record->isNew() and !$event->record->isSaved())
-      $event->record->updated = time();
-  }
+class TimestampsMixin extends ActiveModelMixin
+{
 
-  /**
-   * {@inheritdoc}
-   */
-  public function afterCreate(ActiveModelEvent $event) {
-    $event->record->created = time();
-    $event->record->updated = time();
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function beforeValidate(ActiveModelEvent $event)
+    {
+        if (! $event->record->isNew() and ! $event->record->isSaved()) {
+            $event->record->updated = time();
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function afterCreate(ActiveModelEvent $event)
+    {
+        $event->record->created = time();
+        $event->record->updated = time();
+    }
 }

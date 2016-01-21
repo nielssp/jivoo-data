@@ -10,123 +10,146 @@ use Jivoo\Models\Model;
 /**
  * A wrapper for another database driver.
  */
-class DatabaseConnection implements Database {
-  /**
-   * @var Table[] Tabbles.
-   */
-  private $tables = array();
-  
-  /**
-   * @var Database Database.
-   */
-  private $connection;
-  
-  /**
-   * @var DatabaseSchema Database schema.
-   */
-  private $schema;
+class DatabaseConnection implements Database
+{
 
-  /**
-   * Construct database connection.
-   * @param Database $database Database.
-   */
-  public function __construct(Database $database) {
-    $this->connection = $database;
-    $this->schema = $database->getSchema();
-  }
+    /**
+     * @var Table[] Tabbles.
+     */
+    private $tables = array();
 
-  /**
-   * Get table.
-   * @param string $table Table name.
-   * @return Table Table.
-   */
-  public function __get($table) {
-    if (isset($this->tables[$table]))
-      return $this->tables[$table];
-    if (isset($this->connection->$table)) {
-      $this->tables[$table] = $this->connection->$table;
-      return $this->tables[$table];
+    /**
+     * @var Database Database.
+     */
+    private $connection;
+
+    /**
+     * @var DatabaseSchema Database schema.
+     */
+    private $schema;
+
+    /**
+     * Construct database connection.
+     *
+     * @param Database $database
+     *            Database.
+     */
+    public function __construct(Database $database)
+    {
+        $this->connection = $database;
+        $this->schema = $database->getSchema();
     }
-    return null;
-  }
 
-  /**
-   * Whether or not table exists.
-   * @param string $table Table name.
-   * @return bool True if table exists.
-   */
-  public function __isset($table) {
-    if (isset($this->tables[$table]))
-      return true;
-    if (isset($this->connection->$table)) {
-      $this->tables[$table] = $this->connection->$table;
-      return true;
+    /**
+     * Get table.
+     *
+     * @param string $table
+     *            Table name.
+     * @return Table Table.
+     */
+    public function __get($table)
+    {
+        if (isset($this->tables[$table])) {
+            return $this->tables[$table];
+        }
+        if (isset($this->connection->$table)) {
+            $this->tables[$table] = $this->connection->$table;
+            return $this->tables[$table];
+        }
+        return null;
     }
-    return false;
-  }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function __set($table, Model $model) {
-    $this->tables[$table] = $model;
-  }
+    /**
+     * Whether or not table exists.
+     *
+     * @param string $table
+     *            Table name.
+     * @return bool True if table exists.
+     */
+    public function __isset($table)
+    {
+        if (isset($this->tables[$table])) {
+            return true;
+        }
+        if (isset($this->connection->$table)) {
+            $this->tables[$table] = $this->connection->$table;
+            return true;
+        }
+        return false;
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function __unset($table) {
-    unset($this->tables[$table]);
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function __set($table, Model $model)
+    {
+        $this->tables[$table] = $model;
+    }
 
-  /**
-   * Get wrapped database.
-   * @return Database Database.
-   */
-  public function getConnection() {
-    return $this->connection;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function __unset($table)
+    {
+        unset($this->tables[$table]);
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getSchema() {
-    return $this->schema;
-  }
-  
-  /**
-   * Refresh schema.
-   */
-  public function refreshSchema() {
-    $this->connection->refreshSchema();
-    $this->schema = $this->connection->getSchema();
-  }
+    /**
+     * Get wrapped database.
+     *
+     * @return Database Database.
+     */
+    public function getConnection()
+    {
+        return $this->connection;
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function close() {
-    $this->connection->close();
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function getSchema()
+    {
+        return $this->schema;
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function beginTransaction() {
-    $this->connection->beginTransaction();
-  }
+    /**
+     * Refresh schema.
+     */
+    public function refreshSchema()
+    {
+        $this->connection->refreshSchema();
+        $this->schema = $this->connection->getSchema();
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function commit() {
-    $this->connection->commit();
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function close()
+    {
+        $this->connection->close();
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function rollback() {
-    $this->connection->rollback();
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function beginTransaction()
+    {
+        $this->connection->beginTransaction();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function commit()
+    {
+        $this->connection->commit();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rollback()
+    {
+        $this->connection->rollback();
+    }
 }

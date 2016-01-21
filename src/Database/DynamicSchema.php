@@ -14,93 +14,108 @@ use Jivoo\InvalidPropertyException;
 /**
  * Represents a database table schema.
  */
-class DynamicSchema implements Schema {  
-  /**
-   * @var string Name of table.
-   */
-  private $name = 'undefined';
-  
-  private $text;
-  
-  private $fields = array();
+class DynamicSchema implements Schema
+{
 
-  /**
-   * Constructor
-   * @param string $name Name of schema
-  */
-  public function __construct($name) {
-    $this->name = $name;
-    $this->text = DataType::text(true);
-  }
+    /**
+     * @var string Name of table.
+     */
+    private $name = 'undefined';
 
-  /**
-   * {@inheritdoc}
-   */
-  public function __get($field) {
-    return $this->text;
-  }
+    private $text;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function __isset($field) {
-    return true;
-  }
-  
-  /**
-   * {@inheritdoc}
-   */
-  public function copy($newName) {
-    return new self($newName);
-  }
-  
-  /**
-   * {@inheritdoc}
-   */
-  public function filter($data) {
-    $this->fields = array_unique(array_merge(array_keys($data), $this->fields));
-    return $data;
-  }
+    private $fields = array();
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getFields() {
-    return $this->fields;
-  }
+    /**
+     * Constructor
+     *
+     * @param string $name
+     *            Name of schema
+     */
+    public function __construct($name)
+    {
+        $this->name = $name;
+        $this->text = DataType::text(true);
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getName() {
-    return $this->name;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function __get($field)
+    {
+        return $this->text;
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getPrimaryKey() {
-    return array();
-  }
-  
-  /**
-   * {@inheritdoc}
-   */
-  public function getIndexes() {
-    return array();
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function __isset($field)
+    {
+        return true;
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function indexExists($name) {
-    return false;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function copy($newName)
+    {
+        return new self($newName);
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getIndex($name) {
-    return null;
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function filter($data)
+    {
+        $this->fields = array_unique(array_merge(array_keys($data), $this->fields));
+        return $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPrimaryKey()
+    {
+        return array();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIndexes()
+    {
+        return array();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function indexExists($name)
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIndex($name)
+    {
+        return null;
+    }
 }

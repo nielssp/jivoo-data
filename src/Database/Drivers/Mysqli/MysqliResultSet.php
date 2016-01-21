@@ -10,60 +10,71 @@ use Jivoo\Data\Database\ResultSet;
 /**
  * Result set for MySQLi driver.
  */
-class MysqliResultSet implements ResultSet {
-  /**
-   * @var mysqli_result MySQLi result object.
-   */
-  private $mysqliResult;
-  
-  /**
-   * @var array[] List of saved rows.
-   */
-  private $rows = array();
+class MysqliResultSet implements ResultSet
+{
 
-  /**
-   * Construct result set.
-   * @param mysqli_result $result MySQLi result object.
-   */
-  public function __construct(\mysqli_result $result) {
-    $this->mysqliResult = $result;
-  }
+    /**
+     * @var mysqli_result MySQLi result object.
+     */
+    private $mysqliResult;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function hasRows() {
-    return ($this->rows[] = $this->fetchAssoc()) !== false;
-  }
+    /**
+     * @var array[] List of saved rows.
+     */
+    private $rows = array();
 
-  /**
-   * Get ordered array from associative array.
-   * @param array $assoc Associative array.
-   * @return mixed[] Ordered array.
-   */
-  private function rowFromAssoc($assoc) {
-    return array_values($assoc);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function fetchRow() {
-    if (!empty($this->rows)) {
-      return $this->rowFromAssoc(array_shift($this->rows));
+    /**
+     * Construct result set.
+     *
+     * @param mysqli_result $result
+     *            MySQLi result object.
+     */
+    public function __construct(\mysqli_result $result)
+    {
+        $this->mysqliResult = $result;
     }
-    $row = $this->mysqliResult->fetch_row();
-    return $row === null ? false : $row;
-  }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function fetchAssoc() {
-    if (!empty($this->rows)) {
-      return array_shift($this->rows);
+    /**
+     * {@inheritdoc}
+     */
+    public function hasRows()
+    {
+        return ($this->rows[] = $this->fetchAssoc()) !== false;
     }
-    $assoc = $this->mysqliResult->fetch_assoc();
-    return $assoc === null ? false : $assoc;
-  }
+
+    /**
+     * Get ordered array from associative array.
+     *
+     * @param array $assoc
+     *            Associative array.
+     * @return mixed[] Ordered array.
+     */
+    private function rowFromAssoc($assoc)
+    {
+        return array_values($assoc);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function fetchRow()
+    {
+        if (! empty($this->rows)) {
+            return $this->rowFromAssoc(array_shift($this->rows));
+        }
+        $row = $this->mysqliResult->fetch_row();
+        return $row === null ? false : $row;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function fetchAssoc()
+    {
+        if (! empty($this->rows)) {
+            return array_shift($this->rows);
+        }
+        $assoc = $this->mysqliResult->fetch_assoc();
+        return $assoc === null ? false : $assoc;
+    }
 }

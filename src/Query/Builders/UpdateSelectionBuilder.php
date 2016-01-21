@@ -11,44 +11,48 @@ use Jivoo\Data\Query\Updatable;
 /**
  * An update selection.
  */
-class UpdateSelectionBuilder extends SelectionBase implements Updatable, UpdateSelection {
-  /**
-   * @var array Associative array of field names and values
-   */
-  protected $data = array();
-  
-  /**
-   * {@inheritdoc}
-   */
-  public function getData() {
-    return $data;
-  }
+class UpdateSelectionBuilder extends SelectionBase implements Updatable, UpdateSelection
+{
 
-  /**
-   * {@inheritdoc}
-   */
-  public function set($field, $value = null) {
-    if (is_array($field)) {
-      foreach ($field as $f => $val) {
-        $this->data($f, $val);
-      }
+    /**
+     * @var array Associative array of field names and values
+     */
+    protected $data = array();
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData()
+    {
+        return $data;
     }
-    else {
-      if (strpos($field, '=') !== false) {
-        if (!is_array($value)) {
-          $value = func_get_args();
-          $value = array_slice($value, 1);
+
+    /**
+     * {@inheritdoc}
+     */
+    public function set($field, $value = null)
+    {
+        if (is_array($field)) {
+            foreach ($field as $f => $val) {
+                $this->data($f, $val);
+            }
+        } else {
+            if (strpos($field, '=') !== false) {
+                if (! is_array($value)) {
+                    $value = func_get_args();
+                    $value = array_slice($value, 1);
+                }
+            }
+            $this->data[$field] = $value;
         }
-      }
-      $this->data[$field] = $value;
+        return $this;
     }
-    return $this;
-  }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function update() {
-    $this->source->update($this);
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function update()
+    {
+        $this->source->update($this);
+    }
 }

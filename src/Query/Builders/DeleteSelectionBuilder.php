@@ -10,11 +10,14 @@ use Jivoo\Data\Query\Deletable;
 /**
  * A delete selection.
  */
-class DeleteSelectionBuilder extends SelectionBase implements Deletable {
-  /**
-   * {@inheritdoc}
-   */
-  public function delete() {
-    $this->source->delete($this);
-  }
+class DeleteSelectionBuilder extends SelectionBase implements Deletable
+{
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete()
+    {
+        $this->source->delete($this);
+    }
 }

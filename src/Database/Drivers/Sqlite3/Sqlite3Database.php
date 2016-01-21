@@ -13,63 +13,68 @@ use Jivoo\Data\Database\ConnectionException;
 /**
  * SQLite3 database driver.
  */
-class Sqlite3Database extends SqlDatabaseBase {
-  /**
-   * @var SQLite3 SQLite3 object.
-   */
-  private $handle;
+class Sqlite3Database extends SqlDatabaseBase
+{
 
-  /**
-   * {@inheritdoc}
-   */
-  public function init($options = array()) {
-    $this->setTypeAdapter(new SqliteTypeAdapter($this));
-    if (isset($options['tablePrefix']))
-      $this->tablePrefix = $options['tablePrefix'];
-    try {
-      $this->handle = new \SQLite3($options['filename']);
-    }
-    catch (\Exception $exception) {
-      throw new ConnectionException(
-        tr('SQLite database does not exist and could not be created: %1',
-          $options['filename']),
-        0, $exception
-      );
-    }
-  }
+    /**
+     * @var SQLite3 SQLite3 object.
+     */
+    private $handle;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function close() {
-    $this->handle->close();
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function init($options = array())
+    {
+        $this->setTypeAdapter(new SqliteTypeAdapter($this));
+        if (isset($options['tablePrefix'])) {
+            $this->tablePrefix = $options['tablePrefix'];
+        }
+        try {
+            $this->handle = new \SQLite3($options['filename']);
+        } catch (\Exception $exception) {
+            throw new ConnectionException(
+                'SQLite database does not exist and could not be created: ' . $options['filename'],
+                0,
+                $exception
+            );
+        }
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function quoteString($string) {
-    return '"' . $this->handle->escapeString($string) . '"';
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function close()
+    {
+        $this->handle->close();
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function rawQuery($sql, $pk = null) {
-    $this->logger->debug('SQLite3 query: {query}', array('query' => $sql));
-    $result = $this->handle->query($sql);
-    if (!$result) {
-      throw new QueryException($this->handle
-        ->lastErrorMsg());
+    /**
+     * {@inheritdoc}
+     */
+    public function quoteString($string)
+    {
+        return '"' . $this->handle->escapeString($string) . '"';
     }
-    if (preg_match('/^\\s*(pragma|select|show|explain|describe) /i', $sql)) {
-      return new Sqlite3ResultSet($result);
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rawQuery($sql, $pk = null)
+    {
+        $this->logger->debug('SQLite3 query: {query}', array(
+            'query' => $sql
+        ));
+        $result = $this->handle->query($sql);
+        if (! $result) {
+            throw new QueryException($this->handle->lastErrorMsg());
+        }
+        if (preg_match('/^\\s*(pragma|select|show|explain|describe) /i', $sql)) {
+            return new Sqlite3ResultSet($result);
+        } elseif (preg_match('/^\\s*(insert|replace) /i', $sql)) {
+            return $this->handle->lastInsertRowID();
+        } else {
+            return $this->handle->changes();
+        }
     }
-    else if (preg_match('/^\\s*(insert|replace) /i', $sql)) {
-      return $this->handle->lastInsertRowID();
-    }
-    else {
-      return $this->handle->changes();
-    }
-  }
 }

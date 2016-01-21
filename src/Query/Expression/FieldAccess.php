@@ -12,29 +12,36 @@ use Jivoo\Data\Record;
 /**
  * A literal.
  */
-class FieldAccess implements Expression {
-  public $field;
-  public $model;
-  
-  public function __construct($field, $model = null) {
-    $this->field = $field;
-    $this->model = $model;
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  public function __invoke(Record $record) {
-    $field = $this->field;
-    return $record->$field;
-  }
+class FieldAccess implements Expression
+{
 
-  /**
-   * {@inheritDoc}
-   */
-  public function toString(Quoter $quoter) {
-    if (isset($this->model))
-      return $quoter->quoteModel($this->model) . '.' . $quoter->quoteField($this->field);
-    return $quoter->quoteField($this->field);
-  }
+    public $field;
+
+    public $model;
+
+    public function __construct($field, $model = null)
+    {
+        $this->field = $field;
+        $this->model = $model;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __invoke(Record $record)
+    {
+        $field = $this->field;
+        return $record->$field;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toString(Quoter $quoter)
+    {
+        if (isset($this->model)) {
+            return $quoter->quoteModel($this->model) . '.' . $quoter->quoteField($this->field);
+        }
+        return $quoter->quoteField($this->field);
+    }
 }

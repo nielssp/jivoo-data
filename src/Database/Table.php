@@ -12,59 +12,73 @@ use Jivoo\Models\Schema;
 /**
  * A database table.
  */
-abstract class Table extends ModelBase {
-  /**
-   * Set schema of table.
-   * @param Schema $schema Schema.
-   */
-  public abstract function setSchema(Schema $schema);
+abstract class Table extends ModelBase
+{
 
-  /**
-   * {@inheritdoc}
-   */
-  public function firstSelection(ReadSelectionBuilder $selection) {
-    $resultSet = $this->readSelection($selection->limit(1));
-    if (!$resultSet->hasRows())
-      return null;
-    return $this->createExisting($resultSet->fetchAssoc(), $selection);
-  }
+    /**
+     * Set schema of table.
+     *
+     * @param Schema $schema
+     *            Schema.
+     */
+    abstract public function setSchema(Schema $schema);
 
-  /**
-   * {@inheritdoc}
-   */
-  public function lastSelection(ReadSelectionBuilder $selection) {
-    $resultSet = $this->readSelection($selection->reverseOrder()->limit(1));
-    if (!$resultSet->hasRows())
-      return null;
-    return $this->createExisting($resultSet->fetchAssoc(), $selection);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function read(ReadSelectionBuilder $selection) {
-    $resultSet = $this->readSelection($selection);
-    return new ResultSetIterator($this, $resultSet, $selection);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function readCustom(ReadSelectionBuilder $selection, ModelBase $model = null) {
-    $resultSet = $this->readSelection($selection);
-    if (isset($model))
-      return new ResultSetIterator($model, $resultSet, $selection);
-    $result = array();
-    while ($resultSet->hasRows()) {
-      $result[] = $resultSet->fetchAssoc();
+    /**
+     * {@inheritdoc}
+     */
+    public function firstSelection(ReadSelectionBuilder $selection)
+    {
+        $resultSet = $this->readSelection($selection->limit(1));
+        if (! $resultSet->hasRows()) {
+            return null;
+        }
+        return $this->createExisting($resultSet->fetchAssoc(), $selection);
     }
-    return $result;
-  }
 
-  /**
-   * Read a selection.
-   * @param ReadSelectionBuilder $selection A read selection.
-   * @return ResultSet A result set.
-   */
-  public abstract function readSelection(ReadSelectionBuilder $selection);
+    /**
+     * {@inheritdoc}
+     */
+    public function lastSelection(ReadSelectionBuilder $selection)
+    {
+        $resultSet = $this->readSelection($selection->reverseOrder()
+            ->limit(1));
+        if (! $resultSet->hasRows()) {
+            return null;
+        }
+        return $this->createExisting($resultSet->fetchAssoc(), $selection);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function read(ReadSelectionBuilder $selection)
+    {
+        $resultSet = $this->readSelection($selection);
+        return new ResultSetIterator($this, $resultSet, $selection);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function readCustom(ReadSelectionBuilder $selection, ModelBase $model = null)
+    {
+        $resultSet = $this->readSelection($selection);
+        if (isset($model)) {
+            return new ResultSetIterator($model, $resultSet, $selection);
+        }
+        $result = array();
+        while ($resultSet->hasRows()) {
+            $result[] = $resultSet->fetchAssoc();
+        }
+        return $result;
+    }
+
+    /**
+     * Read a selection.
+     *
+     * @param ReadSelectionBuilder $selection
+     *            A read selection.
+     * @return ResultSet A result set.
+     */
+    abstract public function readSelection(ReadSelectionBuilder $selection);
 }

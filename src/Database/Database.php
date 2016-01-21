@@ -8,45 +8,52 @@ namespace Jivoo\Data\Database;
 /**
  * A database.
  */
-interface Database {
-  /**
-   * Get table.
-   * @param string $table Table name
-   * @return Table Table.
-   * @throws InvalidTableException If the table doesn't exist.
-   */
-  public function __get($table);
-  
-  /**
-   * Whether or not a table exists.
-   * @param string $table Table name.
-   * @return bool True if table exists, false otherwise.
-   */
-  public function __isset($table);
-  
-  /**
-   * Close database connection.
-   */
-  public function close();
-  
-  /**
-   * Get schema of database.
-   * @return DatabaseSchema Database schema.
-   */
-  public function getSchema();
-  
-  /**
-   * Begin database transaction.
-   */
-  public function beginTransaction();
-  
-  /**
-   * Commit database transaction.
-   */
-  public function commit();
-  
-  /**
-   * Rollback database transaction.
-   */
-  public function rollback();
+interface Database
+{
+
+    /**
+     * Get table.
+     *
+     * @param string $table
+     *            Table name
+     * @return Table Table.
+     * @throws InvalidTableException If the table doesn't exist.
+     */
+    public function __get($table);
+
+    /**
+     * Whether or not a table exists.
+     *
+     * @param string $table
+     *            Table name.
+     * @return bool True if table exists, false otherwise.
+     */
+    public function __isset($table);
+
+    /**
+     * Close database connection.
+     */
+    public function close();
+
+    /**
+     * Get schema of database.
+     *
+     * @return DatabaseSchema Database schema.
+     */
+    public function getSchema();
+
+    /**
+     * Begin database transaction.
+     */
+    public function beginTransaction();
+
+    /**
+     * Commit database transaction.
+     */
+    public function commit();
+
+    /**
+     * Rollback database transaction.
+     */
+    public function rollback();
 }

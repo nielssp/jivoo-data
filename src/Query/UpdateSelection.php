@@ -8,9 +8,12 @@ namespace Jivoo\Data\Query;
 /**
  * An update selection.
  */
-interface UpdateSelection extends Selection {
-  /**
-   * @var array Data.
-   */
-  public function getData();
+interface UpdateSelection extends Selection
+{
+
+    /**
+     *
+     * @return array Data.
+     */
+    public function getData();
 }

@@ -8,22 +8,28 @@ namespace Jivoo\Data\Query;
 /**
  * A record selection with a predicate, an ordering and a limit.
  */
-interface Selection {
-  /**
-   * @return Expression
-   */
-  public function getPredicate();
+interface Selection
+{
 
-  /**
-   * List of 2-tuples describing ordering. Each tuple consists of a string
-   * (the field name) and a bool (true if descending order, false if ascending).
-   * @return array[]
-   */
-  public function getOrdering();
-  
-  /**
-   * Optional selection limit.
-   * @return int|null Limit.
-  */
-  public function getLimit();
+    /**
+     *
+     * @return Expression
+     */
+    public function getPredicate();
+
+    /**
+     * List of 2-tuples describing ordering.
+     * Each tuple consists of a string
+     * (the field name) and a bool (true if descending order, false if ascending).
+     *
+     * @return array[]
+     */
+    public function getOrdering();
+
+    /**
+     * Optional selection limit.
+     *
+     * @return int|null Limit.
+     */
+    public function getLimit();
 }

@@ -10,12 +10,16 @@ use Jivoo\Models\Record;
 /**
  * A record validator.
  */
-interface Validator {
-  /**
-   * Validate a record.
-   * @param Record $record Record to validate.
-   * @return string[] An associative array of field names and error messages (array should
-   * be empty if record is valid).
-   */
-  public function validate(Record $record);
+interface Validator
+{
+
+    /**
+     * Validate a record.
+     *
+     * @param Record $record
+     *            Record to validate.
+     * @return string[] An associative array of field names and error messages (array should
+     *         be empty if record is valid).
+     */
+    public function validate(Record $record);
 }

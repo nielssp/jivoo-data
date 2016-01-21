@@ -11,18 +11,24 @@ use Jivoo\Data\Record;
 /**
  * A record expression.
  */
-interface Expression {
-  /**
-   * Apply expression to a record.
-   * @param Record $record Record.
-   * @return mixed Result of expression.
-   */
-  public function __invoke(Record $record);
-  
-  /**
-   * Convert expression to a string.
-   * @param Quoter $quoter String quoter.
-   * @return string SQL expression.
-   */
-  public function toString(Quoter $quoter);
+interface Expression
+{
+
+    /**
+     * Apply expression to a record.
+     *
+     * @param Record $record
+     *            Record.
+     * @return mixed Result of expression.
+     */
+    public function __invoke(Record $record);
+
+    /**
+     * Convert expression to a string.
+     *
+     * @param Quoter $quoter
+     *            String quoter.
+     * @return string SQL expression.
+     */
+    public function toString(Quoter $quoter);
 }
