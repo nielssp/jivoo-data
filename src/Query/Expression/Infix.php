@@ -16,21 +16,21 @@ class Infix implements Expression
 
     /**
      * Left operand.
-     * 
+     *
      * @var Expression
      */
     public $left;
 
     /**
      * Operator.
-     * 
+     *
      * @var string
      */
     public $operator;
 
     /**
      * Right operand.
-     * 
+     *
      * @var Expression
      */
     public $right;

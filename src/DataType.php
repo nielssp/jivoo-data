@@ -109,7 +109,7 @@ class DataType
      */
     protected function __construct($type, $null = false, $default = null, $flags = 0, $length = null)
     {
-        Assume::that($type < 1 or $type > 10);
+        Assume::that($type >= 1 and $type <= 10);
         $this->type = $type;
         $this->length = $length;
         $this->default = $default;
