@@ -60,6 +60,7 @@ abstract class ArrayDataSource implements DataSource
         if (isset($limit)) {
             $data = array_slice($data, $offset, $limit);
         }
+        $projection = $selection->getProjection();
         // TODO: implement projection
         return $data;
     }

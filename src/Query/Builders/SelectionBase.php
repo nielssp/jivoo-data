@@ -199,8 +199,7 @@ abstract class SelectionBase implements Selectable, Selection
 
     /**
      * Convert a basic selection to a full selection.
-     * Removes
-     * all information specific to read/update/delete.
+     * Removes all information specific to read/update/delete.
      *
      * @return SelectionBuilder Selection.
      */

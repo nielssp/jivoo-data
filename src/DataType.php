@@ -7,6 +7,7 @@ namespace Jivoo\Data;
 
 use Jivoo\Models\Validation\ValidatorField;
 use Jivoo\InvalidPropertyException;
+use Jivoo\Assume;
 
 /**
  * Model field data type.
@@ -108,9 +109,7 @@ class DataType
      */
     protected function __construct($type, $null = false, $default = null, $flags = 0, $length = null)
     {
-        if ($type < 1 or $type > 10) {
-            throw new InvalidDataTypeException(tr('%1 is not a valid type', $type));
-        }
+        Assume::that($type < 1 or $type > 10);
         $this->type = $type;
         $this->length = $length;
         $this->default = $default;

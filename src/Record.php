@@ -53,23 +53,9 @@ interface Record extends \ArrayAccess
     /**
      * Get associated model.
      *
-     * @return BasicModel Associated model.
+     * @return Model Associated model.
      */
     public function getModel();
-
-    /**
-     * Get associative array of field names and error messages.
-     *
-     * @return string[] Associative array of field names and error messages.
-     */
-    public function getErrors();
-
-    /**
-     * Whether or not the record contains errors.
-     *
-     * @return bool True if record is considered valid (i.e. no errors).
-     */
-    public function isValid();
 
     /**
      * Set value of a field.
@@ -111,6 +97,20 @@ interface Record extends \ArrayAccess
     public function getVirtualData();
 
     /**
+     * Get associative array of field names and error messages.
+     *
+     * @return string[] Associative array of field names and error messages.
+     */
+    public function getErrors();
+
+    /**
+     * Whether or not the record contains errors.
+     *
+     * @return bool True if record is considered valid (i.e. no errors).
+     */
+    public function isValid();
+
+    /**
      * Save record.
      *
      * @return bool True if successfully saved, false on errors.
@@ -123,8 +123,7 @@ interface Record extends \ArrayAccess
     public function delete();
 
     /**
-     * Determine if the record is new (i.e.
-     * not yet saved).
+     * Determine if the record is new (i.e. not yet saved).
      *
      * @return bool True if new, false otherwise.
      */
@@ -133,7 +132,7 @@ interface Record extends \ArrayAccess
     /**
      * Determine if the record has unsaved data.
      *
-     * @return bool True if saved, false otherwise.
+     * @return bool True if saved, false if unsaved data exists.
      */
     public function isSaved();
 }

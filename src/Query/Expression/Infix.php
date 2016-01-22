@@ -14,10 +14,25 @@ use Jivoo\Data\Record;
 class Infix implements Expression
 {
 
+    /**
+     * Left operand.
+     * 
+     * @var Expression
+     */
     public $left;
 
+    /**
+     * Operator.
+     * 
+     * @var string
+     */
     public $operator;
 
+    /**
+     * Right operand.
+     * 
+     * @var Expression
+     */
     public $right;
 
     public function __construct(Expression $left, $operator, Expression $right = null)
