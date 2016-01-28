@@ -12,7 +12,7 @@ use Jivoo\Data\Record;
 /**
  * A literal.
  */
-class FieldAccess implements Expression
+class FieldAccess extends Node implements Expression, Atomic
 {
 
     public $field;

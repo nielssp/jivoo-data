@@ -5,6 +5,21 @@ use Jivoo\Data\DataType;
 
 class ExpressionParserTest extends \Jivoo\TestCase
 {
+    
+    public function testInstance()
+    {
+        $e = new ExpressionParser('1 = %i', array(1));
+        $record = $this->getMockBuilder('Jivoo\Data\Record')->getMock();
+        $this->assertTrue($e($record));
+        $e = $e->or('1 = 2');
+        $this->assertTrue($e($record));
+        $e = $e->and('1 = 2');
+        $this->assertFalse($e($record));
+
+        $quoter = $this->getMockBuilder('Jivoo\Data\Query\Expression\Quoter')->getMock();
+        $quoter->method('quoteLiteral')->willReturn(1);
+        $this->assertEquals('((1 = 1) or 1 = 2) and 1 = 2', $e->toString($quoter));
+    }
 
     public function testLex()
     {

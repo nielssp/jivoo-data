@@ -11,7 +11,7 @@ use Jivoo\Data\Record;
 /**
  * An infix operator.
  */
-class Infix implements Expression
+class Infix extends Node implements Expression
 {
 
     /**
@@ -86,6 +86,11 @@ class Infix implements Expression
      */
     public function toString(Quoter $quoter)
     {
-        return $this->left->toString($quoter) . ' ' . $this->operator . ' ' . $this->right->toString($quoter);
+        if (! ($this->left instanceof Atomic)) {
+            return '(' . $this->left->toString($quoter) . ') '
+                . $this->operator . ' ' . $this->right->toString($quoter);
+        }
+        return $this->left->toString($quoter) . ' '
+            . $this->operator . ' ' . $this->right->toString($quoter);
     }
 }

@@ -6,6 +6,7 @@
 namespace Jivoo\Data\Query\Expression;
 
 use Jivoo\Data\Query\Expression;
+use Jivoo\Data\DataType;
 
 /**
  * Quotes strings, model names, and field names in expressions.

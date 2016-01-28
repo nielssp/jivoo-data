@@ -10,6 +10,8 @@ use Jivoo\Data\DataType;
 use Jivoo\Parse\RegexLexer;
 use Jivoo\Data\Query\Expression;
 use Jivoo\Assume;
+use Jivoo\Data\Query\E;
+use Jivoo\Data\Record;
 
 /**
  * A parser for simple SQL-like comparison expressions.
@@ -33,8 +35,61 @@ use Jivoo\Assume;
  * | column
  * </code>
  */
-class ExpressionParser
+class ExpressionParser extends Node implements Expression
 {
+
+    /**
+     * @var string
+     */
+    private $expr = '';
+    
+    /**
+     * @var array
+     */
+    private $vars = array();
+    
+    /**
+     * @var Expression|null
+     */
+    private $ast = null;
+    
+    /**
+     * Construct condition.
+     * The function {@see where} is an alias.
+     *
+     * @param Condition|string $expr
+     *            Expression.
+     * @param array $vars
+     *            Additional values to replace placeholders in
+     *            $expr with.
+     */
+    public function __construct($expr = null, $vars = array())
+    {
+        if (isset($expr) and ! empty($expr)) {
+            $this->expr = $expr;
+            $this->vars = $vars;
+        }
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function __invoke(Record $record)
+    {
+        if (! isset($this->ast)) {
+            $tokens = ExpressionParser::lex($this->expr, $this->vars);
+            $this->ast = ExpressionParser::parseExpression($tokens);
+        }
+        return $this->ast->__invoke($record);
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function toString(Quoter $quoter)
+    {
+        return E::interpolate($this->expr, $this->vars, $quoter);
+    }
 
     /**
      *

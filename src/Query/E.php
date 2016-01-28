@@ -7,10 +7,10 @@ namespace Jivoo\Data\Query;
 
 use Jivoo\Data\DataType;
 use Jivoo\Data\Query\Expression;
-use Jivoo\Data\Query\Builders\ExpressionBuilder;
 use Jivoo\Data\Model;
 use Jivoo\Data\Query\Expression\Quoter;
 use Jivoo\Assume;
+use Jivoo\Data\Query\Expression\ExpressionParser;
 
 /**
  * Expression utilities.
@@ -36,7 +36,7 @@ class E
     {
         $vars = func_get_args();
         array_shift($vars);
-        return new ExpressionBuilder($expr, $vars);
+        return new ExpressionParser($expr, $vars);
     }
 
     /**

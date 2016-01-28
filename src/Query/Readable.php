@@ -12,7 +12,7 @@ use Jivoo\Data\Schema;
 /**
  * An interface for readable models and selections.
  */
-interface Readable extends Selectable
+interface Readable extends Selectable, \IteratorAggregate, \Countable
 {
 
     /**

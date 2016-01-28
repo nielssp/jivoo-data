@@ -12,7 +12,7 @@ use Jivoo\Data\Record;
 /**
  * A literal.
  */
-class ArrayLiteral implements Expression
+class ArrayLiteral implements Expression, Atomic
 {
 
     public $type;

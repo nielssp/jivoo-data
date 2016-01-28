@@ -11,7 +11,7 @@ use Jivoo\Data\Record;
 /**
  * A prefix operator.
  */
-class Prefix implements Expression
+class Prefix extends Node implements Expression
 {
 
     public $operator;
@@ -40,6 +40,9 @@ class Prefix implements Expression
      */
     public function toString(Quoter $quoter)
     {
+        if (! ($this->operand instanceof Atomic)) {
+            return $this->operator . ' (' . $this->operand->toString($quoter) . ')';
+        }
         return $this->operator . ' ' . $this->operand->toString($quoter);
     }
 }
