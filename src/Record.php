@@ -53,9 +53,9 @@ interface Record extends \ArrayAccess
     /**
      * Get associated model.
      *
-     * @return Model Associated model.
+     * @return DataSource Associated model.
      */
-    public function getModel();
+    public function getSource();
 
     /**
      * Set value of a field.

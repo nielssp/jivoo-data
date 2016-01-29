@@ -32,7 +32,7 @@ class Prefix extends Node implements Expression
         if ($this->operator == 'not') {
             return ! $this->operand->__invoke($record);
         }
-        trigger_error(E_USER_ERROR, 'undefined operator: ' . $this->operator);
+        trigger_error('undefined operator: ' . $this->operator, E_USER_ERROR);
     }
 
     /**

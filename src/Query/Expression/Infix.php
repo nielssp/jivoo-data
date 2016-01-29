@@ -48,9 +48,14 @@ class Infix extends Node implements Expression
     public function __invoke(Record $record)
     {
         $left = $this->left->__invoke($record);
+        
+        if ($this->operator == 'is' and $this->right === null) {
+            return $left === null;
+        }
+        
         $right = $this->right->__invoke($record);
+        // "like" | "in" | "!=" | "<>" | ">=" | "<=" | "!<" | "!>" | "=" | "<" | ">"
         switch ($this->operator) {
-            // "like" | "in" | "!=" | "<>" | ">=" | "<=" | "!<" | "!>" | "=" | "<" | ">"
             case 'like':
                 return $left == $right; // TODO: should be case insensitive?
             case 'in':
@@ -77,8 +82,9 @@ class Infix extends Node implements Expression
                 return $left and $right;
             case 'or':
                 return $left or $right;
+            default:
+                trigger_error('undefined operator: ' . $this->operator, E_USER_ERROR);
         }
-        trigger_error(E_USER_ERROR, 'undefined operator: ' . $this->operator);
     }
 
     /**
