@@ -19,20 +19,20 @@ use Jivoo\Data\Record;
  * <code>
  * expression ::= ["not"] comparison
  * comparison ::= atomic operator atomic
- * | atomic "is" "null"
- * operator ::= "like" | "in" | "!=" | "<>" | ">=" | "<=" | "!<" | "!>" | "=" | "<" | ">"
- * column ::= [table "."] (field | name)
- * table ::= model | name
- * field ::= "[" name "]"
- * | "%" ("field" | "column" | "c")
- * model ::= "{" name "}"
- * | "%" ("model" | "m")
- * atomic ::= number
- * | "true"
- * | "false"
- * | string
- * | placeholder
- * | column
+ *              | atomic "is" "null"
+ * operator   ::= "like" | "in" | "!=" | "<>" | ">=" | "<=" | "!<" | "!>" | "=" | "<" | ">"
+ * column     ::= [table "."] (field | name)
+ * table      ::= model | name
+ * field      ::= "[" name "]"
+ *              | "%" ("field" | "column" | "c")
+ * model      ::= "{" name "}"
+ *              | "%" ("model" | "m")
+ * atomic     ::= number
+ *              | "true"
+ *              | "false"
+ *              | string
+ *              | placeholder
+ *              | column
  * </code>
  */
 class ExpressionParser extends Node implements Expression
@@ -247,18 +247,21 @@ class ExpressionParser extends Node implements Expression
             $input->expectToken('dot');
             if (! $input->acceptToken('field', $fToken)) {
                 $fToken = $input->expectToken('name');
+                return new FieldAccess($fToken[1], false, $mToken[1]);
             }
-            return new FieldAccess($fToken[1], $mToken[1]);
+            return new FieldAccess($fToken[1], true, $mToken[1]);
         }
-        if (! $input->acceptToken('field', $first)) {
-            $first = $input->expectToken('name');
+        if ($input->acceptToken('field', $field)) {
+            return new FieldAccess($field[1]);
         }
+        $first = $input->expectToken('name');
         if ($input->acceptToken('dot')) {
             if (! $input->acceptToken('field', $fToken)) {
                 $fToken = $input->expectToken('name');
+                return new FieldAccess($fToken[1], false, $first[1], false);
             }
-            return new FieldAccess($fToken[1], $first[1]);
+            return new FieldAccess($fToken[1], true, $first[1], false);
         }
-        return new FieldAccess($first[1]);
+        return new FieldAccess($first[1], false);
     }
 }

@@ -16,13 +16,19 @@ class FieldAccess extends Node implements Expression, Atomic
 {
 
     public $field;
+    
+    public $quoteField;
 
     public $model;
+    
+    public $quoteModel;
 
-    public function __construct($field, $model = null)
+    public function __construct($field, $quoteField = true, $model = null, $quoteModel = true)
     {
         $this->field = $field;
+        $this->quoteField = $quoteField;
         $this->model = $model;
+        $this->quoteModel = $quoteModel;
     }
 
     /**
@@ -39,9 +45,19 @@ class FieldAccess extends Node implements Expression, Atomic
      */
     public function toString(Quoter $quoter)
     {
+        $str = '';
         if (isset($this->model)) {
-            return $quoter->quoteModel($this->model) . '.' . $quoter->quoteField($this->field);
+            if ($this->quoteModel) {
+                $str = $quoter->quoteModel($this->model) . '.';
+            } else {
+                $str = $this->model . '.';
+            }
         }
-        return $quoter->quoteField($this->field);
+        if ($this->quoteField) {
+            $str .= $quoter->quoteField($this->field);
+        } else {
+            $str .= $this->field;
+        }
+        return $str;
     }
 }

@@ -33,7 +33,7 @@ class Prefix extends Node implements Expression
             return ! $this->operand->__invoke($record);
         }
         trigger_error('undefined operator: ' . $this->operator, E_USER_ERROR);
-    }
+    } // @codeCoverageIgnore
 
     /**
      * {@inheritdoc}

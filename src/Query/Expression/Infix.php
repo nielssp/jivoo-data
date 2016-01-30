@@ -57,7 +57,7 @@ class Infix extends Node implements Expression
         // "like" | "in" | "!=" | "<>" | ">=" | "<=" | "!<" | "!>" | "=" | "<" | ">"
         switch ($this->operator) {
             case 'like':
-                return $left == $right; // TODO: should be case insensitive?
+                return strtolower($left) == strtolower($right);
             case 'in':
                 return in_array($left, $right);
             case '!=':
@@ -85,7 +85,7 @@ class Infix extends Node implements Expression
             default:
                 trigger_error('undefined operator: ' . $this->operator, E_USER_ERROR);
         }
-    }
+    } // @codeCoverageIgnore
 
     /**
      * {@inheritdoc}

@@ -11,31 +11,24 @@ class PrefixTest extends \Jivoo\TestCase
         $record = $this->getMockBuilder('Jivoo\Data\Record')->getMock();
         $quoter = $this->getMockBuilder('Jivoo\Data\Query\Expression\Quoter')->getMock();
         $quoter->method('quoteLiteral')->willReturnCallback(function ($type, $value) {
-            return $value;
+            return $value ? 'true' : 'false';
         });
-        
-        $getInfix = function ($left, $operator, $right) {
-            return new Infix(
-                new Literal(DataType::detectType($left), $left),
-                $operator,
-                new Literal(DataType::detectType($right), $right)
-            );
-        };
-                
-        $this->assertTrue($getInfix(5, '>', 4)->__invoke($record));
-        $this->assertFalse($getInfix(5, '<', 4)->__invoke($record));
-        $this->assertTrue($getInfix(5, '=', 5)->__invoke($record));
-        $this->assertFalse($getInfix(5, '!=', 5)->__invoke($record));
-        $this->assertTrue($getInfix(5, '<>', 4)->__invoke($record));
-        $this->assertFalse($getInfix(5, '!>', 4)->__invoke($record));
-        $this->assertTrue($getInfix(5, '!<', 4)->__invoke($record));
-        $this->assertFalse($getInfix(5, '<=', 4)->__invoke($record));
-        $this->assertTrue($getInfix(5, '>=', 5)->__invoke($record));
-        $this->assertTrue($getInfix(2, 'in', array(1, 2, 4))->__invoke($record));
-        $this->assertTrue($getInfix('test', 'like', 'test')->__invoke($record));
-        $isNull = new Infix(new Literal(DataType::integer(), null), 'is', null);
-        $this->assertTrue($isNull->__invoke($record));
 
-        $this->assertEquals('2 = 5', $getInfix(2, '=', 5)->toString($quoter));
+        $prefix = new Prefix('not', new Literal(DataType::boolean(), true));
+        $this->assertFalse($prefix->__invoke($record));
+        $this->assertEquals('not true', $prefix->toString($quoter));
+
+        $prefix = new Prefix('not', new Infix(
+            new Literal(DataType::boolean(), true),
+            'and',
+            new Literal(DataType::boolean(), false)
+        ));
+        $this->assertTrue($prefix->__invoke($record));
+        $this->assertEquals('not (true and false)', $prefix->toString($quoter));
+
+        $prefix = new Prefix('!', new Literal(DataType::boolean(), true));
+        $this->assertThrows('PHPUnit_Framework_Error', function () use ($prefix, $record) {
+            $prefix($record);
+        });
     }
 }

@@ -23,7 +23,7 @@ class E
     }
 
     /**
-     * Construct and expression.
+     * Construct an expression.
      *
      * @param Expression|string $expr
      *            Expression

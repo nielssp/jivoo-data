@@ -50,26 +50,47 @@ class ExpressionParserTest extends \Jivoo\TestCase
         $ast = ExpressionParser::parseColumn(ExpressionParser::lex('foo'));
         $this->assertInstanceOf('Jivoo\Data\Query\Expression\FieldAccess', $ast);
         $this->assertEquals('foo', $ast->field);
+        $this->assertFalse($ast->quoteField);
+        
+        $ast = ExpressionParser::parseColumn(ExpressionParser::lex('[foo]'));
+        $this->assertInstanceOf('Jivoo\Data\Query\Expression\FieldAccess', $ast);
+        $this->assertEquals('foo', $ast->field);
+        $this->assertTrue($ast->quoteField);
         
         $ast = ExpressionParser::parseColumn(ExpressionParser::lex('foo.bar'));
         $this->assertInstanceOf('Jivoo\Data\Query\Expression\FieldAccess', $ast);
         $this->assertEquals('bar', $ast->field);
+        $this->assertFalse($ast->quoteField);
         $this->assertEquals('foo', $ast->model);
+        $this->assertFalse($ast->quoteModel);
         
-        $ast = ExpressionParser::parseColumn(ExpressionParser::lex('foo.bar'));
+        $ast = ExpressionParser::parseColumn(ExpressionParser::lex('foo.[bar]'));
         $this->assertInstanceOf('Jivoo\Data\Query\Expression\FieldAccess', $ast);
         $this->assertEquals('bar', $ast->field);
+        $this->assertTrue($ast->quoteField);
         $this->assertEquals('foo', $ast->model);
-        
-        $ast = ExpressionParser::parseColumn(ExpressionParser::lex('[foo].[bar]'));
-        $this->assertInstanceOf('Jivoo\Data\Query\Expression\FieldAccess', $ast);
-        $this->assertEquals('bar', $ast->field);
-        $this->assertEquals('foo', $ast->model);
+        $this->assertFalse($ast->quoteModel);
         
         $ast = ExpressionParser::parseColumn(ExpressionParser::lex('{Foo}.bar'));
         $this->assertInstanceOf('Jivoo\Data\Query\Expression\FieldAccess', $ast);
         $this->assertEquals('bar', $ast->field);
+        $this->assertFalse($ast->quoteField);
         $this->assertEquals('Foo', $ast->model);
+        $this->assertTrue($ast->quoteModel);
+        
+        $ast = ExpressionParser::parseColumn(ExpressionParser::lex('{Foo}.[bar]'));
+        $this->assertInstanceOf('Jivoo\Data\Query\Expression\FieldAccess', $ast);
+        $this->assertEquals('bar', $ast->field);
+        $this->assertTrue($ast->quoteField);
+        $this->assertEquals('Foo', $ast->model);
+        $this->assertTrue($ast->quoteModel);
+        
+        $ast = ExpressionParser::parseColumn(ExpressionParser::lex('%m.%c', array('Model', 'foo')));
+        $this->assertInstanceOf('Jivoo\Data\Query\Expression\FieldAccess', $ast);
+        $this->assertEquals('foo', $ast->field);
+        $this->assertTrue($ast->quoteField);
+        $this->assertEquals('Model', $ast->model);
+        $this->assertTrue($ast->quoteModel);
     }
 
     public function testParseAtomic()
