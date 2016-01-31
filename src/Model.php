@@ -40,5 +40,5 @@ interface Model extends Readable, Updatable, Deletable, DataSource
      *            ignored.
      * @return Record A record.
      */
-    public function create($data = array(), $allowedFields = null);
+    public function create(array $data = array(), $allowedFields = null);
 }
