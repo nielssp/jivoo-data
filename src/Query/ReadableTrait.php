@@ -5,15 +5,15 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Query;
 
-use Jivoo\Data\DataType;
-use Jivoo\Data\DataSource;
-use Jivoo\Data\Schema;
+use Jivoo\Data\Query\Builders\SelectionBuilder;
 
 /**
- * An interface for readable models and selections.
+ * A trait that implements {@see Readable}.
  */
-interface Readable extends Selectable, \IteratorAggregate, \Countable
+trait ReadableTrait
 {
+    use SelectableTrait;
+
 
     /**
      * Set offset.
@@ -22,7 +22,11 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      *            Offset.
      * @return Readable A readable selection.
      */
-    public function offset($offset);
+    public function offset($offset)
+    {
+        $selection = new SelectionBuilder($this->getSource());
+        return $selection->offset($offset);
+    }
 
     /**
      * Set alias for selection source.
@@ -31,7 +35,11 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      *            Alias.
      * @return Readable A readable selection.
      */
-    public function alias($alias);
+    public function alias($alias)
+    {
+        $selection = new SelectionBuilder($this->getSource());
+        return $selection->alias($alias);
+    }
 
     /**
      * Make a projection.
@@ -43,7 +51,11 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      *            Alias.
      * @return array[] List of associative arrays
      */
-    public function select($expression, $alias = null);
+    public function select($expression, $alias = null)
+    {
+        $selection = new SelectionBuilder($this->getSource());
+        return $selection->select($expression, $alias);
+    }
 
     /**
      * Append an extra virtual field to the returned records.
@@ -56,7 +68,11 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      *            Optional type of field.
      * @return ReadSelection A read selection.
      */
-    public function with($field, $expression, DataType $type = null);
+    public function with($field, $expression, DataType $type = null)
+    {
+        $selection = new SelectionBuilder($this->getSource());
+        return $selection->with($field, $expression, $type);
+    }
 
     /**
      * Append an extra virtual field (with a record as the value) to the returned
@@ -69,7 +85,11 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      *            Schema of associated record.
      * @return Readable A readable selection.
      */
-    public function withRecord($field, Schema $schema);
+    public function withRecord($field, Schema $schema)
+    {
+        $selection = new SelectionBuilder($this->getSource());
+        return $selection->withRecord($field, $schema);
+    }
 
     /**
      * Group by one or more columns.
@@ -81,7 +101,11 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      *            Grouping predicate.
      * @return Readable A readable selection.
      */
-    public function groupBy($columns, $predicate = null);
+    public function groupBy($columns, $predicate = null)
+    {
+        $selection = new SelectionBuilder($this->getSource());
+        return $selection->groupBy($columns, $predicate);
+    }
 
     /**
      * Perform an inner join with another data source.
@@ -94,7 +118,11 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      *            Alias for joined model/table.
      * @return Readable A readable selection.
      */
-    public function innerJoin(DataSource $other, $condition, $alias = null);
+    public function innerJoin(DataSource $other, $condition, $alias = null)
+    {
+        $selection = new SelectionBuilder($this->getSource());
+        return $selection->innerJoin($other, $condition, $alias);
+    }
 
     /**
      * Perform a left join with another data source.
@@ -107,7 +135,11 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      *            Alias for joined model/table.
      * @return Readable A readable selection.
      */
-    public function leftJoin(DataSource $other, $condition, $alias = null);
+    public function leftJoin(DataSource $other, $condition, $alias = null)
+    {
+        $selection = new SelectionBuilder($this->getSource());
+        return $selection->leftJoin($other, $condition, $alias);
+    }
 
     /**
      * Perform a right join with another data source.
@@ -120,7 +152,11 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      *            Alias for joined model/table.
      * @return Readable A readable selection.
      */
-    public function rightJoin(DataSource $other, $condition, $alias = null);
+    public function rightJoin(DataSource $other, $condition, $alias = null)
+    {
+        $selection = new SelectionBuilder($this->getSource());
+        return $selection->rightJoin($other, $condition, $alias);
+    }
 
     /**
      * Fetch only distinct records (i.e.
@@ -130,33 +166,64 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      *            Whether to fetch only distinct records.
      * @return Readable A readable selection.
      */
-    public function distinct($distinct = true);
+    public function distinct($distinct = true)
+    {
+        $selection = new SelectionBuilder($this->getSource());
+        return $selection->distinct($distinct);
+    }
 
     /**
      * Return first record in selection.
      *
      * @return \Jivoo\Data\Record|null A record if available..
      */
-    public function first();
+    public function first()
+    {
+        $selection = new SelectionBuilder($this->getSource());
+        return $selection->first();
+    }
 
     /**
      * Return last record in selection.
      *
      * @return \Jivoo\Data\Record|null A record if available.
      */
-    public function last();
+    public function last()
+    {
+        $selection = new SelectionBuilder($this->getSource());
+        return $selection->last();
+    }
 
     /**
      * Count number of records in selection.
      *
      * @return int Number of records.
      */
-    // public function count();
+    public function count()
+    {
+        $selection = new SelectionBuilder($this->getSource());
+        return $selection->count();
+    }
     
     /**
      * Convert selection to an array.
      *
      * @return \Jivoo\Data\Record[] Array of records.
      */
-    public function toArray();
+    public function toArray()
+    {
+        $selection = new SelectionBuilder($this->getSource());
+        return $selection->toArray();
+    }
+    
+    /**
+     * Get iterator.
+     *
+     * @return \Iterator Iterator
+     */
+    public function toArray()
+    {
+        $selection = new SelectionBuilder($this->getSource());
+        return $selection->getIterator();
+    }
 }
