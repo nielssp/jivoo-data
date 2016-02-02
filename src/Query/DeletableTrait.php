@@ -6,6 +6,7 @@
 namespace Jivoo\Data\Query;
 
 use Jivoo\Data\Query\Builders\SelectionBuilder;
+use Jivoo\Data\Query\Builders\DeleteSelectionBuilder;
 
 /**
  * A trait that implements {@see Deletable}.
@@ -21,7 +22,7 @@ trait DeletableTrait
      */
     public function delete()
     {
-        $selection = new SelectionBuilder($this->getSource());
+        $selection = new DeleteSelectionBuilder($this->getSource());
         return $selection->delete();
     }
 }

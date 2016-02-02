@@ -7,6 +7,7 @@ namespace Jivoo\Models\Validation;
 
 use Jivoo\Models\BasicModel;
 use Jivoo\Models\Record;
+use Jivoo\I18n\I18n;
 
 /**
  * A record validator.
@@ -177,7 +178,7 @@ class ValidatorBuilder implements Validator
             return true;
         }
         // if (!is_scalar($value)) {
-        // return tr('Must be a scalar.');
+        // return I18n::get('Must be a scalar.');
         // }
         switch ($ruleName) {
             case 'type':
@@ -186,22 +187,22 @@ class ValidatorBuilder implements Validator
                 if ((! empty($value) or is_numeric($value)) == $rule) {
                     return true;
                 }
-                return $rule ? tr('Must not be empty.') : tr('Must be empty.');
+                return $rule ? I18n::get('Must not be empty.') : I18n::get('Must be empty.');
             case 'null':
                 if (is_null($value) == $rule) {
                     return true;
                 }
-                return $rule ? tr('Must not be set.') : tr('Must be set.');
+                return $rule ? I18n::get('Must not be set.') : I18n::get('Must be set.');
             case 'email':
                 if ((preg_match(self::EMAIL_REGEX, $value) == 1) == $rule) {
                     return true;
                 }
-                return $rule ? tr('Not a valid email address.') : tr('Must not be an email address.');
+                return $rule ? I18n::get('Not a valid email address.') : I18n::get('Must not be an email address.');
             case 'url':
                 if ((preg_match("/^https?:\/\/[-a-z0-9@:%_\+\.~#\?&\/=\[\]]+$/i", $value) == 1) == $rule) {
                     return true;
                 }
-                return $rule ? tr('Not a valid URL.') : tr('Must not be a URL.');
+                return $rule ? I18n::get('Not a valid URL.') : I18n::get('Must not be a URL.');
             case 'date':
                 $timestamp = false;
                 if (preg_match('/^[-+]?\d+$/', $value) == 1) {
@@ -212,59 +213,59 @@ class ValidatorBuilder implements Validator
                 if (($timestamp !== false) == $rule) {
                     return true;
                 }
-                return $rule ? tr('Not a valid date.') : tr('Must not be a date.');
+                return $rule ? I18n::get('Not a valid date.') : I18n::get('Must not be a date.');
             case 'minLength':
                 if (strlen($value) >= $rule) {
                     return true;
                 }
-                return tn('Must be at least %1 characters long.', 'Must be at least %1 character long.', $rule);
+                return I18n::nget('Must be at least %1 characters long.', 'Must be at least %1 character long.', $rule);
             case 'maxLength':
                 if (strlen($value) <= $rule) {
                     return true;
                 }
-                return tn('Must be at most %1 characters long.', 'Must be at most %1 character long.', $rule);
+                return I18n::nget('Must be at most %1 characters long.', 'Must be at most %1 character long.', $rule);
             case 'numeric':
                 if (is_numeric($value) == $rule) {
                     return true;
                 }
-                return $rule ? tr('Must be numeric.') : tr('Must not be numeric.');
+                return $rule ? I18n::get('Must be numeric.') : I18n::get('Must not be numeric.');
             case 'integer':
                 if ((preg_match('/^[-+]?\d+$/', $value) == 1) == $rule) {
                     return true;
                 }
-                return $rule ? tr('Must be an integer.') : tr('Must not be an integer.');
+                return $rule ? I18n::get('Must be an integer.') : I18n::get('Must not be an integer.');
             case 'float':
                 if ((preg_match('/^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/', $value) == 1) == $rule) {
                     return true;
                 }
-                return $rule ? tr('Must be a decimal number.') : tr('Must not be a decimal number.');
+                return $rule ? I18n::get('Must be a decimal number.') : I18n::get('Must not be a decimal number.');
             case 'boolean':
                 if ((preg_match('/^(0|1|true|false|yes|no)$/i', $value) == 1) == $rule) {
                     return true;
                 }
-                return $rule ? tr('Must be boolean (true or false).') : tr('Must not be boolean.');
+                return $rule ? I18n::get('Must be boolean (true or false).') : I18n::get('Must not be boolean.');
             case 'minValue':
                 $value = is_float($rule) ? (float) $value : (int) $value;
                 if ($value >= $rule) {
                     return true;
                 }
-                return tr('Must be greater than or equal to %1.', $rule);
+                return I18n::get('Must be greater than or equal to %1.', $rule);
             case 'maxValue':
                 $value = is_float($rule) ? (float) $value : (int) $value;
                 if ($value <= $rule) {
                     return true;
                 }
-                return tr('Must be less than or equal to %1.', $rule);
+                return I18n::get('Must be less than or equal to %1.', $rule);
             case 'in':
                 if (in_array($value, $rule)) {
                     return true;
                 }
-                return tn('Must be either "%1{", "}{" or "}".', 'Must be "%1{", "}{" or "}".', $rule);
+                return I18n::nget('Must be either "%1{", "}{" or "}".', 'Must be "%1{", "}{" or "}".', $rule);
             case 'match':
                 if (preg_match($rule, $value) == 1) {
                     return true;
                 }
-                return tr('Invalid value.');
+                return I18n::get('Invalid value.');
             case 'unique':
                 $selection = $record->getModel();
                 if (! $record->isNew()) {
@@ -273,7 +274,7 @@ class ValidatorBuilder implements Validator
                 if (($selection->where($field . ' = ?', $value)->count() == 0) == $rule) {
                     return true;
                 }
-                return $rule ? tr('Must be unique.') : tr('Must not be unique.');
+                return $rule ? I18n::get('Must be unique.') : I18n::get('Must not be unique.');
             case 'callback':
                 if (! is_array($rule)) {
                     $rule = array(

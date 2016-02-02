@@ -40,8 +40,8 @@ interface Selectable extends Boolean
     /**
      * Limit number of records.
      *
-     * @param
-     *            int Number of records.
+     * @param int $limit
+     *            Number of records.
      * @return Selectable A selection.
      */
     public function limit($limit);

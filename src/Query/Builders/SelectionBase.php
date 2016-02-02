@@ -107,7 +107,7 @@ abstract class SelectionBase implements Selectable, Selection
                 $method
             ), $args);
         }
-        throw new InvalidMethodException(tr('Invalid method: %1', $method));
+        throw new InvalidMethodException('Invalid method: ' . $method);
     }
 
     /**

@@ -156,7 +156,7 @@ class RecordBuilder implements Record
             return $this->virtual[$field];
         }
         if (! array_key_exists($field, $this->data)) {
-            throw new InvalidPropertyException(tr('Invalid property: %1', $field));
+            throw new InvalidPropertyException('Invalid property: ' . $field);
         }
         return $this->data[$field];
     }
@@ -167,7 +167,7 @@ class RecordBuilder implements Record
     public function __set($field, $value)
     {
         if (! array_key_exists($field, $this->data)) {
-            throw new InvalidPropertyException(tr('Invalid property: %1', $field));
+            throw new InvalidPropertyException('Invalid property: ' . $field);
         }
         $this->data[$field] = $value;
         $this->updatedData[$field] = $value;
@@ -183,7 +183,7 @@ class RecordBuilder implements Record
             return isset($this->virtual[$field]);
         }
         if (! array_key_exists($field, $this->data)) {
-            throw new InvalidPropertyException(tr('Invalid property: %1', $field));
+            throw new InvalidPropertyException('Invalid property: ' . $field);
         }
         return isset($this->data[$field]);
     }
@@ -194,7 +194,7 @@ class RecordBuilder implements Record
     public function __unset($field)
     {
         if (! array_key_exists($field, $this->data)) {
-            throw new InvalidPropertyException(tr('Invalid property: %1', $field));
+            throw new InvalidPropertyException('Invalid property: ' . $field);
         }
         $this->data[$field] = null;
         $this->updatedData[$field] = null;

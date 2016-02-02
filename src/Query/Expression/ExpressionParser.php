@@ -20,7 +20,7 @@ use Jivoo\Data\Record;
  * expression ::= ["not"] comparison
  * comparison ::= atomic operator atomic
  *              | atomic "is" "null"
- * operator   ::= "like" | "in" | "!=" | "<>" | ">=" | "<=" | "!<" | "!>" | "=" | "<" | ">"
+ * operator   ::= "like" | "in" | "!=" | "<>" | ">=" | "<=" | "!<" | "!>" | "=" | "<" | ">" | "and" | "or"
  * column     ::= [table "."] (field | name)
  * table      ::= model | name
  * field      ::= "[" name "]"

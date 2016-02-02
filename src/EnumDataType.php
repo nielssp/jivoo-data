@@ -48,7 +48,7 @@ class EnumDataType extends DataType
             $this->values = Enum::getValues($this->class);
         }
         if (isset($default) and ! in_array($default, $this->values)) {
-            throw new InvalidEnumException(tr('Default value must be part of enum'));
+            throw new InvalidEnumException('Default value must be part of enum');
         }
     }
 
@@ -62,7 +62,7 @@ class EnumDataType extends DataType
         }
         if ($property === 'placeholder') {
             if (! isset($this->class)) {
-                throw new InvalidPropertyException(tr('Invalid use of anonymous enum type'));
+                throw new InvalidPropertyException('Invalid use of anonymous enum type');
             }
             return '%' . $this->class;
         }

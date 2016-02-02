@@ -21,7 +21,7 @@ interface Boolean
      *            Method name ('and' or 'or')
      * @param mixed[] $args
      *            List of parameters
-     * @return Expression Expression.
+     * @return Boolean Expression.
      */
     public function __call($method, $args);
 
@@ -33,7 +33,7 @@ interface Boolean
      * @param mixed $vars,...
      *            Additional values to replace placeholders in
      *            $expr with.
-     * @return Expression Expression.
+     * @return Boolean Expression.
      */
     public function where($expr);
 
@@ -45,7 +45,7 @@ interface Boolean
      * @param mixed $vars,...
      *            Additional values to replace placeholders in
      *            $expr with.
-     * @return Expression Expression.
+     * @return Boolean Expression.
      */
     public function andWhere($expr);
 
@@ -57,7 +57,7 @@ interface Boolean
      * @param mixed $vars,...
      *            Additional values to replace placeholders in
      *            $expr with.
-     * @return Expression Expression.
+     * @return Boolean Expression.
      */
     public function orWhere($expr);
 }

@@ -89,14 +89,14 @@ abstract class Enum
         }
         if (! isset(self::$values[$class])) {
             if (! self::classExists($class)) {
-                throw new InvalidEnumException(tr('Enum class not found: %1', $class));
+                throw new InvalidEnumException('Enum class not found: ' . $class);
             }
             $class = self::$classes[$class];
             Assume::isSubclassOf($class, 'Jivoo\Models\Enum');
             $ref = new \ReflectionClass($class);
             self::$values[$class] = array_flip($ref->getConstants());
             if (count(self::$values[$class]) < 1) {
-                throw new InvalidEnumException(tr('Enum type "%1" must contain at least one constant', $class));
+                throw new InvalidEnumException('Enum type "' . $class . '" must contain at least one constant');
             }
         }
         return self::$values[$class];

@@ -174,7 +174,7 @@ class DataType
                     return ! $this->signed;
             }
         }
-        throw new InvalidPropertyException(tr('Invalid property: %1', $property));
+        throw new InvalidPropertyException('Invalid property: ' . $property);
     }
 
     /**
@@ -763,6 +763,6 @@ class DataType
         if (Enum::classExists($placeholder)) {
             return self::enum($placeholder);
         }
-        throw new InvalidDataTypeException(tr('Invalid data type placeholder: %1', '%' . $placeholder));
+        throw new InvalidDataTypeException('Invalid data type placeholder: %' . $placeholder);
     }
 }

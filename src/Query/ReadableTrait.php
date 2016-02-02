@@ -5,7 +5,7 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Query;
 
-use Jivoo\Data\Query\Builders\SelectionBuilder;
+use Jivoo\Data\Query\Builders\ReadSelectionBuilder;
 
 /**
  * A trait that implements {@see Readable}.
@@ -24,7 +24,7 @@ trait ReadableTrait
      */
     public function offset($offset)
     {
-        $selection = new SelectionBuilder($this->getSource());
+        $selection = new ReadSelectionBuilder($this->getSource());
         return $selection->offset($offset);
     }
 
@@ -37,7 +37,7 @@ trait ReadableTrait
      */
     public function alias($alias)
     {
-        $selection = new SelectionBuilder($this->getSource());
+        $selection = new ReadSelectionBuilder($this->getSource());
         return $selection->alias($alias);
     }
 
@@ -53,7 +53,7 @@ trait ReadableTrait
      */
     public function select($expression, $alias = null)
     {
-        $selection = new SelectionBuilder($this->getSource());
+        $selection = new ReadSelectionBuilder($this->getSource());
         return $selection->select($expression, $alias);
     }
 
@@ -70,7 +70,7 @@ trait ReadableTrait
      */
     public function with($field, $expression, DataType $type = null)
     {
-        $selection = new SelectionBuilder($this->getSource());
+        $selection = new ReadSelectionBuilder($this->getSource());
         return $selection->with($field, $expression, $type);
     }
 
@@ -87,7 +87,7 @@ trait ReadableTrait
      */
     public function withRecord($field, Schema $schema)
     {
-        $selection = new SelectionBuilder($this->getSource());
+        $selection = new ReadSelectionBuilder($this->getSource());
         return $selection->withRecord($field, $schema);
     }
 
@@ -103,7 +103,7 @@ trait ReadableTrait
      */
     public function groupBy($columns, $predicate = null)
     {
-        $selection = new SelectionBuilder($this->getSource());
+        $selection = new ReadSelectionBuilder($this->getSource());
         return $selection->groupBy($columns, $predicate);
     }
 
@@ -120,7 +120,7 @@ trait ReadableTrait
      */
     public function innerJoin(DataSource $other, $condition, $alias = null)
     {
-        $selection = new SelectionBuilder($this->getSource());
+        $selection = new ReadSelectionBuilder($this->getSource());
         return $selection->innerJoin($other, $condition, $alias);
     }
 
@@ -137,7 +137,7 @@ trait ReadableTrait
      */
     public function leftJoin(DataSource $other, $condition, $alias = null)
     {
-        $selection = new SelectionBuilder($this->getSource());
+        $selection = new ReadSelectionBuilder($this->getSource());
         return $selection->leftJoin($other, $condition, $alias);
     }
 
@@ -154,7 +154,7 @@ trait ReadableTrait
      */
     public function rightJoin(DataSource $other, $condition, $alias = null)
     {
-        $selection = new SelectionBuilder($this->getSource());
+        $selection = new ReadSelectionBuilder($this->getSource());
         return $selection->rightJoin($other, $condition, $alias);
     }
 
@@ -168,7 +168,7 @@ trait ReadableTrait
      */
     public function distinct($distinct = true)
     {
-        $selection = new SelectionBuilder($this->getSource());
+        $selection = new ReadSelectionBuilder($this->getSource());
         return $selection->distinct($distinct);
     }
 
@@ -179,7 +179,7 @@ trait ReadableTrait
      */
     public function first()
     {
-        $selection = new SelectionBuilder($this->getSource());
+        $selection = new ReadSelectionBuilder($this->getSource());
         return $selection->first();
     }
 
@@ -190,7 +190,7 @@ trait ReadableTrait
      */
     public function last()
     {
-        $selection = new SelectionBuilder($this->getSource());
+        $selection = new ReadSelectionBuilder($this->getSource());
         return $selection->last();
     }
 
@@ -201,7 +201,7 @@ trait ReadableTrait
      */
     public function count()
     {
-        $selection = new SelectionBuilder($this->getSource());
+        $selection = new ReadSelectionBuilder($this->getSource());
         return $selection->count();
     }
     
@@ -212,7 +212,7 @@ trait ReadableTrait
      */
     public function toArray()
     {
-        $selection = new SelectionBuilder($this->getSource());
+        $selection = new ReadSelectionBuilder($this->getSource());
         return $selection->toArray();
     }
     
@@ -221,9 +221,9 @@ trait ReadableTrait
      *
      * @return \Iterator Iterator
      */
-    public function toArray()
+    public function getIterator()
     {
-        $selection = new SelectionBuilder($this->getSource());
+        $selection = new ReadSelectionBuilder($this->getSource());
         return $selection->getIterator();
     }
 }

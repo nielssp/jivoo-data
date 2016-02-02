@@ -5,7 +5,7 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Query;
 
-use Jivoo\Data\Query\Builders\SelectionBuilder;
+use Jivoo\Data\Query\Builders\UpdateSelectionBuilder;
 
 /**
  * A trait that implements {@see Updatable}.
@@ -29,7 +29,7 @@ trait UpdatableTrait
      */
     public function set($field, $value = null)
     {
-        $selection = new SelectionBuilder($this->getSource());
+        $selection = new UpdateSelectionBuilder($this->getSource());
         return $selection->set($field, $value);
     }
 
@@ -40,7 +40,7 @@ trait UpdatableTrait
      */
     public function update()
     {
-        $selection = new SelectionBuilder($this->getSource());
+        $selection = new UpdateSelectionBuilder($this->getSource());
         return $selection->update();
     }
 }

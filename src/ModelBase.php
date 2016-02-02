@@ -7,13 +7,14 @@ namespace Jivoo\Data;
 
 use Jivoo\Data\Query\UpdatableTrait;
 use Jivoo\Data\Query\DeletableTrait;
+use Jivoo\Data\Query\ReadableTrait;
 
 /**
  * A selectable data source with a schema.
  */
 abstract class ModelBase implements Model
 {
-    use UpdatableTrait, DeletableTrait;
+    use UpdatableTrait, DeletableTrait, ReadableTrait;
         
     /**
      * {@inheritDoc}
