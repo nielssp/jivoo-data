@@ -39,25 +39,6 @@ interface Record extends \ArrayAccess
     public function getData();
 
     /**
-     * Add data to record.
-     *
-     * @param array $data
-     *            Associative array of field names and values.
-     * @param string[]|null $allowedFields
-     *            List of allowed fields (null for all
-     *            fields allowed), fields that are not allowed (or not in the model) will be
-     *            ignored.
-     */
-    public function addData($data, $allowedFields = null);
-
-    /**
-     * Get associated model.
-     *
-     * @return DataSource Associated model.
-     */
-    public function getSource();
-
-    /**
      * Set value of a field.
      *
      * @param string $field
@@ -90,11 +71,16 @@ interface Record extends \ArrayAccess
     public function set($field, $value);
 
     /**
-     * Get virtual data.
+     * Add data to record.
      *
-     * @return array Associative array of data.
+     * @param array $data
+     *            Associative array of field names and values.
+     * @param string[]|null $allowedFields
+     *            List of allowed fields (null for all
+     *            fields allowed), fields that are not allowed (or not in the model) will be
+     *            ignored.
      */
-    public function getVirtualData();
+    public function addData($data, $allowedFields = null);
 
     /**
      * Get associative array of field names and error messages.

@@ -5,7 +5,6 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Query;
 
-use Jivoo\Data\Query\Builders\SelectionBuilder;
 use Jivoo\Data\Query\Builders\DeleteSelectionBuilder;
 
 /**

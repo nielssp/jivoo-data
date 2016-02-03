@@ -18,7 +18,7 @@ abstract class ArrayDataSource implements DataSource
 
     /**
      *
-     * @return array[] List of records.
+     * @return Record[] List of records.
      */
     abstract public function getData();
 
@@ -112,17 +112,33 @@ abstract class ArrayDataSource implements DataSource
 
     public static function sortAll($data, $orderings)
     {
-        $orderings = array_reverse($orderings);
-        foreach ($orderings as $ordering) {
-            $data = self::sort($data, $ordering[0], $ordering[1]);
-        }
+        Assume::isArray($data);
+        usort($data, function (Record $a, Record $b) use ($orderings) {
+            foreach ($orderings as $ordering) {
+                list($field, $descending) = $ordering;
+                if ($a->$field == $b->$field) {
+                    continue;
+                }
+                if ($descending) {
+                    if (is_numeric($a->$field)) {
+                        return $b->$field - $a->$field;
+                    }
+                    return strcmp($b->$field, $a->$field);
+                } else {
+                    if (is_numeric($a->$field)) {
+                        return $a->$field - $b->$field;
+                    }
+                    return strcmp($a->$field, $b->$field);
+                }
+            }
+        });
         return $data;
     }
 
     public static function sort($data, $field, $descending = false)
     {
         Assume::isArray($data);
-        usort($data, function (BasicRecord $a, BasicRecord $b) use ($field, $descending) {
+        usort($data, function (Record $a, Record $b) use ($field, $descending) {
             if ($a->$field == $b->$field) {
                 return 0;
             }

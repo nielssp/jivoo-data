@@ -12,13 +12,6 @@ interface Schema
 {
 
     /**
-     * Get name of schema.
-     *
-     * @return string Name.
-     */
-    public function getName();
-
-    /**
      * Get list of fields.
      *
      * @return string[] List of field names.

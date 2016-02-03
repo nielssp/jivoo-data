@@ -19,25 +19,9 @@ class SchemaBuilder implements Schema
     private $fields = array();
 
     /**
-     * @var string Name of table.
-     */
-    private $name = 'undefined';
-
-    /**
      * @var array List of keys.
      */
     private $keys = array();
-
-    /**
-     * Constructor
-     *
-     * @param string $name
-     *            Name of schema
-     */
-    public function __construct($name)
-    {
-        $this->name = $name;
-    }
 
     /**
      * Set type of field.
@@ -124,14 +108,6 @@ class SchemaBuilder implements Schema
     public function getFields()
     {
         return array_keys($this->fields);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->name;
     }
 
     /**
@@ -239,7 +215,7 @@ class SchemaBuilder implements Schema
      */
     public function getKeys()
     {
-        return $this->keys;
+        return array_keys($this->keys);
     }
 
     /**
