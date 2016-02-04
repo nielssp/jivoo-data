@@ -1,9 +1,23 @@
 <?php
 namespace Jivoo\Data;
 
-class ArrayDataSourceTest extends \Jivoo\TestCase
+use Jivoo\Data\Query\Builders\DeleteSelectionBuilder;
+
+class ArrayDataSourceBaseTest extends \Jivoo\TestCase
 {
 
+    public function testDelete()
+    {
+        $source = new ArrayDataSource([
+            1 => new ArrayRecord(['id' => 1, 'name' => 'foo']),
+            2 => new ArrayRecord(['id' => 2, 'name' => 'bar']),
+            3 => new ArrayRecord(['id' => 3, 'name' => 'foobar'])
+        ]);
+        
+        $selection = new DeleteSelectionBuilder($source);
+        
+    }
+    
     public function testSort()
     {
         $data = [

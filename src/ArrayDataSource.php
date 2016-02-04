@@ -11,149 +11,66 @@ use Jivoo\Data\Query\ReadSelection;
 use Jivoo\Assume;
 
 /**
- * An array data source.
+ * A data source based on an array of records.
  */
-abstract class ArrayDataSource implements DataSource
+class ArrayDataSource extends ArrayDataSourceBase
 {
-
+    
     /**
-     *
-     * @return Record[] List of records.
+     * @var Record[]
      */
-    abstract public function getData();
-
+    private $data;
+    
     /**
-     *
-     * @param mixed $key
+     * Construct data source from list of records.
+     * @param Record[] $data Records.
      */
-    abstract public function deleteKey($key);
-
-    /**
-     *
-     * @param mixed $key
-     * @param array $record
-     */
-    abstract public function updateKey($key, $record);
-
-    /**
-     * {@inheritdoc}
-     */
-    public function read(ReadSelection $selection)
+    public function __construct(array $data)
     {
-        $data = $this->getData();
-        if (count($selection->getJoins()) > 0) {
-            throw new \Exception('unsupported operation');
-        }
-        $predicate = $selection->getPredicate();
-        $data = new PredicateArray($data, $predicate);
-        $grouping = $selection->getGrouping();
-        if (count($grouping)) {
-            $data = self::sortAll($data, $grouping);
-            $predicate = $selection->getGroupPredicate();
-            if (isset($predicate)) {
-                $data = new PredicateArray($data, $predicate);
-            }
-        }
-        $data = self::sortAll($data, $selection->getOrdering());
-        $limit = $selection->getLimit();
-        $offset = $selection->getOffset();
-        if (isset($limit)) {
-            $data = array_slice($data, $offset, $limit);
-        }
-        $projection = $selection->getProjection();
-        // TODO: implement projection
-        return $data;
+        $this->data = $data;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function update(UpdateSelection $selection)
+    public function insert(array $data, $replace = false)
     {
-        $data = $this->getData();
-        $data = self::sortAll($data, $selection->getOrdering());
-        $updates = $selection->getData();
-        $limit = $selection->getLimit();
-        $predicate = $selection->getPredicate();
-        $count = 0;
-        foreach ($data as $key => $record) {
-            if ($predicate($record)) {
-                $this->updateKey($key, array_merge($record, $updates));
-                $count ++;
-                if (isset($limit) and $count >= $limit) {
-                    break;
-                }
-            }
-        }
-        return $count;
+        $this->data[] = new ArrayRecord($data);
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function delete(Selection $selection)
+    public function insertMultiple(array $records, $replace = false)
     {
-        $data = $this->getData();
-        $data = self::sortAll($data, $selection->getOrdering());
-        $limit = $selection->getLimit();
-        $predicate = $selection->getPredicate();
-        $count = 0;
-        foreach ($data as $key => $record) {
-            if ($predicate($record)) {
-                $this->deleteKey($key);
-                $count ++;
-                if (isset($limit) and $count >= $limit) {
-                    break;
-                }
-            }
+        foreach ($records as $record) {
+            $this->insert($record, $replace);
         }
-        return $count;
+        return null;
     }
 
-    public static function sortAll($data, $orderings)
+    /**
+     * {@inheritdoc}
+     */
+    public function getData()
     {
-        Assume::isArray($data);
-        usort($data, function (Record $a, Record $b) use ($orderings) {
-            foreach ($orderings as $ordering) {
-                list($field, $descending) = $ordering;
-                if ($a->$field == $b->$field) {
-                    continue;
-                }
-                if ($descending) {
-                    if (is_numeric($a->$field)) {
-                        return $b->$field - $a->$field;
-                    }
-                    return strcmp($b->$field, $a->$field);
-                } else {
-                    if (is_numeric($a->$field)) {
-                        return $a->$field - $b->$field;
-                    }
-                    return strcmp($a->$field, $b->$field);
-                }
-            }
-        });
-        return $data;
+        return $this->data;
     }
 
-    public static function sort($data, $field, $descending = false)
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteKey($key)
     {
-        Assume::isArray($data);
-        usort($data, function (Record $a, Record $b) use ($field, $descending) {
-            if ($a->$field == $b->$field) {
-                return 0;
-            }
-            if ($descending) {
-                if (is_numeric($a->$field)) {
-                    return $b->$field - $a->$field;
-                }
-                return strcmp($b->$field, $a->$field);
-            } else {
-                if (is_numeric($a->$field)) {
-                    return $a->$field - $b->$field;
-                }
-                return strcmp($a->$field, $b->$field);
-            }
-        });
-        return $data;
+        unset($this->data[$key]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function updateKey($key, array $record)
+    {
+        $this->data[$key]->addData($record);
     }
 }

@@ -6,13 +6,12 @@
 namespace Jivoo\Data\Query\Builders;
 
 use Jivoo\Models\ModelBase;
-use Jivoo\Models\Condition\ConditionBuilder;
-use Jivoo\InvalidPropertyException;
 use Jivoo\InvalidMethodException;
 use Jivoo\Data\Query\Selection;
 use Jivoo\Data\DataSource;
-use Jivoo\Data\Query\Expression\E;
 use Jivoo\Data\Query\Expression;
+use Jivoo\Data\Query\Selectable;
+use Jivoo\Data\Query\Expression\ExpressionParser;
 
 /**
  * A basic selection.
@@ -49,7 +48,7 @@ abstract class SelectionBase implements Selectable, Selection
      */
     public function __construct(DataSource $source)
     {
-        $this->predicate = new ExpressionBuilder();
+        $this->predicate = new ExpressionParser();
         $this->source = $source;
     }
 

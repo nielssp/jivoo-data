@@ -24,7 +24,7 @@ interface DataSource
      *            Whether to replace records on conflict.
      * @return int|null Last insert id if any.
      */
-    public function insert($data, $replace = false);
+    public function insert(array $data, $replace = false);
 
     /**
      * Insert multiple data records directly into model.
@@ -37,7 +37,7 @@ interface DataSource
      *            Whether to replace records on conflict.
      * @return int|null Last insert id if any.
      */
-    public function insertMultiple($records, $replace = false);
+    public function insertMultiple(array $records, $replace = false);
 
     /**
      * Retrieve the selected records.
