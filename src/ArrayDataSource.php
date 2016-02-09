@@ -5,11 +5,6 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data;
 
-use Jivoo\Data\Query\Selection;
-use Jivoo\Data\Query\UpdateSelection;
-use Jivoo\Data\Query\ReadSelection;
-use Jivoo\Assume;
-
 /**
  * A data source based on an array of records.
  */
@@ -22,12 +17,18 @@ class ArrayDataSource extends ArrayDataSourceBase
     private $data;
     
     /**
+     * @var int
+     */
+    private $insertId = 0;
+    
+    /**
      * Construct data source from list of records.
      * @param Record[] $data Records.
      */
     public function __construct(array $data)
     {
-        $this->data = $data;
+        $this->data = array_values($data);
+        $this->insertId = count($this->data);
     }
 
     /**
@@ -35,8 +36,8 @@ class ArrayDataSource extends ArrayDataSourceBase
      */
     public function insert(array $data, $replace = false)
     {
-        $this->data[] = new ArrayRecord($data);
-        return null;
+        $this->data[$this->insertId] = new ArrayRecord($data);
+        return $this->insertId++;
     }
 
     /**
@@ -47,7 +48,7 @@ class ArrayDataSource extends ArrayDataSourceBase
         foreach ($records as $record) {
             $this->insert($record, $replace);
         }
-        return null;
+        return $this->insertId;
     }
 
     /**

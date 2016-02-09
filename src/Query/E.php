@@ -11,6 +11,7 @@ use Jivoo\Data\Model;
 use Jivoo\Data\Query\Expression\Quoter;
 use Jivoo\Assume;
 use Jivoo\Data\Query\Expression\ExpressionParser;
+use Jivoo\Data\Query\Expression\Literal;
 
 /**
  * Expression utilities.
@@ -30,7 +31,7 @@ class E
      * @param mixed $vars,...
      *            Additional values to replace placeholders in
      *            $expr with.
-     * @return ExpressionBuilder Expression builder.
+     * @return ExpressionParser Expression builder.
      */
     public static function e($expr)
     {

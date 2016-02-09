@@ -12,8 +12,9 @@ interface Selection
 {
 
     /**
+     * An optional predicate expression.
      *
-     * @return Expression
+     * @return Expression|null
      */
     public function getPredicate();
 

@@ -49,7 +49,9 @@ abstract class ArrayDataSourceBase implements DataSource
             throw new \Exception('unsupported operation');
         }
         $predicate = $selection->getPredicate();
-        $data = new PredicateArray($data, $predicate);
+        if (isset($predicate)) {
+            $data = new PredicateArray($data, $predicate);
+        }
         $grouping = $selection->getGrouping();
         if (count($grouping)) {
             $data = self::sortAll($data, $grouping);
@@ -96,9 +98,9 @@ abstract class ArrayDataSourceBase implements DataSource
         $predicate = $selection->getPredicate();
         $count = 0;
         foreach ($data as $key => $record) {
-            if ($predicate($record)) {
+            if ($predicate === null or $predicate($record)) {
                 $this->updateKey($key, array_merge($record->getData(), $updates));
-                $count ++;
+                $count++;
                 if (isset($limit) and $count >= $limit) {
                     break;
                 }
@@ -118,9 +120,9 @@ abstract class ArrayDataSourceBase implements DataSource
         $predicate = $selection->getPredicate();
         $count = 0;
         foreach ($data as $key => $record) {
-            if ($predicate($record)) {
+            if ($predicate === null or $predicate($record)) {
                 $this->deleteKey($key);
-                $count ++;
+                $count++;
                 if (isset($limit) and $count >= $limit) {
                     break;
                 }
@@ -137,10 +139,10 @@ abstract class ArrayDataSourceBase implements DataSource
         return null;
     }
 
-    public static function sortAll($data, $orderings)
+    public static function sortAll($data, $orderings, $assoc = true)
     {
         Assume::isArray($data);
-        usort($data, function (Record $a, Record $b) use ($orderings) {
+        $func = function (Record $a, Record $b) use ($orderings) {
             foreach ($orderings as $ordering) {
                 list($field, $descending) = $ordering;
                 if ($a->$field == $b->$field) {
@@ -158,14 +160,19 @@ abstract class ArrayDataSourceBase implements DataSource
                     return strcmp($a->$field, $b->$field);
                 }
             }
-        });
+        };
+        if ($assoc) {
+            uasort($data, $func);
+        } else {
+            usort($data, $func);
+        }
         return $data;
     }
 
-    public static function sort($data, $field, $descending = false)
+    public static function sort($data, $field, $descending = false, $assoc = true)
     {
         Assume::isArray($data);
-        usort($data, function (Record $a, Record $b) use ($field, $descending) {
+        $func = function (Record $a, Record $b) use ($field, $descending) {
             if ($a->$field == $b->$field) {
                 return 0;
             }
@@ -180,7 +187,12 @@ abstract class ArrayDataSourceBase implements DataSource
                 }
                 return strcmp($a->$field, $b->$field);
             }
-        });
+        };
+        if ($assoc) {
+            uasort($data, $func);
+        } else {
+            usort($data, $func);
+        }
         return $data;
     }
 }

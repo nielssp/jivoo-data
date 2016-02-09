@@ -12,6 +12,7 @@ use Jivoo\Data\DataSource;
 use Jivoo\Data\Query\Expression;
 use Jivoo\Data\Query\Selectable;
 use Jivoo\Data\Query\Expression\ExpressionParser;
+use Jivoo\Data\Query\E;
 
 /**
  * A basic selection.
@@ -31,7 +32,7 @@ abstract class SelectionBase implements Selectable, Selection
     protected $limit = null;
 
     /**
-     * @var Expression
+     * @var Expression|null
      */
     protected $predicate = null;
 
@@ -48,7 +49,6 @@ abstract class SelectionBase implements Selectable, Selection
      */
     public function __construct(DataSource $source)
     {
-        $this->predicate = new ExpressionParser();
         $this->source = $source;
     }
 
@@ -83,28 +83,26 @@ abstract class SelectionBase implements Selectable, Selection
     {
         switch ($method) {
             case 'and':
-                $this->predicate = call_user_func_array(array(
-                    $this->predicate,
-                    'andWhere'
-                ), $args);
+                if (! isset($this->predicate)) {
+                    $expr = array_shift($args);
+                    $this->predicate = new ExpressionParser($expr, $args);
+                } else {
+                    $this->predicate = call_user_func_array([$this->predicate, 'andWhere'], $args);
+                }
                 return $this;
             case 'or':
-                $this->predicate = call_user_func_array(array(
-                    $this->predicate,
-                    'orWhere'
-                ), $args);
+                if (! isset($this->predicate)) {
+                    $expr = array_shift($args);
+                    $this->predicate = new ExpressionParser($expr, $args);
+                } else {
+                    $this->predicate = call_user_func_array([$this->predicate, 'orWhere'], $args);
+                }
                 return $this;
         }
-        // TODO: document this
-        if (is_callable(array(
-            $this->source,
-            $method
-        ))) {
+        // TODO: document this behavior
+        if (is_callable([$this->source, $method])) {
             array_push($args, $this);
-            return call_user_func_array(array(
-                $this->source,
-                $method
-            ), $args);
+            return call_user_func_array([$this->source, $method], $args);
         }
         throw new InvalidMethodException('Invalid method: ' . $method);
     }
@@ -121,39 +119,45 @@ abstract class SelectionBase implements Selectable, Selection
     /**
      * {@inheritdoc}
      */
-    public function where($clause)
+    public function where($expr)
     {
         $args = func_get_args();
-        $this->predicate = call_user_func_array(array(
-            $this->predicate,
-            'where'
-        ), $args);
+        if (! isset($this->predicate)) {
+            $expr = array_shift($args);
+            $this->predicate = new ExpressionParser($expr, $args);
+        } else {
+            $this->predicate = call_user_func_array([$this->predicate, 'where'], $args);
+        }
         return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function andWhere($clause)
+    public function andWhere($expr)
     {
         $args = func_get_args();
-        $this->predicate = call_user_func_array(array(
-            $this->predicate,
-            'andWhere'
-        ), $args);
+        if (! isset($this->predicate)) {
+            $expr = array_shift($args);
+            $this->predicate = new ExpressionParser($expr, $args);
+        } else {
+            $this->predicate = call_user_func_array([$this->predicate, 'andWhere'], $args);
+        }
         return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function orWhere($clause)
+    public function orWhere($expr)
     {
         $args = func_get_args();
-        $this->predicate = call_user_func_array(array(
-            $this->predicate,
-            'orWhere'
-        ), $args);
+        if (! isset($this->predicate)) {
+            $expr = array_shift($args);
+            $this->predicate = new ExpressionParser($expr, $args);
+        } else {
+            $this->predicate = call_user_func_array([$this->predicate, 'orWhere'], $args);
+        }
         return $this;
     }
 

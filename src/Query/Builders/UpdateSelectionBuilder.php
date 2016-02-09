@@ -24,7 +24,7 @@ class UpdateSelectionBuilder extends SelectionBase implements Updatable, UpdateS
      */
     public function getData()
     {
-        return $data;
+        return $this->data;
     }
 
     /**

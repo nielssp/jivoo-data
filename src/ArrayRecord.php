@@ -41,7 +41,7 @@ class ArrayRecord implements Record
             return;
         }
         if (! isset($allowedFields)) {
-            $allowedFields = $this->model->getFields();
+            $allowedFields = array_keys($this->data);
         }
         if (is_array($allowedFields)) {
             $allowedFields = array_flip($allowedFields);

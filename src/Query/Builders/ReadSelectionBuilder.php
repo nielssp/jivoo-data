@@ -5,13 +5,13 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Query\Builders;
 
-use Jivoo\Models\Model;
-use Jivoo\Models\Record;
-use Jivoo\Models\Condition\ConditionBuilder;
-use Jivoo\Models\DataType;
-use Jivoo\Models\BasicModel;
-use Jivoo\Models\ModelBase;
+use Jivoo\Data\Model;
+use Jivoo\Data\Record;
+use Jivoo\Data\DataType;
 use Jivoo\Data\Query\Readable;
+use Jivoo\Data\Query\ReadSelection;
+use Jivoo\Data\Schema;
+use Jivoo\Data\DataSource;
 
 /**
  * A read selection.
@@ -233,20 +233,17 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
     /**
      * {@inheritdoc}
      */
-    public function withRecord($field, BasicModel $model)
+    public function withRecord($field, Schema $schema)
     {
-        foreach ($model->getFields() as $modelField) {
-            if ($model->isVirtual($modelField)) {
-                continue;
-            }
-            $alias = $field . '_' . $modelField;
+        foreach ($schema->getFields() as $schemaField) {
+            $alias = $field . '_' . $schemaField;
             $this->additionalFields[$alias] = array(
                 'alias' => $alias,
-                'expression' => $field . '.' . $modelField,
-                'type' => $model->getType($modelField),
-                'model' => $model,
+                'expression' => $field . '.' . $schemaField,
+                'type' => $schema->getType($schemaField),
+                'schema' => $schema,
                 'record' => $field,
-                'recordField' => $modelField
+                'recordField' => $schemaField
             );
         }
         return $this;
@@ -273,7 +270,7 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
     /**
      * {@inheritdoc}
      */
-    public function innerJoin(Model $dataSource, $predicate = null, $alias = null)
+    public function innerJoin(DataSource $dataSource, $predicate = null, $alias = null)
     {
         if (! ($predicate instanceof Predicate)) {
             $predicate = new ExpressionBuilder($predicate);
@@ -290,7 +287,7 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
     /**
      * {@inheritdoc}
      */
-    public function leftJoin(Model $dataSource, $predicate, $alias = null)
+    public function leftJoin(DataSource $dataSource, $predicate, $alias = null)
     {
         if (! ($condition instanceof Predicate)) {
             $predicate = new ExpressionBuilder($predicate);
@@ -307,7 +304,7 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
     /**
      * {@inheritdoc}
      */
-    public function rightJoin(Model $dataSource, $predicate, $alias = null)
+    public function rightJoin(DataSource $dataSource, $predicate, $alias = null)
     {
         if (! ($condition instanceof Predicate)) {
             $predicate = new ExpressionBuilder($predicate);

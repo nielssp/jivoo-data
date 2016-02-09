@@ -56,7 +56,7 @@ class Infix extends Node implements Expression
         $right = $this->right->__invoke($record);
         // "like" | "in" | "!=" | "<>" | ">=" | "<=" | "!<" | "!>" | "=" | "<" | ">"
         switch ($this->operator) {
-            case 'like':
+            case 'like': // TODO: wildcards
                 return strtolower($left) == strtolower($right);
             case 'in':
                 return in_array($left, $right);
