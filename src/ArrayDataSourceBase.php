@@ -141,6 +141,9 @@ abstract class ArrayDataSourceBase implements DataSource
 
     public static function sortAll($data, $orderings, $assoc = true)
     {
+        if (! count($orderings)) {
+            return $data;
+        }
         Assume::isArray($data);
         $func = function (Record $a, Record $b) use ($orderings) {
             foreach ($orderings as $ordering) {
