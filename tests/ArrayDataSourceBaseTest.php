@@ -56,8 +56,6 @@ class ArrayDataSourceBaseTest extends \Jivoo\TestCase
         $selection->limit(1)->delete();
         
         $this->assertEquals(2, count($source->getData()));
-        $this->assertArrayHasKey(1, $source->getData());
-        $this->assertArrayHasKey(2, $source->getData());
         $this->assertEquals([1 => $data[1], 2 => $data[2]], $source->getData());
         
         // Delete sorted with a limit
@@ -66,8 +64,6 @@ class ArrayDataSourceBaseTest extends \Jivoo\TestCase
         $selection->orderByDescending('id')->limit(1)->delete();
         
         $this->assertEquals(2, count($source->getData()));
-        $this->assertArrayHasKey(0, $source->getData());
-        $this->assertArrayHasKey(1, $source->getData());
         $this->assertEquals([0 => $data[0], 1 => $data[1]], $source->getData());
     }
     
