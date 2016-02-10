@@ -56,8 +56,19 @@ class Infix extends Node implements Expression
         $right = $this->right->__invoke($record);
         // "like" | "in" | "!=" | "<>" | ">=" | "<=" | "!<" | "!>" | "=" | "<" | ">"
         switch ($this->operator) {
-            case 'like': // TODO: wildcards
-                return strtolower($left) == strtolower($right);
+            case 'like': // TODO: character groups? [abc] [^abc]
+                $pattern = preg_split('/(?=^|[^\\\\])(?:\\\\\\\\)*([%_])/', $right, -1, PREG_SPLIT_DELIM_CAPTURE);
+                $regex = '';
+                foreach ($pattern as $substr) {
+                    if ($substr == '%') {
+                        $regex .= '.*';
+                    } elseif ($substr == '_') {
+                        $regex .= '.';
+                    } else {
+                        $regex .= preg_quote($substr, '/');
+                    }
+                }
+                return preg_match('/^' . $regex . '$/i', $left) === 1;
             case 'in':
                 return in_array($left, $right);
             case '!=':

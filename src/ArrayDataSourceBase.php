@@ -57,7 +57,6 @@ abstract class ArrayDataSourceBase implements DataSource
             $data = self::sortAll($data, array_map(function ($column) {
                 return [$column, false];
             }, $grouping));
-            echo 'grouping' . PHP_EOL;
             $previous = null;
             $data = array_filter($data, function (Record $record) use ($grouping, &$previous) {
                 $group = array_intersect_key($record->getData(), array_flip($grouping));
