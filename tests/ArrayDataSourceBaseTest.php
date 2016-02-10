@@ -4,6 +4,7 @@ namespace Jivoo\Data;
 use Jivoo\Data\Query\Builders\DeleteSelectionBuilder;
 use Jivoo\Data\Query\Builders\UpdateSelectionBuilder;
 use Jivoo\Data\Query\Builders\ReadSelectionBuilder;
+use Jivoo\Data\Query\E;
 
 class ArrayDataSourceBaseTest extends \Jivoo\TestCase
 {
@@ -44,7 +45,7 @@ class ArrayDataSourceBaseTest extends \Jivoo\TestCase
         
         $source = new ArrayDataSource($data);
         $selection = new ReadSelectionBuilder($source);
-        $selection = $selection->groupBy(['group', 'name'], 'id <= 3');
+        $selection = $selection->groupBy(['group', 'name'], E::e('name in %s()', ['foo', 'bar', 'foobar']));
         
         $this->assertEquals(3, count($selection->toArray()));
         
