@@ -42,8 +42,17 @@ abstract class ArrayDataSourceBase implements DataSource
     /**
      * {@inheritdoc}
      */
+    public function count(ReadSelection $selection)
+    {
+        return iterator_count($this->read($selection));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function read(ReadSelection $selection)
     {
+        // TODO: distinct and additionalFields
         $data = $this->getData();
         if (count($selection->getJoins()) > 0) {
             throw new \Exception('unsupported operation');

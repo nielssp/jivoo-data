@@ -35,15 +35,9 @@ class ArrayRecord implements Record
     /**
      * {@inheritdoc}
      */
-    public function addData($data, $allowedFields = null)
+    public function addData(array $data, $allowedFields = null)
     {
-        if (! is_array($data)) {
-            return;
-        }
-        if (! isset($allowedFields)) {
-            $allowedFields = array_keys($this->data);
-        }
-        if (is_array($allowedFields)) {
+        if (isset($allowedFields)) {
             $allowedFields = array_flip($allowedFields);
             $data = array_intersect_key($data, $allowedFields);
         }
@@ -58,14 +52,6 @@ class ArrayRecord implements Record
     public function getData()
     {
         return $this->data;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVirtualData()
-    {
-        return $this->virtual;
     }
 
     /**

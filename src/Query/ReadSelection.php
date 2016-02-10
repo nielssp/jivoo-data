@@ -74,4 +74,22 @@ interface ReadSelection extends Selection
      * @return array[]
      */
     public function getProjection();
+    
+    /**
+     * List of aditional virtual fields.
+     *
+     * Each array is of the following format:
+     * <code>
+     * array(
+     *   'alias' => ... // Alias (string)
+     *   'expression' => ..., // Expression (string)
+     *   'type' => ... // Type (DataType|null)
+     *   'model' => ... // Model (BasicModel|null)
+     *   'record' => ... // Record field (string|null)
+     * )
+     * </code>
+     *
+     * @return array[]
+     */
+    public function getAdditionalFields();
 }

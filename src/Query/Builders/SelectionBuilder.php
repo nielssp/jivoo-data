@@ -172,6 +172,7 @@ class SelectionBuilder extends SelectionBase implements Readable, ReadSelection,
      */
     public function rowNumber(Record $record)
     {
+        // TODO: reimplement this functionality somwehere
         return $this->copyBasicAttr(new ReadSelectionBuilder($this->source))->rowNumber($record);
     }
 

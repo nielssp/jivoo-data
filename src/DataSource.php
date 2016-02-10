@@ -40,6 +40,15 @@ interface DataSource
     public function insertMultiple(array $records, $replace = false);
 
     /**
+     * Count the selected records.
+     *
+     * @param Selection $selection
+     *            Record selection.
+     * @return int Number of records in selection.
+     */
+    public function count(ReadSelection $selection);
+
+    /**
      * Retrieve the selected records.
      *
      * @param Selection $selection

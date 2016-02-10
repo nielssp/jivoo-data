@@ -41,7 +41,7 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      *            they are used as aliases).
      * @param string $alias
      *            Alias.
-     * @return array[] List of associative arrays
+     * @return \Iterator A {@see Record} iterator.
      * @todo Rename to 'project' ?
      */
     public function select($expression, $alias = null);

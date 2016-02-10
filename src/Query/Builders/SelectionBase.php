@@ -5,17 +5,14 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Query\Builders;
 
-use Jivoo\Models\ModelBase;
 use Jivoo\InvalidMethodException;
 use Jivoo\Data\Query\Selection;
 use Jivoo\Data\DataSource;
 use Jivoo\Data\Query\Expression;
 use Jivoo\Data\Query\Selectable;
 use Jivoo\Data\Query\Expression\ExpressionParser;
-use Jivoo\Data\Query\E;
 
 /**
- * A basic selection.
  * Base class for other selections.
  */
 abstract class SelectionBase implements Selectable, Selection
@@ -24,27 +21,29 @@ abstract class SelectionBase implements Selectable, Selection
     /**
      * @var array[]
      */
-    protected $ordering = array();
+    private $ordering = array();
 
     /**
      * @var int|null Limit.
      */
-    protected $limit = null;
+    private $limit = null;
 
     /**
      * @var Expression|null
      */
-    protected $predicate = null;
+    private $predicate = null;
 
     /**
+     * The data source.
+     *
      * @var DataSource
      */
     protected $source = null;
 
     /**
-     * Construct basic selection.
+     * Construct selection base.
      *
-     * @param ModelBase $model
+     * @param DataSource $source
      *            Target of selection.
      */
     public function __construct(DataSource $source)

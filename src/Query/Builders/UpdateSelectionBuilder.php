@@ -15,9 +15,9 @@ class UpdateSelectionBuilder extends SelectionBase implements Updatable, UpdateS
 {
 
     /**
-     * @var array Associative array of field names and values
+     * @var array
      */
-    protected $data = array();
+    private $data = array();
 
     /**
      * {@inheritdoc}

@@ -80,7 +80,7 @@ interface Record extends \ArrayAccess
      *            fields allowed), fields that are not allowed (or not in the model) will be
      *            ignored.
      */
-    public function addData($data, $allowedFields = null);
+    public function addData(array $data, $allowedFields = null);
 
     /**
      * Get associative array of field names and error messages.

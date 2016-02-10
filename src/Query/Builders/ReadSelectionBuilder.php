@@ -5,7 +5,6 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Query\Builders;
 
-use Jivoo\Data\Model;
 use Jivoo\Data\Record;
 use Jivoo\Data\DataType;
 use Jivoo\Data\Query\Readable;
@@ -17,101 +16,49 @@ use Jivoo\Data\Query\Expression\ExpressionParser;
 
 /**
  * A read selection.
- *
- * @property-read bool $distinct Distinct.
- * @property-read int $offset Offset.
- *                @proeprty-read array $groupBy An array describing grouping.
- *                @proeprty-read array[] $joins List of arrays describing joings.
- * @property-read array[] $fields List of arrays describing fields.
- * @property-read array[] $additionalFields List of arrays describing fields.
  */
 class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelection
 {
 
     /**
-     * @var bool Distinct.
+     * @var bool
      */
-    protected $distinct = false;
+    private $distinct = false;
 
     /**
-     * @var string|null Alias for source.
+     * @var string|null
      */
-    protected $alias = null;
+    private $alias = null;
 
     /**
-     * An arrays describing grouping.
-     *
-     * Each array is of the following format:
-     * <code>
-     * array(
-     * 'columns' => ... // List of columns
-     * 'condition' => ... // Join condition ({@see Condition})
-     * )
-     * </code>
-     *
-     * @var array
+     * @var string[]|null
      */
-    protected $groupBy = null;
+    private $grouping = null;
 
     /**
-     * @var Predicate
+     * @var Expression|null
      */
     private $groupPredicate = null;
 
     /**
-     * @var int Offset
+     * @var int
      */
-    protected $offset = 0;
+    private $offset = 0;
 
     /**
-     * List of arrays describing joins.
-     *
-     * Each array is of the following format:
-     * <code>
-     * array(
-     * 'source' => ..., // Data source to join with ({@see DataSource})
-     * 'type' => ..., // Type of join: 'INNER', 'RIGHT' or 'LEFT'
-     * 'alias' => ..., // Alias for other data source (string|null)
-     * 'predicate' => ... // Join predicate ({@see Expression})
-     * );
-     * </code>
-     *
      * @var array[]
      */
-    protected $joins = array();
+    private $joins = array();
 
     /**
-     * List of arrays describing columns.
-     *
-     * Each array is of the following format:
-     * <code>
-     * array(
-     * 'expression' => ..., // Expression (string)
-     * 'alias' => ... // Alias (string|null)
-     * )
-     * </code>
-     *
      * @var array[]
      */
-    protected $fields = array();
+    private $projection = array();
 
     /**
-     * List of arrays describing columns.
-     *
-     * Each array is of the following format:
-     * <code>
-     * array(
-     * 'alias' => ... // Alias (string)
-     * 'expression' => ..., // Expression (string)
-     * 'type' => ... // Type (DataType|null)
-     * 'model' => ... // Model (BasicModel|null)
-     * 'record' => ... // Record field (string|null)
-     * )
-     * </code>
-     *
      * @var array[]
      */
-    protected $additionalFields = array();
+    private $additionalFields = array();
 
     /**
      * {@inheritdoc}
@@ -134,7 +81,7 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
      */
     public function getGrouping()
     {
-        return $this->groupBy;
+        return $this->grouping;
     }
 
     /**
@@ -166,7 +113,15 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
      */
     public function getProjection()
     {
-        return $this->fields;
+        return $this->projection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAdditionalFields()
+    {
+        return $this->additionalFields;
     }
 
     /**
@@ -183,19 +138,19 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
      */
     public function select($expression, $alias = null)
     {
-        $this->fields = array();
+        $this->projection = array();
         if (is_array($expression)) {
             foreach ($expression as $alias => $expression) {
                 if (! ($expression instanceof Expression)) {
                     $expression = new ExpressionParser($expression);
                 }
                 if (is_int($alias)) {
-                    $this->fields[] = array(
+                    $this->projection[] = array(
                         'expression' => $expression,
                         'alias' => null
                     );
                 } else {
-                    $this->fields[] = array(
+                    $this->projection[] = array(
                         'expression' => $expression,
                         'alias' => $alias
                     );
@@ -205,13 +160,13 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
             if (! ($expression instanceof Expression)) {
                 $expression = new ExpressionParser($expression);
             }
-            $this->fields[] = array(
+            $this->projection[] = array(
                 'expression' => $expression,
                 'alias' => $alias
             );
         }
         $result = $this->source->read($this);
-        $this->fields = array();
+        $this->projection = array();
         return $result;
     }
 
@@ -261,7 +216,7 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
         if (is_string($predicate)) {
             $predicate = new ExpressionParser($predicate);
         }
-        $this->groupBy = $columns;
+        $this->grouping = $columns;
         $this->groupPredicate = $predicate;
         return $this;
     }
@@ -331,7 +286,11 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
      */
     public function first()
     {
-        return $this->source->firstSelection($this);
+        $result = $this->limit(1)->toArray();
+        if (! isset($result[0])) {
+            return null;
+        }
+        return $result[0];
     }
 
     /**
@@ -339,7 +298,11 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
      */
     public function last()
     {
-        return $this->source->lastSelection($this);
+        $result = $this->reverseOrder()->limit(1)->toArray();
+        if (! isset($result[0])) {
+            return null;
+        }
+        return $result[0];
     }
 
     /**
@@ -347,7 +310,7 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
      */
     public function count()
     {
-        return $this->source->countSelection($this);
+        return $this->source->count($this);
     }
 
     /**
