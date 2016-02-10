@@ -12,6 +12,8 @@ use Jivoo\Data\Query\Readable;
 use Jivoo\Data\Query\ReadSelection;
 use Jivoo\Data\Schema;
 use Jivoo\Data\DataSource;
+use Jivoo\Data\Query\Expression;
+use Jivoo\Data\Query\Expression\ExpressionParser;
 
 /**
  * A read selection.
@@ -181,37 +183,34 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
      */
     public function select($expression, $alias = null)
     {
-        if ($alias instanceof ModelBase) {
-            $this->fields = array(
-                array(
-                    'expression' => $expression,
-                    'alias' => null
-                )
-            );
-            return $this->source->readCustom($this, $alias);
-        }
         $this->fields = array();
         if (is_array($expression)) {
-            foreach ($expression as $exp => $alias) {
-                if (is_int($exp)) {
+            foreach ($expression as $alias => $expression) {
+                if (! ($expression instanceof Expression)) {
+                    $expression = new ExpressionParser($expression);
+                }
+                if (is_int($alias)) {
                     $this->fields[] = array(
-                        'expression' => $alias,
+                        'expression' => $expression,
                         'alias' => null
                     );
                 } else {
                     $this->fields[] = array(
-                        'expression' => $exp,
+                        'expression' => $expression,
                         'alias' => $alias
                     );
                 }
             }
         } else {
+            if (! ($expression instanceof Expression)) {
+                $expression = new ExpressionParser($expression);
+            }
             $this->fields[] = array(
                 'expression' => $expression,
                 'alias' => $alias
             );
         }
-        $result = $this->source->readCustom($this);
+        $result = $this->source->read($this);
         $this->fields = array();
         return $result;
     }
@@ -259,8 +258,8 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
                 $columns
             );
         }
-        if (! ($predicate instanceof Predicate)) {
-            $predicate = new ExpressionBuilder($predicate);
+        if (is_string($predicate)) {
+            $predicate = new ExpressionParser($predicate);
         }
         $this->groupBy = $columns;
         $this->groupPredicate = $predicate;
@@ -272,8 +271,8 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
      */
     public function innerJoin(DataSource $dataSource, $predicate = null, $alias = null)
     {
-        if (! ($predicate instanceof Predicate)) {
-            $predicate = new ExpressionBuilder($predicate);
+        if (! ($predicate instanceof Expression)) {
+            $predicate = new ExpressionParser($predicate);
         }
         $this->joins[] = array(
             'source' => $dataSource,
@@ -289,8 +288,8 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
      */
     public function leftJoin(DataSource $dataSource, $predicate, $alias = null)
     {
-        if (! ($condition instanceof Predicate)) {
-            $predicate = new ExpressionBuilder($predicate);
+        if (! ($predicate instanceof Expression)) {
+            $predicate = new ExpressionParser($predicate);
         }
         $this->joins[] = array(
             'source' => $dataSource,
@@ -306,8 +305,8 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
      */
     public function rightJoin(DataSource $dataSource, $predicate, $alias = null)
     {
-        if (! ($condition instanceof Predicate)) {
-            $predicate = new ExpressionBuilder($predicate);
+        if (! ($predicate instanceof Expression)) {
+            $predicate = new ExpressionParser($predicate);
         }
         $this->joins[] = array(
             'source' => $dataSource,
@@ -389,6 +388,6 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
      */
     public function getIterator()
     {
-        return $this->source->getIterator($this);
+        return $this->source->read($this);
     }
 }

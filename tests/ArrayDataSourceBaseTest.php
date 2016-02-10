@@ -8,6 +8,66 @@ use Jivoo\Data\Query\Builders\ReadSelectionBuilder;
 class ArrayDataSourceBaseTest extends \Jivoo\TestCase
 {
     
+    public function testRead()
+    {
+        $data = [
+            new ArrayRecord(['id' => 1, 'name' => 'foo', 'group' => 'admin']),
+            new ArrayRecord(['id' => 2, 'name' => 'bar', 'group' => 'user']),
+            new ArrayRecord(['id' => 3, 'name' => 'foobar', 'group' => 'user']),
+            new ArrayRecord(['id' => 4, 'name' => 'foo', 'group' => 'admin']),
+            new ArrayRecord(['id' => 5, 'name' => 'baz', 'group' => 'user']),
+            new ArrayRecord(['id' => 6, 'name' => 'foobaz', 'group' => 'user'])
+        ];
+        
+        // Select all
+        $source = new ArrayDataSource($data);
+        $selection = new ReadSelectionBuilder($source);
+        
+        $this->assertEquals(6, count($selection->toArray()));
+        $this->assertEquals($data, $selection->toArray());
+        
+        // Select with a predicate
+        $source = new ArrayDataSource($data);
+        $selection = new ReadSelectionBuilder($source);
+        $selection = $selection->where('group = %s', 'user');
+        
+        $this->assertEquals(4, count($selection->toArray()));
+        $this->assertNotContains($data[0], $selection->toArray());
+        $this->assertContains($data[1], $selection->toArray());
+        
+        // Select with groups
+        $source = new ArrayDataSource($data);
+        $selection = new ReadSelectionBuilder($source);
+        $selection = $selection->groupBy(['group']);
+        
+        $this->assertEquals(2, count($selection->toArray()));
+        
+        $source = new ArrayDataSource($data);
+        $selection = new ReadSelectionBuilder($source);
+        $selection = $selection->groupBy(['group', 'name'], 'id <= 3');
+        
+        $this->assertEquals(3, count($selection->toArray()));
+        
+        // Select with limit
+        $source = new ArrayDataSource($data);
+        $selection = new ReadSelectionBuilder($source);
+        $selection = $selection->limit(1);
+        
+        $this->assertEquals(1, count($selection->toArray()));
+        $this->assertContains($data[0], $selection->toArray());
+        
+        // Select with projection
+        $source = new ArrayDataSource($data);
+        $selection = new ReadSelectionBuilder($source);
+        $projection = $selection->select(['n' => 'name']);
+
+        $this->assertEquals(6, iterator_count($projection));
+        foreach ($projection as $record) {
+            $this->assertEquals(['n'], array_keys($record->getData()));
+        }
+        
+    }
+    
     public function testUpdate()
     {
         $data = [

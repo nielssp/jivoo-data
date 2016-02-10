@@ -54,7 +54,18 @@ abstract class ArrayDataSourceBase implements DataSource
         }
         $grouping = $selection->getGrouping();
         if (count($grouping)) {
-            $data = self::sortAll($data, $grouping);
+            $data = self::sortAll($data, array_map(function ($column) {
+                return [$column, false];
+            }, $grouping));
+            $previous = null;
+            $data = array_filter($data, function (Record $record) use ($grouping, &$previous) {
+                $group = array_intersect_key($record->getData(), array_flip($grouping));
+                if (isset($previous) and $group == $previous) {
+                    return false;
+                }
+                $previous = $group;
+                return true;
+            });
             $predicate = $selection->getGroupPredicate();
             if (isset($predicate)) {
                 $data = new PredicateArray($data, $predicate);
@@ -71,11 +82,12 @@ abstract class ArrayDataSourceBase implements DataSource
             $projected = array();
             foreach ($data as $key => $record) {
                 $recordData = array();
+                $i = 0;
                 foreach ($projection as $field) {
                     if (isset($field['alias'])) {
                         $alias = $field['alias'];
                     } else {
-                        $alias = $field['expression'];
+                        $alias = 'expr#' . $i++;
                     }
                     $recordData[$alias] = $field['expression']->__invoke($record);
                 }
@@ -83,7 +95,10 @@ abstract class ArrayDataSourceBase implements DataSource
             }
             $data = $projected;
         }
-        return $data;
+        if ($data instanceof \Iterator) {
+            return $data;
+        }
+        return new \ArrayIterator($data);
     }
 
     /**

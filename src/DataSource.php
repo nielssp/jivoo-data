@@ -44,7 +44,7 @@ interface DataSource
      *
      * @param Selection $selection
      *            Record selection.
-     * @return Record[]|Traversable Selected records as an array or iterator.
+     * @return \Iterator A {@see Record} iterator.
      */
     public function read(ReadSelection $selection);
 

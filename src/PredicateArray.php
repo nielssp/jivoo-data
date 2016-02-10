@@ -8,7 +8,7 @@ namespace Jivoo\Data;
 /**
  * An array with a predicate.
  */
-class PredicateArray implements \ArrayAccess, \Countable, \Iterator
+class PredicateArray extends \FilterIterator implements \ArrayAccess, \Countable
 {
 
     /**
@@ -25,6 +25,7 @@ class PredicateArray implements \ArrayAccess, \Countable, \Iterator
 
     public function __construct($array, $predicate)
     {
+        parent::__construct(new \ArrayIterator($array));
         $this->original = $array;
         $this->predicate = $predicate;
     }
@@ -87,49 +88,9 @@ class PredicateArray implements \ArrayAccess, \Countable, \Iterator
     /**
      * {@inheritdoc}
      */
-    public function current()
+    public function accept()
     {
-        return current($this->original);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function key()
-    {
-        return key($this->original);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function next()
-    {
-        while (true) {
-            next($this->original);
-            if (key($this->original) === null) {
-                break;
-            }
-            if (call_user_func($this->predicate, current($this->original))) {
-                break;
-            }
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rewind()
-    {
-        reset($this->original);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function valid()
-    {
-        return key($this->original) !== null;
+        return call_user_func($this->predicate, $this->current());
     }
 
     /**

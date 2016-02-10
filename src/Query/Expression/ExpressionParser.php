@@ -20,6 +20,7 @@ use Jivoo\Data\Record;
  * expression ::= ["not"] comparison
  * comparison ::= atomic operator atomic
  *              | atomic "is" "null"
+ *              | atomic
  * operator   ::= "like" | "in" | "!=" | "<>" | ">=" | "<=" | "!<" | "!>" | "=" | "<" | ">" | "and" | "or"
  * column     ::= [table "."] (field | name)
  * table      ::= model | name
@@ -33,6 +34,7 @@ use Jivoo\Data\Record;
  *              | string
  *              | placeholder
  *              | column
+ *              | FUNCTION "(" atomic ")" // TODO
  * </code>
  */
 class ExpressionParser extends Node implements Expression
@@ -57,18 +59,17 @@ class ExpressionParser extends Node implements Expression
      * Construct condition.
      * The function {@see where} is an alias.
      *
-     * @param Condition|string $expr
+     * @param string $expr
      *            Expression.
      * @param array $vars
      *            Additional values to replace placeholders in
      *            $expr with.
      */
-    public function __construct($expr = null, $vars = array())
+    public function __construct($expr, $vars = array())
     {
-        if (isset($expr) and ! empty($expr)) {
-            $this->expr = $expr;
-            $this->vars = $vars;
-        }
+        Assume::that($expr != "");
+        $this->expr = $expr;
+        $this->vars = $vars;
     }
     
     /**
@@ -228,9 +229,11 @@ class ExpressionParser extends Node implements Expression
             $input->expectToken('null');
             return new Infix($left, 'is', null);
         }
-        $op = $input->expectToken('operator');
-        $right = self::parseAtomic($input);
-        return new Infix($left, $op[1], $right);
+        if ($input->acceptToken('operator', $op)) {
+            $right = self::parseAtomic($input);
+            return new Infix($left, $op[1], $right);
+        }
+        return $left;
     }
 
     public static function parseAtomic(ParseInput $input)

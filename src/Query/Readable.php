@@ -36,12 +36,13 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
     /**
      * Make a projection.
      *
-     * @param string|string[]|array $expression
-     *            Expression or array of expressions
-     *            and aliases
+     * @param string|string[]|Expression|Expression[] $expression
+     *            Expression or array of expressions (if the keys are strings,
+     *            they are used as aliases).
      * @param string $alias
      *            Alias.
      * @return array[] List of associative arrays
+     * @todo Rename to 'project' ?
      */
     public function select($expression, $alias = null);
 
@@ -50,7 +51,7 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      *
      * @param string $alias
      *            Name of new field.
-     * @param string $expression
+     * @param Expression|string $expression
      *            Expression for field, e.g. 'COUNT(*)'.
      * @param DataType|null $type
      *            Optional type of field.

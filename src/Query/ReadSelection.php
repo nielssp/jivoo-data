@@ -63,11 +63,11 @@ interface ReadSelection extends Selection
      * Each array is of the following format:
      * <code>
      * array(
-     * 'expression' => ..., // Expression ({@see Expression})
-     * 'alias' => ... // Optional alias (string|null)
-     * 'type' => ... // Optional type hint (DataType|null)
-     * 'source' => ... // Optional source (DataSource|null)
-     * 'record' => ... // Optional record field (string|null)
+     *   'expression' => ..., // Expression ({@see Expression})
+     *   'alias' => ... // Optional alias (string|null)
+     *   'type' => ... // Optional type hint (DataType|null)
+     *   'source' => ... // Optional source (DataSource|null)
+     *   'record' => ... // Optional record field (string|null)
      * )
      * </code>
      *
