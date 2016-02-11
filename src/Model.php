@@ -12,7 +12,7 @@ use Jivoo\Data\Query\Deletable;
 /**
  * A selectable data source with a schema.
  */
-interface Model extends Readable, Updatable, Deletable, DataSoure
+interface Model extends Readable, Updatable, Deletable, DataSource
 {
 
     /**

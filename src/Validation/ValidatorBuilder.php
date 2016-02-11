@@ -3,10 +3,9 @@
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
-namespace Jivoo\Models\Validation;
+namespace Jivoo\Data\Validation;
 
-use Jivoo\Models\BasicModel;
-use Jivoo\Models\Record;
+use Jivoo\Data\Record;
 use Jivoo\I18n\I18n;
 
 /**
@@ -30,21 +29,13 @@ class ValidatorBuilder implements Validator
     private $fields = array();
 
     /**
-     * @var BasicModel Model.
-     */
-    private $model;
-
-    /**
      * Construct validator.
      *
-     * @param BasicModel $model
-     *            Associated model.
      * @param array $fields
      *            Associative array of field-names and rules.
      */
-    public function __construct(BasicModel $model, $fields = array())
+    public function __construct($fields = array())
     {
-        $this->model = $model;
         foreach ($fields as $field => $rules) {
             $this->fields[$field] = new ValidatorField($rules);
         }
