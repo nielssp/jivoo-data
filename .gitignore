@@ -16,3 +16,4 @@
 /examples/*/user/media/*
 /tests/_output
 /vendor/*
+/nbproject/private/

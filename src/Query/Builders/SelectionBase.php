@@ -82,21 +82,9 @@ abstract class SelectionBase implements Selectable, Selection
     {
         switch ($method) {
             case 'and':
-                if (! isset($this->predicate)) {
-                    $expr = array_shift($args);
-                    $this->predicate = new ExpressionParser($expr, $args);
-                } else {
-                    $this->predicate = call_user_func_array([$this->predicate, 'andWhere'], $args);
-                }
-                return $this;
+                return call_user_func_array([$this, 'andWhere'], $args);
             case 'or':
-                if (! isset($this->predicate)) {
-                    $expr = array_shift($args);
-                    $this->predicate = new ExpressionParser($expr, $args);
-                } else {
-                    $this->predicate = call_user_func_array([$this->predicate, 'orWhere'], $args);
-                }
-                return $this;
+                return call_user_func_array([$this, 'orWhere'], $args);
         }
         // TODO: document this behavior
         if (is_callable([$this->source, $method])) {
@@ -121,13 +109,7 @@ abstract class SelectionBase implements Selectable, Selection
     public function where($expr)
     {
         $args = func_get_args();
-        if (! isset($this->predicate)) {
-            $expr = array_shift($args);
-            $this->predicate = new ExpressionParser($expr, $args);
-        } else {
-            $this->predicate = call_user_func_array([$this->predicate, 'where'], $args);
-        }
-        return $this;
+        return call_user_func_array([$this, 'andWhere'], $args);
     }
 
     /**
@@ -165,14 +147,10 @@ abstract class SelectionBase implements Selectable, Selection
      */
     public function orderBy($column)
     {
-        if (! isset($column)) {
-            $this->ordering = array();
-        } else {
-            $this->ordering[] = array(
-                $column,
-                false
-            );
-        }
+        $this->ordering[] = array(
+            $column,
+            false
+        );
         return $this;
     }
 

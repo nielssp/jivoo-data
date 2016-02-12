@@ -5,10 +5,16 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Query\Builders;
 
+use Jivoo\Data\DataSource;
+use Jivoo\Data\DataType;
+use Jivoo\Data\Model;
+use Jivoo\Data\Query\Deletable;
 use Jivoo\Data\Query\Readable;
 use Jivoo\Data\Query\ReadSelection;
 use Jivoo\Data\Query\Updatable;
 use Jivoo\Data\Query\UpdateSelection;
+use Jivoo\Data\Record;
+use Jivoo\Data\Schema;
 
 /**
  * An undecided selection.
@@ -17,6 +23,78 @@ use Jivoo\Data\Query\UpdateSelection;
  */
 class SelectionBuilder extends SelectionBase implements Readable, ReadSelection, Updatable, UpdateSelection, Deletable
 {
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function getAdditionalFields()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAlias()
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGroupPredicate()
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGrouping()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getJoins()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOffset()
+    {
+        return 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getProjection()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isDistinct()
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData()
+    {
+        return [];
+    }
 
     /**
      * Copy attributes into a basic selection.
@@ -94,9 +172,9 @@ class SelectionBuilder extends SelectionBase implements Readable, ReadSelection,
     /**
      * {@inheritdoc}
      */
-    public function withRecord($field, BasicModel $model)
+    public function withRecord($field, Schema $schema)
     {
-        return $this->copyBasicAttr(new ReadSelectionBuilder($this->source))->withRecord($field, $model);
+        return $this->copyBasicAttr(new ReadSelectionBuilder($this->source))->withRecord($field, $schema);
     }
 
     /**
@@ -110,7 +188,7 @@ class SelectionBuilder extends SelectionBase implements Readable, ReadSelection,
     /**
      * {@inheritdoc}
      */
-    public function innerJoin(Model $other, $condition, $alias = null)
+    public function innerJoin(DataSource $other, $condition, $alias = null)
     {
         return $this->copyBasicAttr(new ReadSelectionBuilder($this->source))->innerJoin($other, $condition, $alias);
     }
@@ -118,7 +196,7 @@ class SelectionBuilder extends SelectionBase implements Readable, ReadSelection,
     /**
      * {@inheritdoc}
      */
-    public function leftJoin(Model $other, $condition, $alias = null)
+    public function leftJoin(DataSource $other, $condition, $alias = null)
     {
         return $this->copyBasicAttr(new ReadSelectionBuilder($this->source))->leftJoin($other, $condition, $alias);
     }
@@ -126,7 +204,7 @@ class SelectionBuilder extends SelectionBase implements Readable, ReadSelection,
     /**
      * {@inheritdoc}
      */
-    public function rightJoin(Model $other, $condition, $alias = null)
+    public function rightJoin(DataSource $other, $condition, $alias = null)
     {
         return $this->copyBasicAttr(new ReadSelectionBuilder($this->source))->rightJoin($other, $condition, $alias);
     }
