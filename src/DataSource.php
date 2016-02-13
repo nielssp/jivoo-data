@@ -28,8 +28,7 @@ interface DataSource
 
     /**
      * Insert multiple data records directly into model.
-     * Each record-array MUST cotain the
-     * same columns and order of columns.
+     * Each record-array MUST cotain the same fields and order of fields.
      *
      * @param array[] $records
      *            List of associative arrays of record data.
@@ -46,7 +45,7 @@ interface DataSource
      *            Record selection.
      * @return int Number of records in selection.
      */
-    public function count(ReadSelection $selection);
+    public function countSelection(ReadSelection $selection);
 
     /**
      * Retrieve the selected records.
@@ -55,7 +54,7 @@ interface DataSource
      *            Record selection.
      * @return \Iterator A {@see Record} iterator.
      */
-    public function read(ReadSelection $selection);
+    public function readSelection(ReadSelection $selection);
 
     /**
      * Update the selected records.
@@ -64,7 +63,7 @@ interface DataSource
      *            Update selection.
      * @return int Number of updated records if availabble.
      */
-    public function update(UpdateSelection $selection);
+    public function updateSelection(UpdateSelection $selection);
 
     /**
      * Delete the selected records.
@@ -73,7 +72,7 @@ interface DataSource
      *            Selection.
      * @return int Number of deleted records if availabble.
      */
-    public function delete(Selection $selection);
+    public function deleteSelection(Selection $selection);
 
     /**
      * Join two data sources.

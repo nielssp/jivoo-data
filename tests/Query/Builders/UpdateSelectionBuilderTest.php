@@ -21,7 +21,7 @@ class UpdateSelectionBuilderTest extends SelectionBaseTest
         
         $this->dataSource
             ->expects($this->once())
-            ->method('update')
+            ->method('updateSelection')
             ->with($this->equalTo($update))
             ->willReturn(3);
         

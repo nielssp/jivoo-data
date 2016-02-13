@@ -12,7 +12,13 @@ use Jivoo\Data\Query\Builders\DeleteSelectionBuilder;
  */
 trait DeletableTrait
 {
-    use SelectableTrait;
+    
+    /**
+     * Return the data source to make selections on.
+     *
+     * @return \Jivoo\Data\DataSource
+     */
+    abstract protected function getSource();
 
     /**
      * Delete selected records.

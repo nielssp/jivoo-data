@@ -5,15 +5,24 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Query;
 
+use Jivoo\Data\DataSource;
+use Jivoo\Data\DataType;
 use Jivoo\Data\Query\Builders\ReadSelectionBuilder;
+use Jivoo\Data\Record;
+use Jivoo\Data\Schema;
 
 /**
  * A trait that implements {@see Readable}.
  */
 trait ReadableTrait
 {
-    use SelectableTrait;
-
+    
+    /**
+     * Return the data source to make selections on.
+     *
+     * @return \Jivoo\Data\DataSource
+     */
+    abstract protected function getSource();
 
     /**
      * Set offset.
@@ -61,7 +70,7 @@ trait ReadableTrait
     /**
      * Append an extra virtual field to the returned records.
      *
-     * @param string $alias
+     * @param string $field
      *            Name of new field.
      * @param Expression|string $expression
      *            Expression for field, e.g. 'COUNT(*)'.
@@ -86,8 +95,7 @@ trait ReadableTrait
      *            Schema of associated record.
      * @return ReadSelectionBuilder A read selection.
      */
-    public function withRecord($field, Schema $schema)
-    {
+    public function withRecord($field, Schema $schema)  {
         $selection = new ReadSelectionBuilder($this->getSource());
         return $selection->withRecord($field, $schema);
     }
@@ -176,7 +184,7 @@ trait ReadableTrait
     /**
      * Return first record in selection.
      *
-     * @return \Jivoo\Data\Record|null A record if available..
+     * @return Record|null A record if available..
      */
     public function first()
     {
@@ -187,7 +195,7 @@ trait ReadableTrait
     /**
      * Return last record in selection.
      *
-     * @return \Jivoo\Data\Record|null A record if available.
+     * @return Record|null A record if available.
      */
     public function last()
     {
@@ -209,7 +217,7 @@ trait ReadableTrait
     /**
      * Convert selection to an array.
      *
-     * @return \Jivoo\Data\Record[] Array of records.
+     * @return Record[] Array of records.
      */
     public function toArray()
     {

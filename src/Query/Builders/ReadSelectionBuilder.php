@@ -165,7 +165,7 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
                 'alias' => $alias
             );
         }
-        $result = $this->source->read($this);
+        $result = $this->source->readSelection($this);
         $this->projection = array();
         return $result;
     }
@@ -310,7 +310,7 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
      */
     public function count()
     {
-        return $this->source->count($this);
+        return $this->source->countSelection($this);
     }
 
     /**
@@ -351,6 +351,6 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
      */
     public function getIterator()
     {
-        return $this->source->read($this);
+        return $this->source->readSelection($this);
     }
 }

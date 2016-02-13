@@ -31,7 +31,7 @@ class SelectionBuilderTest extends SelectionBaseTest
         
         $this->dataSource
             ->expects($this->once())
-            ->method('update')
+            ->method('updateSelection')
             ->with($this->isInstanceOf('Jivoo\Data\Query\UpdateSelection'))
             ->willReturn(3);
         
@@ -39,7 +39,7 @@ class SelectionBuilderTest extends SelectionBaseTest
         
         $this->dataSource
             ->expects($this->once())
-            ->method('delete')
+            ->method('deleteSelection')
             ->with($this->isInstanceOf('Jivoo\Data\Query\Selection'))
             ->willReturn(3);
         

@@ -18,6 +18,6 @@ class DeleteSelectionBuilder extends SelectionBase implements Deletable
      */
     public function delete()
     {
-        return $this->source->delete($this);
+        return $this->source->deleteSelection($this);
     }
 }

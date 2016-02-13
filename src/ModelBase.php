@@ -5,16 +5,17 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data;
 
-use Jivoo\Data\Query\UpdatableTrait;
 use Jivoo\Data\Query\DeletableTrait;
 use Jivoo\Data\Query\ReadableTrait;
+use Jivoo\Data\Query\UpdatableTrait;
+use Jivoo\Data\Query\SelectableTrait;
 
 /**
  * A selectable data source with a schema.
  */
 abstract class ModelBase implements Model
 {
-    use UpdatableTrait, DeletableTrait, ReadableTrait;
+    use SelectableTrait, UpdatableTrait, DeletableTrait, ReadableTrait;
         
     /**
      * {@inheritDoc}

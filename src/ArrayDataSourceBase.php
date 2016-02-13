@@ -43,15 +43,15 @@ abstract class ArrayDataSourceBase implements DataSource
     /**
      * {@inheritdoc}
      */
-    public function count(ReadSelection $selection)
+    public function countSelection(ReadSelection $selection)
     {
-        return iterator_count($this->read($selection));
+        return iterator_count($this->readSelection($selection));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function read(ReadSelection $selection)
+    public function readSelection(ReadSelection $selection)
     {
         // TODO: distinct and additionalFields
         $data = $this->getData();
@@ -114,7 +114,7 @@ abstract class ArrayDataSourceBase implements DataSource
     /**
      * {@inheritdoc}
      */
-    public function update(UpdateSelection $selection)
+    public function updateSelection(UpdateSelection $selection)
     {
         $data = $this->getData();
         $data = self::sortAll($data, $selection->getOrdering());
@@ -143,7 +143,7 @@ abstract class ArrayDataSourceBase implements DataSource
     /**
      * {@inheritdoc}
      */
-    public function delete(Selection $selection)
+    public function deleteSelection(Selection $selection)
     {
         $data = $this->getData();
         $data = self::sortAll($data, $selection->getOrdering());

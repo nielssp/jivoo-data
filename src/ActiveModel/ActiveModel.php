@@ -1065,11 +1065,11 @@ abstract class ActiveModel extends ModelBase implements EventListener
             case 'hasMany':
                 $key = $association['thisKey'];
                 $id = $this->primaryKey;
-                return $association['model']->where($key . ' = ?', $record->$id)->count() != 0;
+                return $association['model']->where($key . ' = ?', $record->$id)->countSelection() != 0;
             case 'hasAndBelongsToMany':
                 $key = $association['thisKey'];
                 $id = $this->primaryKey;
-                return $association['join']->where($key . ' = ?', $record->$id)->count() != 0;
+                return $association['join']->where($key . ' = ?', $record->$id)->countSelection() != 0;
         }
         throw new InvalidAssociationException(tr('Unknown association type: %1', $association['type']));
     }
@@ -1096,12 +1096,12 @@ abstract class ActiveModel extends ModelBase implements EventListener
                 $id = $this->primaryKey;
                 $association['model']->where($key . ' = ?', $record->$id)
                     ->set($key, null)
-                    ->update();
+                    ->updateSelection();
                 return;
             case 'hasAndBelongsToMany':
                 $key = $association['thisKey'];
                 $id = $this->primaryKey;
-                $association['join']->where($key . ' = ?', $record->$id)->delete();
+                $association['join']->where($key . ' = ?', $record->$id)->deleteSelection();
                 return;
         }
         throw new InvalidAssociationException(tr('Unknown association type: %1', $association['type']));

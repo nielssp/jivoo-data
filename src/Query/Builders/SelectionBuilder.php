@@ -272,6 +272,6 @@ class SelectionBuilder extends SelectionBase implements AnySelectable, ReadSelec
      */
     public function getIterator()
     {
-        return $this->source->read($this->copyBasicAttr(new ReadSelectionBuilder($this->source)));
+        return $this->source->readSelection($this->copyBasicAttr(new ReadSelectionBuilder($this->source)));
     }
 }

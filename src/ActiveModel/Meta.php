@@ -208,7 +208,7 @@ class Meta implements Record
         if (! empty($this->deletions)) {
             $this->model->where('%c = %i', $this->recordKey, $this->id)
                 ->and('variable IN %s()', array_keys($this->deletions))
-                ->delete();
+                ->deleteSelection();
             foreach ($this->deletions as $var => $val) {
                 unset($this->data[$var]);
             }

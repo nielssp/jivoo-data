@@ -178,7 +178,7 @@ class ActiveCollection extends ModelBase
                 ));
             }
         } else {
-            $selection->set($this->thisKey, $this->recordId)->update();
+            $selection->set($this->thisKey, $this->recordId)->updateSelection();
         }
     }
 
@@ -217,9 +217,9 @@ class ActiveCollection extends ModelBase
             $pk = $this->otherPrimary;
             return $this->join->where($this->thisKey . ' = ?', $this->recordId)
                 ->and($this->otherKey . ' = ?', $record->$pk)
-                ->count() > 0;
+                ->countSelection() > 0;
         } else {
-            return $this->source->where($this->thisKey . ' = ?', $this->recordId)->count() > 0;
+            return $this->source->where($this->thisKey . ' = ?', $this->recordId)->countSelection() > 0;
         }
     }
 
@@ -235,7 +235,7 @@ class ActiveCollection extends ModelBase
             $pk = $this->otherPrimary;
             $this->join->where($this->thisKey . ' = ?', $this->recordId)
                 ->and($this->otherKey . ' = ?', $record->$pk)
-                ->delete();
+                ->deleteSelection();
         } else {
             $key = $this->thisKey;
             $record->$key = null;
@@ -257,10 +257,10 @@ class ActiveCollection extends ModelBase
             foreach ($selection as $record) {
                 $this->join->where($this->thisKey . ' = ?', $this->recordId)
                     ->and($this->otherKey . ' = ?', $record->$pk)
-                    ->delete();
+                    ->deleteSelection();
             }
         } else {
-            $selection->set($this->thisKey, null)->update();
+            $selection->set($this->thisKey, null)->updateSelection();
         }
     }
 
@@ -316,7 +316,7 @@ class ActiveCollection extends ModelBase
             $num ++;
             $this->other->where($this->otherPrimary . ' = ?', $otherId)
                 ->set($sets)
-                ->update();
+                ->updateSelection();
         }
         return $num;
     }
@@ -340,8 +340,8 @@ class ActiveCollection extends ModelBase
             $num ++;
             $this->join->where($this->thisKey . ' = ?', $this->recordId)
                 ->and($this->otherKey . ' = ?', $record->$pk)
-                ->delete();
-            $record->delete();
+                ->deleteSelection();
+            $record->deleteSelection();
         }
         return $num;
     }

@@ -438,7 +438,7 @@ class ActiveRecord implements Record, ActionRecord, Linkable
             }
             $this->model->selectRecord($this)
                 ->set($this->updatedData)
-                ->update();
+                ->updateSelection();
         }
         $this->updatedData = array();
         $this->saved = true;
@@ -452,7 +452,7 @@ class ActiveRecord implements Record, ActionRecord, Linkable
     public function delete()
     {
         $this->model->triggerEvent('beforeDelete', new ActiveModelEvent($this));
-        $this->model->selectRecord($this)->delete();
+        $this->model->selectRecord($this)->deleteSelection();
     }
 
     /**

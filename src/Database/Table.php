@@ -51,7 +51,7 @@ abstract class Table implements \Jivoo\Data\DataSource
     /**
      * {@inheritdoc}
      */
-    public function read(ReadSelectionBuilder $selection)
+    public function readSelection(ReadSelectionBuilder $selection)
     {
         $resultSet = $this->readSelection($selection);
         return new ResultSetIterator($this, $resultSet, $selection);

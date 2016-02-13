@@ -15,7 +15,7 @@ class DeleteSelectionBuilderTest extends SelectionBaseTest
         
         $this->dataSource
             ->expects($this->once())
-            ->method('delete')
+            ->method('deleteSelection')
             ->with($this->equalTo($delete))
             ->wilLReturn(3);
         

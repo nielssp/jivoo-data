@@ -262,7 +262,7 @@ class ValidatorBuilder implements Validator
                 if (! $record->isNew()) {
                     $selection = $selection->selectNotRecord($record);
                 }
-                if (($selection->where($field . ' = ?', $value)->count() == 0) == $rule) {
+                if (($selection->where($field . ' = ?', $value)->countSelection() == 0) == $rule) {
                     return true;
                 }
                 return $rule ? I18n::get('Must be unique.') : I18n::get('Must not be unique.');
