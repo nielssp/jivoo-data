@@ -26,7 +26,7 @@ trait SelectableTrait
      * @param Expression|string|null $expression
      *            Expression or column.
      *            If null all ordering will be removed from selection.
-     * @return Selectable A selection.
+     * @return SelectionBuilder A selection.
      */
     public function orderBy($expr)
     {
@@ -39,7 +39,7 @@ trait SelectableTrait
      *
      * @param Expression|string $expression
      *            Expression or column.
-     * @return Selectable A selection.
+     * @return SelectionBuilder A selection.
      */
     public function orderByDescending($expr)
     {
@@ -50,7 +50,7 @@ trait SelectableTrait
     /**
      * Reverse the ordering.
      *
-     * @return Selectable A selection.
+     * @return SelectionBuilder A selection.
      */
     public function reverseOrder()
     {
@@ -63,7 +63,7 @@ trait SelectableTrait
      *
      * @param
      *            int Number of records.
-     * @return Selectable A selection.
+     * @return SelectionBuilder A selection.
      */
     public function limit($limit)
     {

@@ -41,4 +41,35 @@ interface Model extends Readable, Updatable, Deletable, DataSource
      * @return Record A record.
      */
     public function create(array $data = array(), $allowedFields = null);
+
+    /**
+     * Make a selection that selects a single record.
+     * @param Record $record
+     *            A record.
+     * @return Query\AnySelectable A selection.
+     */
+    public function selectRecord(Record $record);
+
+    /**
+     * Make a selection that selects everything except for a single record.
+     *
+     * @param Record $record
+     *            A record.
+     * @return Query\AnySelectable A selection.
+     */
+    public function selectNotRecord(Record $record);
+
+    /**
+     * Find a record by its primary key. If the primary key
+     * consists of multiple fields, this function expects a
+     * parameter for each field (in alphabetical order).
+     * @param mixed $primary
+     *            Value of primary key.
+     * @param mixed ...$primary
+     *            For multifield primary key.
+     * @return Record|null A single matching record or null if it doesn't exist.
+     * @throws InvalidArgumentException If number of parameters does not
+     * match size of primary key.
+     */
+    public function find($primary);
 }

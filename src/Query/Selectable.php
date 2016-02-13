@@ -17,7 +17,7 @@ interface Selectable extends Boolean
      * @param Expression|string|null $expression
      *            Expression or column.
      *            If null all ordering will be removed from selection.
-     * @return Selectable A selection.
+     * @return static
      */
     public function orderBy($expr);
 
@@ -26,14 +26,14 @@ interface Selectable extends Boolean
      *
      * @param Expression|string $expression
      *            Expression or column.
-     * @return Selectable A selection.
+     * @return static
      */
     public function orderByDescending($expr);
 
     /**
      * Reverse the ordering.
      *
-     * @return Selectable A selection.
+     * @return static
      */
     public function reverseOrder();
 
@@ -42,7 +42,7 @@ interface Selectable extends Boolean
      *
      * @param int $limit
      *            Number of records.
-     * @return Selectable A selection.
+     * @return static
      */
     public function limit($limit);
 }

@@ -8,8 +8,8 @@ namespace Jivoo\Data\Query;
 /**
  * An interface for combining expressions using boolean logic.
  *
- * @method Boolean and(Expression|string $expr, mixed $vars,... ) AND operator.
- * @method Boolean or(Expression|string $expr, mixed $vars,... ) OR operator.
+ * @method static and(Expression|string $expr, mixed $vars,... ) AND operator.
+ * @method static or(Expression|string $expr, mixed $vars,... ) OR operator.
  */
 interface Boolean
 {
@@ -21,7 +21,7 @@ interface Boolean
      *            Method name ('and' or 'or')
      * @param mixed[] $args
      *            List of parameters
-     * @return Boolean Expression.
+     * @return static
      */
     public function __call($method, $args);
 
@@ -33,7 +33,7 @@ interface Boolean
      * @param mixed $vars,...
      *            Additional values to replace placeholders in
      *            $expr with.
-     * @return Boolean Expression.
+     * @return static
      */
     public function where($expr);
 
@@ -45,7 +45,7 @@ interface Boolean
      * @param mixed $vars,...
      *            Additional values to replace placeholders in
      *            $expr with.
-     * @return Boolean Expression.
+     * @return static
      */
     public function andWhere($expr);
 
@@ -57,7 +57,7 @@ interface Boolean
      * @param mixed $vars,...
      *            Additional values to replace placeholders in
      *            $expr with.
-     * @return Boolean Expression.
+     * @return static
      */
     public function orWhere($expr);
 }

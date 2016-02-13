@@ -7,11 +7,8 @@ namespace Jivoo\Data\Query\Builders;
 
 use Jivoo\Data\DataSource;
 use Jivoo\Data\DataType;
-use Jivoo\Data\Model;
-use Jivoo\Data\Query\Deletable;
-use Jivoo\Data\Query\Readable;
+use Jivoo\Data\Query\AnySelectable;
 use Jivoo\Data\Query\ReadSelection;
-use Jivoo\Data\Query\Updatable;
 use Jivoo\Data\Query\UpdateSelection;
 use Jivoo\Data\Record;
 use Jivoo\Data\Schema;
@@ -21,7 +18,7 @@ use Jivoo\Data\Schema;
  * Will transform into a more specific selection based
  * on use.
  */
-class SelectionBuilder extends SelectionBase implements Readable, ReadSelection, Updatable, UpdateSelection, Deletable
+class SelectionBuilder extends SelectionBase implements AnySelectable, ReadSelection, UpdateSelection
 {
     
     /**
@@ -99,9 +96,9 @@ class SelectionBuilder extends SelectionBase implements Readable, ReadSelection,
     /**
      * Copy attributes into a basic selection.
      *
-     * @param BasicSelectionBase $copy
+     * @param SelectionBase $copy
      *            A basic selection.
-     * @return BasicSelectionBase A basic selection.
+     * @return SelectionBase A basic selection.
      */
     private function copyBasicAttr(SelectionBase $copy)
     {

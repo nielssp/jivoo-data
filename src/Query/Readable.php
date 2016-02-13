@@ -20,7 +20,7 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      *
      * @param int $offset
      *            Offset.
-     * @return Readable A readable selection.
+     * @return static
      */
     public function offset($offset);
 
@@ -29,7 +29,7 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      *
      * @param string $alias
      *            Alias.
-     * @return Readable A readable selection.
+     * @return static
      */
     public function alias($alias);
 
@@ -49,13 +49,13 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
     /**
      * Append an extra virtual field to the returned records.
      *
-     * @param string $alias
+     * @param string $field
      *            Name of new field.
      * @param Expression|string $expression
      *            Expression for field, e.g. 'COUNT(*)'.
      * @param DataType|null $type
      *            Optional type of field.
-     * @return ReadSelection A read selection.
+     * @return static
      */
     public function with($field, $expression, DataType $type = null);
 
@@ -63,12 +63,12 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      * Append an extra virtual field (with a record as the value) to the returned
      * records.
      *
-     * @param string $alias
+     * @param string $field
      *            Name of new field, expects the associated model to be
      *            aliased with the same name.
      * @param Schema $schema
      *            Schema of associated record.
-     * @return Readable A readable selection.
+     * @return static
      */
     public function withRecord($field, Schema $schema);
 
@@ -80,7 +80,7 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      *            names.
      * @param Expression|string $predicate
      *            Grouping predicate.
-     * @return Readable A readable selection.
+     * @return static
      */
     public function groupBy($columns, $predicate = null);
 
@@ -93,7 +93,7 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      *            Join condition.
      * @param string $alias
      *            Alias for joined model/table.
-     * @return Readable A readable selection.
+     * @return static
      */
     public function innerJoin(DataSource $other, $condition, $alias = null);
 
@@ -106,7 +106,7 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      *            Join condition.
      * @param string $alias
      *            Alias for joined model/table.
-     * @return Readable A readable selection.
+     * @return static
      */
     public function leftJoin(DataSource $other, $condition, $alias = null);
 
@@ -119,7 +119,7 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      *            Join condition.
      * @param string $alias
      *            Alias for joined model/table.
-     * @return Readable A readable selection.
+     * @return static
      */
     public function rightJoin(DataSource $other, $condition, $alias = null);
 
@@ -129,7 +129,7 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      *
      * @param bool $distinct
      *            Whether to fetch only distinct records.
-     * @return Readable A readable selection.
+     * @return static
      */
     public function distinct($distinct = true);
 

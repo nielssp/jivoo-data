@@ -21,7 +21,7 @@ interface Updatable extends Selectable
      *            {@see UpdateSelection::getData} for format.
      * @param mixed|Expression $value
      *            Field value. May be an expression.
-     * @return Updatable An updatable selection.
+     * @return static
      */
     public function set($field, $value = null);
 
