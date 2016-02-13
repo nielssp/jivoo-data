@@ -95,7 +95,8 @@ trait ReadableTrait
      *            Schema of associated record.
      * @return ReadSelectionBuilder A read selection.
      */
-    public function withRecord($field, Schema $schema)  {
+    public function withRecord($field, Schema $schema)
+    {
         $selection = new ReadSelectionBuilder($this->getSource());
         return $selection->withRecord($field, $schema);
     }
