@@ -105,9 +105,9 @@ class SelectionBuilder extends SelectionBase implements Readable, ReadSelection,
      */
     private function copyBasicAttr(SelectionBase $copy)
     {
-        $copy->where = $this->where;
+        $copy->predicate = $this->predicate;
         $copy->limit = $this->limit;
-        $copy->orderBy = $this->orderBy;
+        $copy->ordering = $this->ordering;
         return $copy;
     }
 

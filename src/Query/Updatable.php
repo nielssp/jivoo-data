@@ -13,15 +13,14 @@ interface Updatable extends Selectable
 
     /**
      * Assign value to field.
-     * If $field is an associative array, then multiple
-     * fields are assigned. If $field contains an equals sign ('=') then $field
-     * is used as the set expression.
+     * If `$field` is an associative array, then multiple
+     * fields are assigned.
      *
-     * @param string|array $field
-     *            Field name or associative array of field names
-     *            and values
-     * @param string $value
-     *            Value
+     * @param (mixed|Expression)[]|mixed|Expression $field
+     *            Field name or associative array of update data (see
+     *            {@see UpdateSelection::getData} for format.
+     * @param mixed|Expression $value
+     *            Field value. May be an expression.
      * @return Updatable An updatable selection.
      */
     public function set($field, $value = null);

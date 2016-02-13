@@ -34,15 +34,9 @@ class UpdateSelectionBuilder extends SelectionBase implements Updatable, UpdateS
     {
         if (is_array($field)) {
             foreach ($field as $f => $val) {
-                $this->data($f, $val);
+                $this->set($f, $val);
             }
         } else {
-            if (strpos($field, '=') !== false) {
-                if (! is_array($value)) {
-                    $value = func_get_args();
-                    $value = array_slice($value, 1);
-                }
-            }
             $this->data[$field] = $value;
         }
         return $this;
@@ -53,6 +47,6 @@ class UpdateSelectionBuilder extends SelectionBase implements Updatable, UpdateS
      */
     public function update()
     {
-        $this->source->update($this);
+        return $this->source->update($this);
     }
 }

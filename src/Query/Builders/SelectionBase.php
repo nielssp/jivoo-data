@@ -19,19 +19,23 @@ abstract class SelectionBase implements Selectable, Selection
 {
 
     /**
+     * The ordering.
+     *
      * @var array[]
      */
-    private $ordering = array();
+    protected $ordering = array();
 
     /**
+     * Record limit.
+     *
      * @var int|null Limit.
      */
-    private $limit = null;
+    protected $limit = null;
 
     /**
      * @var Expression|null
      */
-    private $predicate = null;
+    protected $predicate = null;
 
     /**
      * The data source.

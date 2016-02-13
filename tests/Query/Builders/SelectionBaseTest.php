@@ -3,11 +3,19 @@ namespace Jivoo\Data\Query\Builders;
 
 class SelectionBaseTest extends \Jivoo\TestCase
 {
+    protected $dataSource;
+    
+    protected function setUp()
+    {
+        $this->dataSource = $this->getMockBuilder('Jivoo\Data\DataSource')->getMock();
+    }
     
     protected function getInstance()
     {
-        $dataSource = $this->getMockBuilder('Jivoo\Data\DataSource')->getMock();
-        return $this->getMockForAbstractClass('Jivoo\Data\Query\Builders\SelectionBase', [$dataSource]);
+        return $this->getMockForAbstractClass(
+            'Jivoo\Data\Query\Builders\SelectionBase',
+            [$this->dataSource]
+        );
     }
 
     public function testPredicate()

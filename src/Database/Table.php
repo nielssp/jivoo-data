@@ -12,7 +12,7 @@ use Jivoo\Models\Schema;
 /**
  * A database table.
  */
-abstract class Table extends ModelBase
+abstract class Table implements \Jivoo\Data\DataSource
 {
 
     /**

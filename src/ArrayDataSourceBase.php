@@ -5,10 +5,11 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data;
 
+use Jivoo\Assume;
+use Jivoo\Data\Query\Expression;
+use Jivoo\Data\Query\ReadSelection;
 use Jivoo\Data\Query\Selection;
 use Jivoo\Data\Query\UpdateSelection;
-use Jivoo\Data\Query\ReadSelection;
-use Jivoo\Assume;
 
 /**
  * A data source based on an array of records.
@@ -123,7 +124,13 @@ abstract class ArrayDataSourceBase implements DataSource
         $count = 0;
         foreach ($data as $key => $record) {
             if ($predicate === null or $predicate($record)) {
-                $this->updateKey($key, array_merge($record->getData(), $updates));
+                $data = array_map(function ($value) use ($record) {
+                    if ($value instanceof Expression) {
+                        return $value($record);
+                    }
+                    return $value;
+                }, $updates);
+                $this->updateKey($key, array_merge($record->getData(), $data));
                 $count++;
                 if (isset($limit) and $count >= $limit) {
                     break;

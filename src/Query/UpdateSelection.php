@@ -12,8 +12,10 @@ interface UpdateSelection extends Selection
 {
 
     /**
+     * The update data as an associative array. The keys are field names and
+     * the values are either values or expressions.
      *
-     * @return array Data.
+     * @return (mixed|Expression)[]
      */
     public function getData();
 }

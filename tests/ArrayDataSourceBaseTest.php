@@ -85,6 +85,14 @@ class ArrayDataSourceBaseTest extends \Jivoo\TestCase
         foreach ($source->getData() as $record) {
             $this->assertEquals('baz', $record->name);
         }
+        
+        // Update using expression
+        $selection = new UpdateSelectionBuilder($source);
+        $selection->set('name', E::e('id'))->update();
+        
+        foreach ($source->getData() as $record) {
+            $this->assertEquals($record->id, $record->name);
+        }
     }
 
     public function testDelete()
