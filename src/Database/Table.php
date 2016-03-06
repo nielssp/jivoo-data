@@ -21,7 +21,7 @@ abstract class Table implements \Jivoo\Data\DataSource
      * @param Schema $schema
      *            Schema.
      */
-    abstract public function setSchema(Schema $schema);
+    abstract public function setSchema(Definition $schema);
 
     /**
      * {@inheritdoc}

@@ -79,7 +79,7 @@ class SqlTable extends Table
     /**
      * {@inheritdoc}
      */
-    public function setSchema(Schema $schema)
+    public function setSchema(Definition $schema)
     {
         $this->schema = $schema;
     }

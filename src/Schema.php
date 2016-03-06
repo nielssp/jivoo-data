@@ -6,57 +6,33 @@
 namespace Jivoo\Data;
 
 /**
- * Model schema.
+ * A schema describing multiple models.
  */
 interface Schema
 {
 
     /**
-     * Get list of fields.
+     * Get a model.
      *
-     * @return string[] List of field names.
+     * @param string $model
+     *            Model name
+     * @return Modle Model.
      */
-    public function getFields();
+    public function __get($model);
 
     /**
-     * Get type of field
+     * Whether a model exists in the schema.
      *
-     * @param string $field
-     *            Field name.
-     * @return DataType Type of field.
+     * @param string $model
+     *            Model name.
+     * @return bool True if model exists, false otherwise.
      */
-    public function getType($field);
+    public function __isset($model);
 
     /**
-     * Get fields of primary key.
-     * Should return same result as `getKey('PRIMARY')`.
+     * Get names of models in schema.
      *
-     * @return string[] List of field names or empty array if no primary key.
+     * @return string[] Names of models in schema.
      */
-    public function getPrimaryKey();
-
-    /**
-     * Get names of indexes/keys.
-     *
-     * @return string[] Names of keys.
-     */
-    public function getKeys();
-
-    /**
-     * Get fields of key.
-     *
-     * @param string $key
-     *            Key name.
-     * @return string[] List of field names.
-     */
-    public function getKey($key);
-
-    /**
-     * Whether key is unique.
-     *
-     * @param string $key
-     *            Key name.
-     * @return bool True if unique, false otherwise.
-     */
-    public function isUnique($key);
+    public function getModels();
 }

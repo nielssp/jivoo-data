@@ -96,7 +96,7 @@ class MigrationSchema implements DatabaseSchema, Migratable
     /**
      * {@inheritdoc}
      */
-    public function addSchema(Schema $schema)
+    public function addSchema(Definition $schema)
     {
         $this->schemas[$schema->getName()] = $schema;
     }
@@ -104,7 +104,7 @@ class MigrationSchema implements DatabaseSchema, Migratable
     /**
      * {@inheritdoc}
      */
-    public function createTable(SchemaBuilder $schema)
+    public function createTable(DefinitionBuilder $schema)
     {
         $table = $schema->getName();
         $this->tables[] = $table;

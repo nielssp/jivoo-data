@@ -35,5 +35,5 @@ interface DatabaseSchema
      * @param Schema $schema
      *            Table schema;
      */
-    public function addSchema(Schema $schema);
+    public function addSchema(Definition $schema);
 }

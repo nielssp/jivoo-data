@@ -11,7 +11,7 @@ use Jivoo\Data\Query\AnySelectable;
 use Jivoo\Data\Query\ReadSelection;
 use Jivoo\Data\Query\UpdateSelection;
 use Jivoo\Data\Record;
-use Jivoo\Data\Schema;
+use Jivoo\Data\Definition;
 
 /**
  * An undecided selection.
@@ -169,7 +169,7 @@ class SelectionBuilder extends SelectionBase implements AnySelectable, ReadSelec
     /**
      * {@inheritdoc}
      */
-    public function withRecord($field, Schema $schema)
+    public function withRecord($field, Definition $schema)
     {
         return $this->copyBasicAttr(new ReadSelectionBuilder($this->source))->withRecord($field, $schema);
     }

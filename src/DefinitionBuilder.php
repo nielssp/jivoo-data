@@ -10,7 +10,7 @@ use Jivoo\Models\Validation\ValidatorBuilder;
 /**
  * Represents a database table schema.
  */
-class SchemaBuilder implements Schema
+class DefinitionBuilder implements Definition
 {
 
     /**
@@ -47,14 +47,12 @@ class SchemaBuilder implements Schema
         unset($this->fields[$field]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function copy($newName)
+    public function getType($field)
     {
-        $new = clone $this;
-        $new->name = $newName;
-        return $new;
+        if (! isset($this->fields[$field])) {
+            return null;
+        }
+        return $this->fields[$field];
     }
 
     /**

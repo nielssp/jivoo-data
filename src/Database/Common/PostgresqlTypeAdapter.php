@@ -316,7 +316,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function createTable(SchemaBuilder $schema)
+    public function createTable(DefinitionBuilder $schema)
     {
         $table = $schema->getName();
         $sql = 'CREATE TABLE ' . $this->db->quoteModel($table) . ' (';

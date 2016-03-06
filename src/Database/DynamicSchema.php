@@ -14,7 +14,7 @@ use Jivoo\InvalidPropertyException;
 /**
  * Represents a database table schema.
  */
-class DynamicSchema implements Schema
+class DynamicSchema implements Definition
 {
 
     /**

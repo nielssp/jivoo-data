@@ -58,7 +58,7 @@ class DatabaseSchemaBuilder implements DatabaseSchema
     /**
      * {@inheritdoc}
      */
-    public function addSchema(Schema $schema)
+    public function addSchema(Definition $schema)
     {
         $name = $schema->getName();
         if (! in_array($name, $this->tables)) {

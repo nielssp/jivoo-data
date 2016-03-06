@@ -9,7 +9,7 @@ use Jivoo\Data\Record;
 use Jivoo\Data\DataType;
 use Jivoo\Data\Query\Readable;
 use Jivoo\Data\Query\ReadSelection;
-use Jivoo\Data\Schema;
+use Jivoo\Data\Definition;
 use Jivoo\Data\DataSource;
 use Jivoo\Data\Query\Expression;
 use Jivoo\Data\Query\Expression\ExpressionParser;
@@ -187,7 +187,7 @@ class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelect
     /**
      * {@inheritdoc}
      */
-    public function withRecord($field, Schema $schema)
+    public function withRecord($field, Definition $schema)
     {
         foreach ($schema->getFields() as $schemaField) {
             $alias = $field . '_' . $schemaField;

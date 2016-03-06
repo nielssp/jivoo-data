@@ -7,7 +7,7 @@ namespace Jivoo\Data\Query;
 
 use Jivoo\Data\DataType;
 use Jivoo\Data\DataSource;
-use Jivoo\Data\Schema;
+use Jivoo\Data\Definition;
 
 /**
  * An interface for readable models and selections.
@@ -66,11 +66,11 @@ interface Readable extends Selectable, \IteratorAggregate, \Countable
      * @param string $field
      *            Name of new field, expects the associated model to be
      *            aliased with the same name.
-     * @param Schema $schema
+     * @param Definition $schema
      *            Schema of associated record.
      * @return static
      */
-    public function withRecord($field, Schema $schema);
+    public function withRecord($field, Definition $schema);
 
     /**
      * Group by one or more columns.

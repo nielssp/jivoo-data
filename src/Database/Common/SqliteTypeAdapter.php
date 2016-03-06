@@ -266,7 +266,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function createTable(SchemaBuilder $schema)
+    public function createTable(DefinitionBuilder $schema)
     {
         $sql = 'CREATE TABLE "' . $this->db->tableName($schema->getName()) . '" (';
         $columns = $schema->getFields();

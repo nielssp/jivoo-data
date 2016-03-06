@@ -23,11 +23,11 @@ interface Model extends Readable, Updatable, Deletable, DataSource
     public function getName();
 
     /**
-     * Get schema for model.
+     * Get model data definition.
      *
-     * @return Schema Schema.
+     * @return Definition Schema.
      */
-    public function getShema();
+    public function getDefinition();
 
     /**
      * Create a record.

@@ -9,7 +9,7 @@ use Jivoo\Data\DataSource;
 use Jivoo\Data\DataType;
 use Jivoo\Data\Query\Builders\ReadSelectionBuilder;
 use Jivoo\Data\Record;
-use Jivoo\Data\Schema;
+use Jivoo\Data\Definition;
 
 /**
  * A trait that implements {@see Readable}.
@@ -91,11 +91,11 @@ trait ReadableTrait
      * @param string $field
      *            Name of new field, expects the associated model to be
      *            aliased with the same name.
-     * @param Schema $schema
+     * @param Definition $schema
      *            Schema of associated record.
      * @return ReadSelectionBuilder A read selection.
      */
-    public function withRecord($field, Schema $schema)
+    public function withRecord($field, Definition $schema)
     {
         $selection = new ReadSelectionBuilder($this->getSource());
         return $selection->withRecord($field, $schema);

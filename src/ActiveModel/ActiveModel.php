@@ -35,7 +35,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
     /**
      * @var string Name of database used by model.
      */
-    protected $database = 'default';
+    protected $schema = 'default';
 
     /**
      * @var string Name of database table used by model, null for default based
@@ -191,33 +191,25 @@ abstract class ActiveModel extends ModelBase implements EventListener
     /**
      * Construct active model.
      *
-     * @param App $app
-     *            Associated application.
-     * @param DatabaseLoader $databases
-     *            Databases module.
+     * @param Schema $schema
+     *            Schema.
      * @throws InvalidActiveModelException If model is incorrectly defined.
      * @throws InvalidTableException If table not found.
      * @throws InvalidAssociationException If association models are invalid.
      * @throws InvalidMixinException If a mixin is invalid.
      */
-    final public function __construct(App $app, Loader $databases)
+    final public function __construct(\Jivoo\Data\Schema $schema)
     {
-        parent::__construct($app);
-        $databaseName = $this->database;
-        $database = $databases->$databaseName;
         $this->name = Utilities::getClassName(get_class($this));
-        if (! isset($database)) {
-            throw new InvalidActiveModelException(tr('Database "%1" not found', $this->database));
-        }
-        $this->database = $database;
+        $this->schema = $schema;
         if (! isset($this->table)) {
             $this->table = $this->name;
         }
         $table = $this->table;
-        if (! isset($this->database->$table)) {
+        if (! isset($this->schema->$table)) {
             throw new InvalidTableException(tr('Table "%1" not found in database', $table));
         }
-        $this->source = $this->database->$table;
+        $this->source = $this->schema->$table;
         
         $this->schema = $this->source->getSchema();
         if (! isset($this->schema)) {
@@ -281,7 +273,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
             }
         }
         
-        $this->database->$table = $this;
+        $this->schema->$table = $this;
         
         $this->init();
     }
@@ -417,7 +409,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
      */
     public function getDatabase()
     {
-        return $this->database;
+        return $this->schema;
     }
 
     /**
@@ -554,10 +546,10 @@ abstract class ActiveModel extends ModelBase implements EventListener
         $options['type'] = $type;
         $options['name'] = $name;
         $otherModel = $options['model'];
-        if (! isset($this->database->$otherModel)) {
+        if (! isset($this->schema->$otherModel)) {
             throw new InvalidAssociationException(tr('Model %1 not found in  %2', $otherModel, $this->name));
         }
-        $options['model'] = $this->database->$otherModel;
+        $options['model'] = $this->schema->$otherModel;
         if (! isset($options['thisKey'])) {
             $options['thisKey'] = lcfirst($this->name) . 'Id';
         }
@@ -579,10 +571,10 @@ abstract class ActiveModel extends ModelBase implements EventListener
                 }
             }
             $join = $options['join'];
-            if (! isset($this->database->$join)) {
+            if (! isset($this->schema->$join)) {
                 throw new InvalidAssociationException('Association data source "' . $join . '" not found');
             }
-            $options['join'] = $this->database->$join;
+            $options['join'] = $this->schema->$join;
         }
         $this->associations[$name] = $options;
     }

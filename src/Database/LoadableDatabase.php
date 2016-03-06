@@ -161,7 +161,7 @@ abstract class LoadableDatabase extends Module implements MigratableDatabase
     /**
      * {@inheritdoc}
      */
-    public function createTable(SchemaBuilder $schema)
+    public function createTable(DefinitionBuilder $schema)
     {
         $this->migrationAdapter->createTable($schema);
         $this->schema->addSchema($schema);

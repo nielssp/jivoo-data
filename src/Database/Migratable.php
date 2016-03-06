@@ -19,7 +19,7 @@ interface Migratable
      * @param SchemaBuilder $schema
      *            Schema.
      */
-    public function createTable(SchemaBuilder $schema);
+    public function createTable(DefinitionBuilder $schema);
 
     /**
      * Rename a table.

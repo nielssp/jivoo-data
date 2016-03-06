@@ -74,7 +74,7 @@ abstract class Migration
      * @param SchemaBuilder $schema
      *            Schema for table.
      */
-    protected function createTable(SchemaBuilder $schema)
+    protected function createTable(DefinitionBuilder $schema)
     {
         try {
             $this->db->createTable($schema);
