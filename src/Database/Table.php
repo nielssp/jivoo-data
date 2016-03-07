@@ -12,8 +12,12 @@ use Jivoo\Models\Schema;
 /**
  * A database table.
  */
-abstract class Table implements \Jivoo\Data\DataSource
+interface Table extends \Jivoo\Data\DataSource
 {
+    
+    public function getName();
+    
+    public function getDefinition();
 
     /**
      * Set schema of table.
@@ -21,64 +25,5 @@ abstract class Table implements \Jivoo\Data\DataSource
      * @param Schema $schema
      *            Schema.
      */
-    abstract public function setSchema(Definition $schema);
-
-    /**
-     * {@inheritdoc}
-     */
-    public function firstSelection(ReadSelectionBuilder $selection)
-    {
-        $resultSet = $this->readSelection($selection->limit(1));
-        if (! $resultSet->hasRows()) {
-            return null;
-        }
-        return $this->createExisting($resultSet->fetchAssoc(), $selection);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function lastSelection(ReadSelectionBuilder $selection)
-    {
-        $resultSet = $this->readSelection($selection->reverseOrder()
-            ->limit(1));
-        if (! $resultSet->hasRows()) {
-            return null;
-        }
-        return $this->createExisting($resultSet->fetchAssoc(), $selection);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function readSelection(ReadSelectionBuilder $selection)
-    {
-        $resultSet = $this->readSelection($selection);
-        return new ResultSetIterator($this, $resultSet, $selection);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function readCustom(ReadSelectionBuilder $selection, ModelBase $model = null)
-    {
-        $resultSet = $this->readSelection($selection);
-        if (isset($model)) {
-            return new ResultSetIterator($model, $resultSet, $selection);
-        }
-        $result = array();
-        while ($resultSet->hasRows()) {
-            $result[] = $resultSet->fetchAssoc();
-        }
-        return $result;
-    }
-
-    /**
-     * Read a selection.
-     *
-     * @param ReadSelectionBuilder $selection
-     *            A read selection.
-     * @return ResultSet A result set.
-     */
-    abstract public function readSelection(ReadSelectionBuilder $selection);
+    public function setDefinition(Definition $definition);
 }

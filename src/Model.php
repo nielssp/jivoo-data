@@ -44,6 +44,7 @@ interface Model extends Readable, Updatable, Deletable, DataSource
 
     /**
      * Make a selection that selects a single record.
+     *
      * @param Record $record
      *            A record.
      * @return Query\AnySelectable A selection.
@@ -63,6 +64,7 @@ interface Model extends Readable, Updatable, Deletable, DataSource
      * Find a record by its primary key. If the primary key
      * consists of multiple fields, this function expects a
      * parameter for each field (in alphabetical order).
+     *
      * @param mixed $primary
      *            Value of primary key.
      * @param mixed ...$primary

@@ -27,6 +27,39 @@ interface SqlDatabase extends Database
      * @throws \Jivoo\Data\Database\QueryException if query failed.
      */
     public function rawQuery($sql, $pk = null);
+    
+    /**
+     * Execute a raw sql insert or replace statement on database.
+     *
+     * @param string $sql
+     *            Raw sql.
+     * @param string|null $pk
+     *            Name of auto incrementing primary key if any (only needed for
+     *            some database systems).
+     * @return int The last insert id if any.
+     * @throws \Jivoo\Data\Database\QueryException if query failed.
+     */
+    public function insert($sql, $pk = null);
+    
+    /**
+     * Execute a raw sql query on database.
+     *
+     * @param string $sql
+     *            Raw sql.
+     * @return ResultSet A result set.
+     * @throws \Jivoo\Data\Database\QueryException if query failed.
+     */
+    public function query($sql);
+    
+    /**
+     * Execute a raw sql statement on database.
+     *
+     * @param string $sql
+     *            Raw sql.
+     * @return int Number of affected rows.
+     * @throws \Jivoo\Data\Database\QueryException if query failed.
+     */
+    public function execute($sql);
 
     /**
      * Get type adapter.
