@@ -12,21 +12,16 @@ use Jivoo\Data\Database\Database;
  */
 interface SqlDatabase extends Database
 {
-
+    
     /**
      * Execute a raw sql query on database.
      *
      * @param string $sql
      *            Raw sql.
-     * @param string|null $pk
-     *            Name of auto incrementing primary key if any (only
-     *            supplied for inserts and only needed for some database systems).
-     * @return ResultSet|int A result set if query is a select-, show-,
-     *         explain-, or describe-query, the last insert id if query is an insert- or
-     *         replace-query, or number of affected rows in any other case..
+     * @return ResultSet A result set.
      * @throws \Jivoo\Data\Database\QueryException if query failed.
      */
-    public function rawQuery($sql, $pk = null);
+    public function query($sql);
     
     /**
      * Execute a raw sql insert or replace statement on database.
@@ -40,16 +35,6 @@ interface SqlDatabase extends Database
      * @throws \Jivoo\Data\Database\QueryException if query failed.
      */
     public function insert($sql, $pk = null);
-    
-    /**
-     * Execute a raw sql query on database.
-     *
-     * @param string $sql
-     *            Raw sql.
-     * @return ResultSet A result set.
-     * @throws \Jivoo\Data\Database\QueryException if query failed.
-     */
-    public function query($sql);
     
     /**
      * Execute a raw sql statement on database.

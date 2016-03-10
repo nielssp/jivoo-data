@@ -47,18 +47,14 @@ class PdoPostgresqlDatabase extends PdoDatabase
     /**
      * {@inheritdoc}
      */
-    public function rawQuery($sql, $pk = null)
+    public function insert($sql, $pk = null)
     {
         if (isset($pk)) {
-            $result = $this->pdo->query($sql . ' RETURNING ' . $this->quoteField($pk));
-            if (! $result) {
-                $errorInfo = $this->pdo->errorInfo();
-                throw new QueryException($errorInfo[0] . ' - ' . $errorInfo[1] . ' - ' . $errorInfo[2]);
-            }
-            $row = $result->fetch(\PDO::FETCH_NUM);
+            $row = $this->rawQuery($sql . ' RETURNING ' . $this->quoteField($pk))
+                ->fetch(\PDO::FETCH_NUM);
             return $row[0];
         }
-        return parent::rawQuery($sql);
+        return parent::insert($sql);
     }
 
     /**

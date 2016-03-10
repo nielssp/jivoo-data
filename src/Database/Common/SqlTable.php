@@ -204,7 +204,7 @@ class SqlTable extends Table
     public function countSelection(ReadSelectionBuilder $selection)
     {
         if (isset($selection->groupBy)) {
-            $result = $this->owner->rawQuery(
+            $result = $this->owner->query(
                 'SELECT COUNT(*) as _count FROM ('
                     . $this->convertReadSelection($selection, '1') . ') AS _selection_count'
             );
@@ -221,7 +221,7 @@ class SqlTable extends Table
      */
     public function readSelection(ReadSelectionBuilder $selection)
     {
-        return $this->owner->rawQuery($this->convertReadSelection($selection));
+        return $this->owner->query($this->convertReadSelection($selection));
     }
 
     /**
@@ -372,7 +372,7 @@ class SqlTable extends Table
         if (isset($selection->limit)) {
             $sqlString .= ' ' . $this->owner->sqlLimitOffset($selection->limit);
         }
-        return $this->owner->rawQuery($sqlString);
+        return $this->owner->execute($sqlString);
     }
 
     /**
@@ -394,7 +394,7 @@ class SqlTable extends Table
         if (isset($selection->limit)) {
             $sqlString .= ' ' . $this->owner->sqlLimitOffset($selection->limit);
         }
-        return $this->owner->rawQuery($sqlString);
+        return $this->owner->execute($sqlString);
     }
 
     /**
@@ -441,6 +441,6 @@ class SqlTable extends Table
             $tuples[] = $tupleSql;
         }
         $sqlString .= implode(', ', $tuples);
-        return $this->owner->rawQuery($sqlString, $this->getAiPrimaryKey());
+        return $this->owner->insert($sqlString, $this->getAiPrimaryKey());
     }
 }

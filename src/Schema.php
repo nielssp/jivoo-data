@@ -21,7 +21,7 @@ interface Schema
     public function __get($model);
 
     /**
-     * Whether a model exists in the schema.
+     * Whether a model is defined in the schema.
      *
      * @param string $model
      *            Model name.

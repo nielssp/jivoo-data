@@ -59,9 +59,13 @@ class MysqlDatabase extends SqlDatabaseBase
     }
 
     /**
-     * {@inheritdoc}
+     * Execute raw query on database.
+     *
+     * @param string $sql SQL query.
+     * @return resource Result.
+     * @throws QueryException On error.
      */
-    public function rawQuery($sql, $pk = null)
+    protected function rawQuery($sql)
     {
         $this->logger->debug('MySQL query: {query}', array(
             'query' => $sql
@@ -70,12 +74,32 @@ class MysqlDatabase extends SqlDatabaseBase
         if (! $result) {
             throw new QueryException(mysql_error());
         }
-        if (preg_match('/^\\s*(select|show|explain|describe) /i', $sql)) {
-            return new MysqlResultSet($result);
-        } elseif (preg_match('/^\\s*(insert|replace) /i', $sql)) {
-            return mysql_insert_id($this->handle);
-        } else {
-            return mysql_affected_rows($this->handle);
-        }
+        return $result;
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function query($sql)
+    {
+        return new MysqlResultSet($this->rawQuery($sql));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function insert($sql, $pk = null)
+    {
+        $this->rawQuery($sql);
+        return mysql_insert_id($this->handle);
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function execute($sql)
+    {
+        $this->rawQuery($sql);
+        return mysql_affected_rows($this->handle);
     }
 }

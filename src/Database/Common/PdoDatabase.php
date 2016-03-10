@@ -32,26 +32,50 @@ abstract class PdoDatabase extends SqlDatabaseBase
     {
         return $this->pdo->quote($string);
     }
-
+    
     /**
-     * {@inheritdoc}
+     * Execute raw query on database.
+     *
+     * @param string $sql SQL query.
+     * @return \PDOStatement Result.
+     * @throws QueryException On error.
      */
-    public function rawQuery($sql, $pk = null)
+    protected function rawQuery($sql)
     {
-        $this->logger->debug('PDO query: {query}', array(
+        $this->logger->debug('PDO query: {query}', [
             'query' => $sql
-        ));
+        ]);
         $result = $this->pdo->query($sql);
         if (! $result) {
             $errorInfo = $this->pdo->errorInfo();
             throw new QueryException($errorInfo[0] . ' - ' . $errorInfo[1] . ' - ' . $errorInfo[2]);
         }
-        if (preg_match('/^\\s*(select|show|explain|describe|pragma) /i', $sql)) {
-            return new PdoResultSet($result);
-        } elseif (preg_match('/^\\s*(insert|replace) /i', $sql)) {
-            return $this->pdo->lastInsertId();
-        } else {
-            return $result->rowCount();
-        }
+        return $result;
+        
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function query($sql)
+    {
+        return new PdoResultSet($this->rawQuery($sql));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function insert($sql, $pk = null)
+    {
+        $this->rawQuery($sql);
+        return $this->pdo->lastInsertId();
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function execute($sql)
+    {
+        return $this->rawQuery($sql)->rowCount();
     }
 }
