@@ -5,14 +5,12 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Database;
 
-use Jivoo\Module;
-use Jivoo\App;
-use Jivoo\Models\DataType;
+use Jivoo\Data\DataType;
 
 /**
  * A database driver that can be loaded by the {@see Databases} module.
  */
-abstract class LoadableDatabase extends Module implements MigratableDatabase
+abstract class LoadableDatabase implements MigratableDatabase
 {
 
     /**
@@ -45,7 +43,6 @@ abstract class LoadableDatabase extends Module implements MigratableDatabase
      */
     final public function __construct(DatabaseSchema $schema, $options = array())
     {
-        parent::__construct();
         $this->schema = $schema;
         $this->init($options);
         $this->migrationAdapter = $this->getMigrationAdapter();

@@ -5,25 +5,27 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Database;
 
-use Jivoo\Models\ModelBase;
-use Jivoo\Models\Selection\ReadSelectionBuilder;
-use Jivoo\Models\Schema;
-
 /**
  * A database table.
  */
-interface Table extends \Jivoo\Data\DataSource
+interface Table extends \Jivoo\Data\Model
 {
     
-    public function getName();
-    
-    public function getDefinition();
-
     /**
-     * Set schema of table.
+     * Whether the table exists.
      *
-     * @param Schema $schema
-     *            Schema.
+     * @return bool
      */
-    public function setDefinition(Definition $definition);
+    public function exists();
+    
+    /**
+     * Create the table.
+     * @throws
+     */
+    public function create(); // TODO: rename method
+    
+    /**
+     * Delete the table.
+     */
+    public function drop();
 }

@@ -120,7 +120,7 @@ class RecordBuilder implements Record
             return;
         }
         if (! isset($allowedFields)) {
-            $allowedFields = $this->model->getFields();
+            $allowedFields = $this->model->getDefinition()->getFields();
         }
         if (is_array($allowedFields)) {
             $allowedFields = array_flip($allowedFields);

@@ -18,14 +18,14 @@ interface Model extends Readable, Updatable, Deletable, DataSource
     /**
      * Get name of model.
      *
-     * @return string Name.
+     * @return string
      */
     public function getName();
 
     /**
      * Get model data definition.
      *
-     * @return Definition Schema.
+     * @return Definition
      */
     public function getDefinition();
 

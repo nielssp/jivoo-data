@@ -5,7 +5,8 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Database;
 
-use Jivoo\Models\DataType;
+use Jivoo\Data\DataType;
+use Jivoo\Data\Definition;
 
 /**
  * Interface containing methods for migrating databases.
@@ -14,12 +15,12 @@ interface Migratable
 {
 
     /**
-     * Create a table based on a schema.
+     * Create a table based on a definition.
      *
-     * @param SchemaBuilder $schema
+     * @param Definition $schema
      *            Schema.
      */
-    public function createTable(DefinitionBuilder $schema);
+    public function createTable(Definition $definition);
 
     /**
      * Rename a table.
