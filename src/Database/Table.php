@@ -11,21 +11,4 @@ namespace Jivoo\Data\Database;
 interface Table extends \Jivoo\Data\Model
 {
     
-    /**
-     * Whether the table exists.
-     *
-     * @return bool
-     */
-    public function exists();
-    
-    /**
-     * Create the table.
-     * @throws
-     */
-    public function create(); // TODO: rename method
-    
-    /**
-     * Delete the table.
-     */
-    public function drop();
 }

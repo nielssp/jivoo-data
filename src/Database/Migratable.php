@@ -17,10 +17,12 @@ interface Migratable
     /**
      * Create a table based on a definition.
      *
+     * @param string $table
+     *            Table name.
      * @param Definition $schema
      *            Schema.
      */
-    public function createTable(Definition $definition);
+    public function createTable($table, Definition $definition);
 
     /**
      * Rename a table.

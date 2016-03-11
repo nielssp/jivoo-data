@@ -172,7 +172,7 @@ abstract class SqlDatabaseBase extends LoadableDatabase implements SqlDatabase, 
      */
     public function beginTransaction()
     {
-        $this->rawQuery('BEGIN');
+        $this->execute('BEGIN');
     }
 
     /**
@@ -180,7 +180,7 @@ abstract class SqlDatabaseBase extends LoadableDatabase implements SqlDatabase, 
      */
     public function commit()
     {
-        $this->rawQuery('COMMIT');
+        $this->execute('COMMIT');
     }
 
     /**
@@ -188,6 +188,6 @@ abstract class SqlDatabaseBase extends LoadableDatabase implements SqlDatabase, 
      */
     public function rollback()
     {
-        $this->rawQuery('ROLLBACK');
+        $this->execute('ROLLBACK');
     }
 }

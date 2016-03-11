@@ -230,7 +230,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
      */
     public function getTableSchema($table)
     {
-        $result = $this->db->rawQuery(
+        $result = $this->db->query(
             "SELECT * FROM information_schema.columns WHERE table_name = '" . $this->db->tableName($table) . "'"
         );
         $schema = new SchemaBuilder($table);
@@ -244,7 +244,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
         $sql .= ' t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid';
         $sql .= " AND a.attnum = ANY(ix.indkey) AND t.relkind = 'r'";
         $sql .= " AND t.relname = '" . $this->db->tableName($table) . "'";
-        $result = $this->db->rawQuery($sql);
+        $result = $this->db->query($sql);
         $indexes = array();
         while ($row = $result->fetchAssoc()) {
             $index = $row['index_name'];
@@ -286,7 +286,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
      */
     public function tableExists($table)
     {
-        $result = $this->db->rawQuery(
+        $result = $this->db->query(
             // TODO: custom schemaname?
             "SELECT 1 FROM pg_catalog.pg_tables WHERE schemaname = 'public' AND tablename = '"
                 . $this->db->tableName($table) . "'"
@@ -301,7 +301,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
     {
         $prefix = $this->db->tableName('');
         $prefixLength = strlen($prefix);
-        $result = $this->db->rawQuery("SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public'");
+        $result = $this->db->query("SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public'");
         $tables = array();
         while ($row = $result->fetchRow()) {
             $name = $row[0];
@@ -316,14 +316,13 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function createTable(DefinitionBuilder $schema)
+    public function createTable($table, \Jivoo\Data\Definition $definition)
     {
-        $table = $schema->getName();
         $sql = 'CREATE TABLE ' . $this->db->quoteModel($table) . ' (';
-        $columns = $schema->getFields();
+        $columns = $definition->getFields();
         $first = true;
         foreach ($columns as $column) {
-            $type = $schema->$column;
+            $type = $definition->$column;
             if (! $first) {
                 $sql .= ', ';
             } else {
@@ -332,7 +331,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
             $sql .= $this->db->quoteField($column);
             $sql .= ' ' . $this->fromDataType($type);
         }
-        $pk = $schema->getPrimaryKey();
+        $pk = $definition->getPrimaryKey();
         if (count($pk) > 0) {
             $sql .= ', CONSTRAINT "' . $this->db->tableName($table) . '_PRIMARY" PRIMARY KEY (';
             $pk = array_map(array(
@@ -342,8 +341,8 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
             $sql .= implode(', ', $pk) . ')';
         }
         $sql .= ')';
-        $this->db->rawQuery($sql);
-        foreach ($schema->getIndexes() as $index => $options) {
+        $this->db->execute($sql);
+        foreach ($definition->getIndexes() as $index => $options) {
             if ($index == 'PRIMARY') {
                 continue;
             }
@@ -358,7 +357,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
                 'quoteField'
             ), $options['columns']);
             $sql .= ' (' . implode(', ', $columns) . ')';
-            $this->db->rawQuery($sql);
+            $this->db->execute($sql);
         }
     }
 
@@ -369,7 +368,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
     {
         $sql = 'ALTER TABLE ' . $this->db->quoteModel($table) . ' RENAME TO ';
         $sql .= $this->db->quoteModel($newName);
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -378,7 +377,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
     public function dropTable($table)
     {
         $sql = 'DROP TABLE ' . $this->db->quoteModel($table);
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -389,7 +388,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
         $sql = 'ALTER TABLE ' . $this->db->quoteModel($table);
         $sql .= ' ADD ' . $this->db->quoteField($column);
         $sql .= ' ' . $this->fromDataType($type);
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -399,7 +398,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
     {
         $sql = 'ALTER TABLE ' . $this->db->quoteModel($table);
         $sql .= ' DROP ' . $this->db->quoteField($column);
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -411,7 +410,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
         $sql = 'ALTER TABLE ' . $this->db->quoteModel($table);
         $sql .= ' ALTER ' . $this->db->quoteField($column);
         $sql .= ' TYPE ' . $this->fromDataType($type);
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -423,7 +422,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
         $sql .= ' RENAME ' . $this->db->quoteField($column);
         $sql .= ' TO ' . $this->db->quoteField($newName);
         $type = $this->db->$table->getSchema()->$column;
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -440,7 +439,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
         if ($index == 'PRIMARY') {
             $sql = 'ALTER TABLE ' . $this->db->quoteModel($table);
             $sql .= 'ADD CONSTRAINT "' . $this->db->tableName($table) . '_PRIMARY" PRIMARY KEY ' . $columns;
-            $this->db->rawQuery($sql);
+            $this->db->execute($sql);
             return;
         }
         $sql = 'CREATE';
@@ -450,7 +449,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
         $sql .= ' INDEX "' . $this->db->tableName($table) . '_' . $index . '"';
         $sql .= ' ON ' . $this->db->quoteModel($schema->getName());
         $sql .= ' ' . $columns;
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -461,13 +460,13 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
         if ($index == 'PRIMARY') {
             $sql = 'ALTER TABLE ' . $this->db->quoteModel($table);
             $sql .= 'DROP CONSTRAINT "' . $this->db->tableName($table) . '_PRIMARY"';
-            $this->db->rawQuery($sql);
+            $this->db->execute($sql);
             return;
         }
         
         $sql = 'DROP INDEX ';
         $sql .= '"' . $this->db->tableName($table) . '_' . $index . '"';
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**

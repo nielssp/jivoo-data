@@ -221,13 +221,13 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
      */
     public function getTableSchema($table)
     {
-        $result = $this->db->rawQuery('SHOW COLUMNS FROM `' . $this->db->tableName($table) . '`');
+        $result = $this->db->query('SHOW COLUMNS FROM `' . $this->db->tableName($table) . '`');
         $schema = new SchemaBuilder($table);
         while ($row = $result->fetchAssoc()) {
             $column = $row['Field'];
             $schema->addField($column, $this->toDataType($row));
         }
-        $result = $this->db->rawQuery('SHOW INDEX FROM `' . $this->db->tableName($table) . '`');
+        $result = $this->db->query('SHOW INDEX FROM `' . $this->db->tableName($table) . '`');
         $indexes = array();
         while ($row = $result->fetchAssoc()) {
             $index = $row['Key_name'];
@@ -259,7 +259,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
      */
     public function tableExists($table)
     {
-        $result = $this->db->rawQuery('SHOW TABLES LIKE "' . $this->db->tableName($table) . '"');
+        $result = $this->db->query('SHOW TABLES LIKE "' . $this->db->tableName($table) . '"');
         return $result->hasRows();
     }
 
@@ -270,7 +270,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
     {
         $prefix = $this->db->tableName('');
         $prefixLength = strlen($prefix);
-        $result = $this->db->rawQuery('SHOW TABLES');
+        $result = $this->db->query('SHOW TABLES');
         $tables = array();
         while ($row = $result->fetchRow()) {
             $name = $row[0];
@@ -285,13 +285,13 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function createTable(DefinitionBuilder $schema)
+    public function createTable($table, \Jivoo\Data\Definition $definition)
     {
-        $sql = 'CREATE TABLE `' . $this->db->tableName($schema->getName()) . '` (';
-        $columns = $schema->getFields();
+        $sql = 'CREATE TABLE `' . $this->db->tableName($table) . '` (';
+        $columns = $definition->getFields();
         $first = true;
         foreach ($columns as $column) {
-            $type = $schema->$column;
+            $type = $definition->$column;
             if (! $first) {
                 $sql .= ', ';
             } else {
@@ -300,7 +300,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
             $sql .= $column;
             $sql .= ' ' . $this->fromDataType($type);
         }
-        foreach ($schema->getIndexes() as $index => $options) {
+        foreach ($definition->getIndexes() as $index => $options) {
             $sql .= ', ';
             if ($index == 'PRIMARY') {
                 $sql .= 'PRIMARY KEY (';
@@ -312,7 +312,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
             $sql .= implode(', ', $options['columns']) . ')';
         }
         $sql .= ') CHARACTER SET utf8';
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -322,7 +322,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
     {
         $sql = 'RENAME TABLE `' . $this->db->tableName($table) . '` TO `';
         $sql .= $this->db->tableName($newName) . '`';
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -331,7 +331,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
     public function dropTable($table)
     {
         $sql = 'DROP TABLE `' . $this->db->tableName($table) . '`';
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -341,7 +341,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
     {
         $sql = 'ALTER TABLE `' . $this->db->tableName($table) . '` ADD ' . $column;
         $sql .= ' ' . $this->fromDataType($type);
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -350,7 +350,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
     public function deleteColumn($table, $column)
     {
         $sql = 'ALTER TABLE `' . $this->db->tableName($table) . '` DROP ' . $column;
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -360,7 +360,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
     {
         $sql = 'ALTER TABLE `' . $this->db->tableName($table) . '` CHANGE ' . $column . ' ' . $column;
         $sql .= ' ' . $this->fromDataType($type);
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -371,7 +371,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
         $type = $this->db->$table->getSchema()->$column;
         $sql = 'ALTER TABLE `' . $this->db->tableName($table) . '` CHANGE ' . $column . ' ' . $newName;
         $sql .= ' ' . $this->fromDataType($type);
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -390,7 +390,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
         $sql .= ' (';
         $sql .= implode(', ', $options['columns']);
         $sql .= ')';
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -404,7 +404,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
         } else {
             $sql .= ' DROP INDEX ' . $index;
         }
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -429,6 +429,6 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
         $sql .= ' (';
         $sql .= implode(', ', $options['columns']);
         $sql .= ')';
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 }

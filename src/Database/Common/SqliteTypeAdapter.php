@@ -196,7 +196,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
      */
     public function getTableSchema($table)
     {
-        $result = $this->db->rawQuery('PRAGMA table_info("' . $this->db->tableName($table) . '")');
+        $result = $this->db->query('PRAGMA table_info("' . $this->db->tableName($table) . '")');
         $schema = new SchemaBuilder($table);
         $primaryKey = array();
         while ($row = $result->fetchAssoc()) {
@@ -207,7 +207,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
             $schema->addField($column, $this->toDataType($row));
         }
         $schema->setPrimaryKey($primaryKey);
-        $result = $this->db->rawQuery('PRAGMA index_list("' . $this->db->tableName($table) . '")');
+        $result = $this->db->query('PRAGMA index_list("' . $this->db->tableName($table) . '")');
         while ($row = $result->fetchAssoc()) {
             $index = $row['name'];
             $unique = $row['unique'] == 1;
@@ -221,7 +221,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
             if ($count == 0) {
                 continue;
             }
-            $columnResult = $this->db->rawQuery('PRAGMA index_info("' . $index . '")');
+            $columnResult = $this->db->query('PRAGMA index_info("' . $index . '")');
             $columns = array();
             while ($row = $columnResult->fetchAssoc()) {
                 $columns[] = $row['name'];
@@ -240,7 +240,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
      */
     public function tableExists($table)
     {
-        $result = $this->db->rawQuery('PRAGMA table_info("' . $this->db->tableName($table) . '")');
+        $result = $this->db->query('PRAGMA table_info("' . $this->db->tableName($table) . '")');
         return $result->hasRows();
     }
 
@@ -251,7 +251,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
     {
         $prefix = $this->db->tableName('');
         $prefixLength = strlen($prefix);
-        $result = $this->db->rawQuery('SELECT name FROM sqlite_master WHERE type = "table"');
+        $result = $this->db->query('SELECT name FROM sqlite_master WHERE type = "table"');
         $tables = array();
         while ($row = $result->fetchRow()) {
             $name = $row[0];
@@ -266,15 +266,15 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function createTable(DefinitionBuilder $schema)
+    public function createTable($table, \Jivoo\Data\Definition $definition)
     {
-        $sql = 'CREATE TABLE "' . $this->db->tableName($schema->getName()) . '" (';
-        $columns = $schema->getFields();
+        $sql = 'CREATE TABLE "' . $this->db->tableName($table) . '" (';
+        $columns = $definition->getFields();
         $first = true;
-        $primaryKey = $schema->getPrimaryKey();
+        $primaryKey = $definition->getPrimaryKey();
         $singlePrimary = count($primaryKey) == 1;
         foreach ($columns as $column) {
-            $type = $schema->$column;
+            $type = $definition->$column;
             if (! $first) {
                 $sql .= ', ';
             } else {
@@ -284,11 +284,11 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
             $sql .= ' ' . $this->fromDataType($type, $singlePrimary and $primaryKey[0] == $column);
         }
         if (! $singlePrimary) {
-            $sql .= ', PRIMARY KEY (' . implode(', ', $schema->getPrimaryKey()) . ')';
+            $sql .= ', PRIMARY KEY (' . implode(', ', $definition->getPrimaryKey()) . ')';
         }
         $sql .= ')';
-        $this->db->rawQuery($sql);
-        foreach ($schema->getIndexes() as $index => $options) {
+        $this->db->execute($sql);
+        foreach ($definition->getIndexes() as $index => $options) {
             if ($index == 'PRIMARY') {
                 continue;
             }
@@ -297,11 +297,11 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
                 $sql .= ' UNIQUE';
             }
             $sql .= ' INDEX "';
-            $sql .= $this->db->tableName($schema->getName()) . '_' . $index;
-            $sql .= '" ON "' . $this->db->tableName($schema->getName());
+            $sql .= $this->db->tableName($table) . '_' . $index;
+            $sql .= '" ON "' . $this->db->tableName($table);
             $sql .= '" (';
             $sql .= implode(', ', $options['columns']) . ')';
-            $this->db->rawQuery($sql);
+            $this->db->execute($sql);
         }
     }
 
@@ -317,7 +317,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
             $this->createTable($newSchema);
             $sql = 'INSERT INTO ' . $this->db->quoteModel($newSchema->getName());
             $sql .= ' SELECT * FROM ' . $this->db->quoteModel($table);
-            $this->db->rawQuery($sql);
+            $this->db->execute($sql);
             $this->dropTable($table);
             $this->db->commit();
         } catch (\Exception $e) {
@@ -332,7 +332,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
     public function dropTable($table)
     {
         $sql = 'DROP TABLE "' . $this->db->tableName($table) . '"';
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -342,7 +342,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
     {
         $sql = 'ALTER TABLE "' . $this->db->tableName($table) . '" ADD ' . $column;
         $sql .= ' ' . $this->fromDataType($type);
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -357,7 +357,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
             $this->createTable($temp);
             $sql = 'INSERT INTO ' . $this->db->quoteModel($temp->getName());
             $sql .= ' SELECT * FROM ' . $this->db->quoteModel($table);
-            $this->db->rawQuery($sql);
+            $this->db->execute($sql);
             $this->dropTable($table);
             $newSchema = $current->copy($table);
             unset($newSchema->$column);
@@ -365,7 +365,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
             $sql = 'INSERT INTO ' . $this->db->quoteModel($table);
             $sql .= ' SELECT ' . implode(', ', $newSchema->getFields());
             $sql .= ' FROM ' . $this->db->quoteModel($temp->getName());
-            $this->db->rawQuery($sql);
+            $this->db->insert($sql);
             $this->dropTable($temp->getName());
             $this->db->commit();
         } catch (\Exception $e) {
@@ -430,7 +430,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
             $columns[] = $column;
             $sql = 'INSERT INTO ' . $this->db->quoteModel($table);
             $sql .= ' SELECT ' . implode(', ', $columns) . ' FROM ' . $this->db->quoteModel($temp->getName());
-            $this->db->rawQuery($sql);
+            $this->db->execute($sql);
             $this->dropTable($temp->getName());
             $this->db->commit();
         } catch (\Exception $e) {
@@ -453,7 +453,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
         $sql .= '" ON "' . $this->db->tableName($table);
         $sql .= '" (';
         $sql .= implode(', ', $options['columns']) . ')';
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
@@ -463,7 +463,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
     {
         $sql = 'DROP INDEX "';
         $sql .= $this->db->tableName($table) . '_' . $index . '"';
-        $this->db->rawQuery($sql);
+        $this->db->execute($sql);
     }
 
     /**
