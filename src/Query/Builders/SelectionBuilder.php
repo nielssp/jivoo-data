@@ -18,7 +18,11 @@ use Jivoo\Data\Definition;
  * Will transform into a more specific selection based
  * on use.
  */
-class SelectionBuilder extends SelectionBase implements AnySelectable, ReadSelection, UpdateSelection
+class SelectionBuilder extends SelectionBase implements
+    \IteratorAggregate,
+    AnySelectable,
+    ReadSelection,
+    UpdateSelection
 {
     
     /**

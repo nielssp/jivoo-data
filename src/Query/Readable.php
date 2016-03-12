@@ -12,7 +12,7 @@ use Jivoo\Data\Definition;
 /**
  * An interface for readable models and selections.
  */
-interface Readable extends Selectable, \IteratorAggregate, \Countable
+interface Readable extends Selectable, \Traversable, \Countable
 {
 
     /**

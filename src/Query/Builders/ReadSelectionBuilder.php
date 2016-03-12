@@ -17,7 +17,7 @@ use Jivoo\Data\Query\Expression\ExpressionParser;
 /**
  * A read selection.
  */
-class ReadSelectionBuilder extends SelectionBase implements Readable, ReadSelection
+class ReadSelectionBuilder extends SelectionBase implements \IteratorAggregate, Readable, ReadSelection
 {
 
     /**
