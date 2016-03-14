@@ -30,7 +30,7 @@ interface Model extends Readable, Updatable, Deletable, DataSource
     public function getDefinition();
 
     /**
-     * Create a record.
+     * Create a new record (without saving it).
      *
      * @param array $data
      *            Associative array of record data.
@@ -41,6 +41,16 @@ interface Model extends Readable, Updatable, Deletable, DataSource
      * @return Record A record.
      */
     public function create(array $data = array(), $allowedFields = null);
+    
+    /**
+     * Create a {@see Record} object for an existing record using the provided
+     * data. Read selection.
+     *
+     * @param array $data Record data.
+     * @param \Jivoo\Data\Query\ReadSelection $selection
+     * @return Record A record.
+     */
+    public function open(array $data, Query\ReadSelection $selection);
 
     /**
      * Make a selection that selects a single record.

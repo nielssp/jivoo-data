@@ -61,7 +61,7 @@ class RecordBuilder implements Record
     private function __construct(Model $model, $data = array(), $allowedFields = null)
     {
         $this->model = $model;
-        $this->data = array_fill_keys($model->getFields(), null);
+        $this->data = array_fill_keys($model->getDefinition()->getFields(), null);
         $this->addData($data, $allowedFields);
     }
 
@@ -76,9 +76,9 @@ class RecordBuilder implements Record
      *            List of allowed fields.
      * @return RecordBuilder A new record.
      */
-    public static function createNew(Model $model, $data = array(), $allowedFields = null)
+    public static function create(Model $model, $data = array(), $allowedFields = null)
     {
-        $record = new RecordBuilder($model, $model->getSchema()->filter($data), $allowedFields);
+        $record = new RecordBuilder($model, $data, $allowedFields);
         $record->new = true;
         $record->saved = false;
         return $record;
@@ -95,9 +95,9 @@ class RecordBuilder implements Record
      *            Associative array of virtual record data.
      * @return RecordBuilder An existing record.
      */
-    public static function createExisting(Model $model, $data = array(), $virtual = array())
+    public static function open(Model $model, $data = array(), $virtual = array())
     {
-        $record = new RecordBuilder($model, $model->getSchema()->filter($data));
+        $record = new RecordBuilder($model, $data);
         $record->updatedData = array();
         $record->virtual = $virtual;
         return $record;
@@ -120,7 +120,7 @@ class RecordBuilder implements Record
             return;
         }
         if (! isset($allowedFields)) {
-            $allowedFields = $this->model->getDefinition()->getFields();
+            $allowedFields = array_keys($this->data);
         }
         if (is_array($allowedFields)) {
             $allowedFields = array_flip($allowedFields);
@@ -137,14 +137,6 @@ class RecordBuilder implements Record
     public function getData()
     {
         return $this->data;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVirtualData()
-    {
-        return $this->virtual;
     }
 
     /**
@@ -255,7 +247,7 @@ class RecordBuilder implements Record
         if (! $this->isValid()) {
             return false;
         }
-        if ($this->isNew()) {
+        if ($this->new) {
             $insertId = $this->model->insert($this->data);
             $pk = $this->model->getAiPrimaryKey();
             if (isset($pk)) {

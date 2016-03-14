@@ -32,7 +32,49 @@ abstract class ModelBase implements Model
      */
     public function create(array $data = array(), $allowedFields = null)
     {
-        return RecordBuilder::createNew($this, $data, $allowedFields);
+        return RecordBuilder::create($this, $data, $allowedFields);
+    }
+        
+    /**
+     * {@inheritDoc}
+     */
+    public function open(array $data, Query\ReadSelection $selection)
+    {
+        $additional = $selection->getAdditionalFields();
+        if (empty($additional)) {
+            return RecordBuilder::open($this, $data, []);
+        }
+        $virtual = array();
+        $subrecords = array();
+        foreach ($data as $field => $value) {
+            if (isset($additional[$field])) {
+                if (isset($additional[$field]['record'])) {
+                    $record = $additional[$field]['record'];
+                    if (!isset($subrecords[$record])) {
+                        $subrecords[$record] = [
+                            'model' => $additional[$field]['model'],
+                            'null' => true,
+                            'data' => []
+                        ];
+                    }
+                    $subrecords[$record]['data'][$additional[$field]['recordField']] = $value;
+                    if (isset($value)) {
+                        $subrecords[$record]['null'] = false;
+                    }
+                } else {
+                    $virtual[$field] = $value;
+                }
+                unset($data[$field]);
+            }
+        }
+        foreach ($subrecords as $field => $record) {
+            if ($record['null']) {
+                $virtual[$field] = null;
+            } else {
+                $virtual[$field] = RecordBuilder::open($record['model'], $record['data']);
+            }
+        }
+        return RecordBuilder::open($this, $data, $virtual);
     }
     
     /**
