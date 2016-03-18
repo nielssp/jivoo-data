@@ -21,7 +21,7 @@ abstract class ArrayDataSourceBase implements DataSource
      * Array of records. The keys of the array are used for {@see deleteKey} and
      * {@see updateKey}.
      *
-     * @return Record[]
+     * @return array[]
      */
     abstract public function getData();
 
@@ -68,8 +68,8 @@ abstract class ArrayDataSourceBase implements DataSource
                 return [$column, false];
             }, $grouping));
             $previous = null;
-            $data = array_filter($data, function (Record $record) use ($grouping, &$previous) {
-                $group = array_intersect_key($record->getData(), array_flip($grouping));
+            $data = array_filter($data, function ($record) use ($grouping, &$previous) {
+                $group = array_intersect_key($record, array_flip($grouping));
                 if (isset($previous) and $group == $previous) {
                     return false;
                 }
@@ -101,7 +101,7 @@ abstract class ArrayDataSourceBase implements DataSource
                     }
                     $recordData[$alias] = $field['expression']->__invoke($record);
                 }
-                $projected[] = new ArrayRecord($recordData);
+                $projected[] = $recordData;
             }
             $data = $projected;
         }
@@ -130,7 +130,7 @@ abstract class ArrayDataSourceBase implements DataSource
                     }
                     return $value;
                 }, $updates);
-                $this->updateKey($key, array_merge($record->getData(), $data));
+                $this->updateKey($key, array_merge($record, $data));
                 $count++;
                 if (isset($limit) and $count >= $limit) {
                     break;
@@ -176,22 +176,22 @@ abstract class ArrayDataSourceBase implements DataSource
             return $data;
         }
         Assume::isArray($data);
-        $func = function (Record $a, Record $b) use ($orderings) {
+        $func = function (array $a, array $b) use ($orderings) {
             foreach ($orderings as $ordering) {
                 list($field, $descending) = $ordering;
-                if ($a->$field == $b->$field) {
+                if ($a[$field] == $b[$field]) {
                     continue;
                 }
                 if ($descending) {
-                    if (is_numeric($a->$field)) {
-                        return $b->$field - $a->$field;
+                    if (is_numeric($a[$field])) {
+                        return $b[$field] - $a[$field];
                     }
-                    return strcmp($b->$field, $a->$field);
+                    return strcmp($b[$field], $a[$field]);
                 } else {
-                    if (is_numeric($a->$field)) {
-                        return $a->$field - $b->$field;
+                    if (is_numeric($a[$field])) {
+                        return $a[$field] - $b[$field];
                     }
-                    return strcmp($a->$field, $b->$field);
+                    return strcmp($a[$field], $b[$field]);
                 }
             }
         };
@@ -206,20 +206,20 @@ abstract class ArrayDataSourceBase implements DataSource
     public static function sort($data, $field, $descending = false, $assoc = true)
     {
         Assume::isArray($data);
-        $func = function (Record $a, Record $b) use ($field, $descending) {
-            if ($a->$field == $b->$field) {
+        $func = function (array $a, array $b) use ($field, $descending) {
+            if ($a[$field] == $b[$field]) {
                 return 0;
             }
             if ($descending) {
-                if (is_numeric($a->$field)) {
-                    return $b->$field - $a->$field;
+                if (is_numeric($a[$field])) {
+                    return $b[$field] - $a[$field];
                 }
-                return strcmp($b->$field, $a->$field);
+                return strcmp($b[$field], $a[$field]);
             } else {
-                if (is_numeric($a->$field)) {
-                    return $a->$field - $b->$field;
+                if (is_numeric($a[$field])) {
+                    return $a[$field] - $b[$field];
                 }
-                return strcmp($a->$field, $b->$field);
+                return strcmp($a[$field], $b[$field]);
             }
         };
         if ($assoc) {

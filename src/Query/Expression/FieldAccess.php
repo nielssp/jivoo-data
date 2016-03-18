@@ -6,8 +6,6 @@
 namespace Jivoo\Data\Query\Expression;
 
 use Jivoo\Data\Query\Expression;
-use Jivoo\Data\DataType;
-use Jivoo\Data\Record;
 
 /**
  * A literal.
@@ -34,10 +32,9 @@ class FieldAccess extends Node implements Expression, Atomic
     /**
      * {@inheritdoc}
      */
-    public function __invoke(Record $record)
+    public function __invoke(array $data)
     {
-        $field = $this->field;
-        return $record->$field;
+        return $data[$this->field];
     }
 
     /**

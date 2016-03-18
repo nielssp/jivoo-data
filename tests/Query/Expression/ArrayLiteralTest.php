@@ -8,7 +8,7 @@ class ArrayLiteralTest extends \Jivoo\TestCase
     
     public function testInstance()
     {
-        $record = $this->getMockBuilder('Jivoo\Data\Record')->getMock();
+        $record = [];
         $quoter = $this->getMockBuilder('Jivoo\Data\Query\Expression\Quoter')->getMock();
         $quoter->method('quoteLiteral')->willReturnCallback(function ($type, $value) {
             return '"' . $value . '"';

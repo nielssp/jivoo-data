@@ -12,12 +12,12 @@ class ArrayDataSourceBaseTest extends \Jivoo\TestCase
     public function testRead()
     {
         $data = [
-            new ArrayRecord(['id' => 1, 'name' => 'foo', 'group' => 'admin']),
-            new ArrayRecord(['id' => 2, 'name' => 'bar', 'group' => 'user']),
-            new ArrayRecord(['id' => 3, 'name' => 'foobar', 'group' => 'user']),
-            new ArrayRecord(['id' => 4, 'name' => 'foo', 'group' => 'admin']),
-            new ArrayRecord(['id' => 5, 'name' => 'baz', 'group' => 'user']),
-            new ArrayRecord(['id' => 6, 'name' => 'foobaz', 'group' => 'user'])
+            ['id' => 1, 'name' => 'foo', 'group' => 'admin'],
+            ['id' => 2, 'name' => 'bar', 'group' => 'user'],
+            ['id' => 3, 'name' => 'foobar', 'group' => 'user'],
+            ['id' => 4, 'name' => 'foo', 'group' => 'admin'],
+            ['id' => 5, 'name' => 'baz', 'group' => 'user'],
+            ['id' => 6, 'name' => 'foobaz', 'group' => 'user']
         ];
         
         // Select all
@@ -64,7 +64,7 @@ class ArrayDataSourceBaseTest extends \Jivoo\TestCase
 
         $this->assertEquals(6, iterator_count($projection));
         foreach ($projection as $record) {
-            $this->assertEquals(['n'], array_keys($record->getData()));
+            $this->assertEquals(['n'], array_keys($record));
         }
         
     }
@@ -72,9 +72,9 @@ class ArrayDataSourceBaseTest extends \Jivoo\TestCase
     public function testUpdate()
     {
         $data = [
-            new ArrayRecord(['id' => 1, 'name' => 'foo']),
-            new ArrayRecord(['id' => 2, 'name' => 'bar']),
-            new ArrayRecord(['id' => 3, 'name' => 'foobar'])
+            ['id' => 1, 'name' => 'foo'],
+            ['id' => 2, 'name' => 'bar'],
+            ['id' => 3, 'name' => 'foobar']
         ];
         
         // Update all
@@ -83,7 +83,7 @@ class ArrayDataSourceBaseTest extends \Jivoo\TestCase
         $selection->set('name', 'baz')->update();
         
         foreach ($source->getData() as $record) {
-            $this->assertEquals('baz', $record->name);
+            $this->assertEquals('baz', $record['name']);
         }
         
         // Update using expression
@@ -91,16 +91,16 @@ class ArrayDataSourceBaseTest extends \Jivoo\TestCase
         $selection->set('name', E::e('id'))->update();
         
         foreach ($source->getData() as $record) {
-            $this->assertEquals($record->id, $record->name);
+            $this->assertEquals($record['id'], $record['name']);
         }
     }
 
     public function testDelete()
     {
         $data = [
-            new ArrayRecord(['id' => 1, 'name' => 'foo']),
-            new ArrayRecord(['id' => 2, 'name' => 'bar']),
-            new ArrayRecord(['id' => 3, 'name' => 'foobar'])
+            ['id' => 1, 'name' => 'foo'],
+            ['id' => 2, 'name' => 'bar'],
+            ['id' => 3, 'name' => 'foobar']
         ];
         
         // Delete all
@@ -139,48 +139,48 @@ class ArrayDataSourceBaseTest extends \Jivoo\TestCase
     public function testSort()
     {
         $data = [
-            new ArrayRecord(['a' => 4, 'b' => 'b']),
-            new ArrayRecord(['a' => 6, 'b' => 'be']),
-            new ArrayRecord(['a' => 1, 'b' => 'a']),
-            new ArrayRecord(['a' => -4, 'b' => 'c']),
-            new ArrayRecord(['a' => 3, 'b' => 'd']),
-            new ArrayRecord(['a' => 3, 'b' => 'd'])
+            ['a' => 4, 'b' => 'b'],
+            ['a' => 6, 'b' => 'be'],
+            ['a' => 1, 'b' => 'a'],
+            ['a' => -4, 'b' => 'c'],
+            ['a' => 3, 'b' => 'd'],
+            ['a' => 3, 'b' => 'd']
         ];
 
         $expected1 = [
-            new ArrayRecord(['a' => -4, 'b' => 'c']),
-            new ArrayRecord(['a' => 1, 'b' => 'a']),
-            new ArrayRecord(['a' => 3, 'b' => 'd']),
-            new ArrayRecord(['a' => 3, 'b' => 'd']),
-            new ArrayRecord(['a' => 4, 'b' => 'b']),
-            new ArrayRecord(['a' => 6, 'b' => 'be'])
+            ['a' => -4, 'b' => 'c'],
+            ['a' => 1, 'b' => 'a'],
+            ['a' => 3, 'b' => 'd'],
+            ['a' => 3, 'b' => 'd'],
+            ['a' => 4, 'b' => 'b'],
+            ['a' => 6, 'b' => 'be']
         ];
 
         $expected2 = [
-            new ArrayRecord(['a' => 6, 'b' => 'be']),
-            new ArrayRecord(['a' => 4, 'b' => 'b']),
-            new ArrayRecord(['a' => 3, 'b' => 'd']),
-            new ArrayRecord(['a' => 3, 'b' => 'd']),
-            new ArrayRecord(['a' => 1, 'b' => 'a']),
-            new ArrayRecord(['a' => -4, 'b' => 'c'])
+            ['a' => 6, 'b' => 'be'],
+            ['a' => 4, 'b' => 'b'],
+            ['a' => 3, 'b' => 'd'],
+            ['a' => 3, 'b' => 'd'],
+            ['a' => 1, 'b' => 'a'],
+            ['a' => -4, 'b' => 'c']
         ];
 
         $expected3 = [
-            new ArrayRecord(['a' => 1, 'b' => 'a']),
-            new ArrayRecord(['a' => 4, 'b' => 'b']),
-            new ArrayRecord(['a' => 6, 'b' => 'be']),
-            new ArrayRecord(['a' => -4, 'b' => 'c']),
-            new ArrayRecord(['a' => 3, 'b' => 'd']),
-            new ArrayRecord(['a' => 3, 'b' => 'd'])
+            ['a' => 1, 'b' => 'a'],
+            ['a' => 4, 'b' => 'b'],
+            ['a' => 6, 'b' => 'be'],
+            ['a' => -4, 'b' => 'c'],
+            ['a' => 3, 'b' => 'd'],
+            ['a' => 3, 'b' => 'd']
         ];
 
         $expected4 = [
-            new ArrayRecord(['a' => 3, 'b' => 'd']),
-            new ArrayRecord(['a' => 3, 'b' => 'd']),
-            new ArrayRecord(['a' => -4, 'b' => 'c']),
-            new ArrayRecord(['a' => 6, 'b' => 'be']),
-            new ArrayRecord(['a' => 4, 'b' => 'b']),
-            new ArrayRecord(['a' => 1, 'b' => 'a'])
+            ['a' => 3, 'b' => 'd'],
+            ['a' => 3, 'b' => 'd'],
+            ['a' => -4, 'b' => 'c'],
+            ['a' => 6, 'b' => 'be'],
+            ['a' => 4, 'b' => 'b'],
+            ['a' => 1, 'b' => 'a']
         ];
         
         $this->assertEquals($expected1, ArrayDataSource::sort($data, 'a', false, false));
@@ -191,15 +191,15 @@ class ArrayDataSourceBaseTest extends \Jivoo\TestCase
         // maintain key association
         
         $data = [
-            0 => new ArrayRecord(['a' => 4]),
-            1 => new ArrayRecord(['a' => 6]),
-            2 => new ArrayRecord(['a' => 1])
+            0 => ['a' => 4],
+            1 => ['a' => 6],
+            2 => ['a' => 1]
         ];
         
         $expected = [
-            2 => new ArrayRecord(['a' => 1]),
-            0 => new ArrayRecord(['a' => 4]),
-            1 => new ArrayRecord(['a' => 6])
+            2 => ['a' => 1],
+            0 => ['a' => 4],
+            1 => ['a' => 6]
         ];
         
         $this->assertEquals($expected, ArrayDataSource::sort($data, 'a', false, true));
@@ -208,48 +208,48 @@ class ArrayDataSourceBaseTest extends \Jivoo\TestCase
     public function testSorAll()
     {
         $data = [
-            new ArrayRecord(['a' => 4, 'b' => 'b']),
-            new ArrayRecord(['a' => 6, 'b' => 'be']),
-            new ArrayRecord(['a' => 1, 'b' => 'a']),
-            new ArrayRecord(['a' => 1, 'b' => 'c']),
-            new ArrayRecord(['a' => 3, 'b' => 'd']),
-            new ArrayRecord(['a' => 3, 'b' => 'd'])
+            ['a' => 4, 'b' => 'b'],
+            ['a' => 6, 'b' => 'be'],
+            ['a' => 1, 'b' => 'a'],
+            ['a' => 1, 'b' => 'c'],
+            ['a' => 3, 'b' => 'd'],
+            ['a' => 3, 'b' => 'd']
         ];
 
         $expected1 = [
-            new ArrayRecord(['a' => 1, 'b' => 'a']),
-            new ArrayRecord(['a' => 1, 'b' => 'c']),
-            new ArrayRecord(['a' => 3, 'b' => 'd']),
-            new ArrayRecord(['a' => 3, 'b' => 'd']),
-            new ArrayRecord(['a' => 4, 'b' => 'b']),
-            new ArrayRecord(['a' => 6, 'b' => 'be'])
+            ['a' => 1, 'b' => 'a'],
+            ['a' => 1, 'b' => 'c'],
+            ['a' => 3, 'b' => 'd'],
+            ['a' => 3, 'b' => 'd'],
+            ['a' => 4, 'b' => 'b'],
+            ['a' => 6, 'b' => 'be']
         ];
 
         $expected2 = [
-            new ArrayRecord(['a' => 1, 'b' => 'c']),
-            new ArrayRecord(['a' => 1, 'b' => 'a']),
-            new ArrayRecord(['a' => 3, 'b' => 'd']),
-            new ArrayRecord(['a' => 3, 'b' => 'd']),
-            new ArrayRecord(['a' => 4, 'b' => 'b']),
-            new ArrayRecord(['a' => 6, 'b' => 'be'])
+            ['a' => 1, 'b' => 'c'],
+            ['a' => 1, 'b' => 'a'],
+            ['a' => 3, 'b' => 'd'],
+            ['a' => 3, 'b' => 'd'],
+            ['a' => 4, 'b' => 'b'],
+            ['a' => 6, 'b' => 'be']
         ];
 
         $expected3 = [
-            new ArrayRecord(['a' => 6, 'b' => 'be']),
-            new ArrayRecord(['a' => 4, 'b' => 'b']),
-            new ArrayRecord(['a' => 3, 'b' => 'd']),
-            new ArrayRecord(['a' => 3, 'b' => 'd']),
-            new ArrayRecord(['a' => 1, 'b' => 'a']),
-            new ArrayRecord(['a' => 1, 'b' => 'c'])
+            ['a' => 6, 'b' => 'be'],
+            ['a' => 4, 'b' => 'b'],
+            ['a' => 3, 'b' => 'd'],
+            ['a' => 3, 'b' => 'd'],
+            ['a' => 1, 'b' => 'a'],
+            ['a' => 1, 'b' => 'c']
         ];
 
         $expected4 = [
-            new ArrayRecord(['a' => 6, 'b' => 'be']),
-            new ArrayRecord(['a' => 4, 'b' => 'b']),
-            new ArrayRecord(['a' => 3, 'b' => 'd']),
-            new ArrayRecord(['a' => 3, 'b' => 'd']),
-            new ArrayRecord(['a' => 1, 'b' => 'c']),
-            new ArrayRecord(['a' => 1, 'b' => 'a'])
+            ['a' => 6, 'b' => 'be'],
+            ['a' => 4, 'b' => 'b'],
+            ['a' => 3, 'b' => 'd'],
+            ['a' => 3, 'b' => 'd'],
+            ['a' => 1, 'b' => 'c'],
+            ['a' => 1, 'b' => 'a']
         ];
         
         $this->assertEquals($expected1, ArrayDataSource::sortAll($data, [['a', false], ['b', false]], false));
@@ -260,15 +260,15 @@ class ArrayDataSourceBaseTest extends \Jivoo\TestCase
         // maintain key association
         
         $data = [
-            0 => new ArrayRecord(['a' => 4, 'b' => 'd']),
-            1 => new ArrayRecord(['a' => 1, 'b' => 'e']),
-            2 => new ArrayRecord(['a' => 1, 'b' => 'a'])
+            0 => ['a' => 4, 'b' => 'd'],
+            1 => ['a' => 1, 'b' => 'e'],
+            2 => ['a' => 1, 'b' => 'a']
         ];
         
         $expected = [
-            2 => new ArrayRecord(['a' => 1, 'b' => 'a']),
-            1 => new ArrayRecord(['a' => 1, 'b' => 'e']),
-            0 => new ArrayRecord(['a' => 4, 'b' => 'd'])
+            2 => ['a' => 1, 'b' => 'a'],
+            1 => ['a' => 1, 'b' => 'e'],
+            0 => ['a' => 4, 'b' => 'd']
         ];
 
         $this->assertEquals($expected, ArrayDataSource::sortAll($data, [['a', false], ['b', false]], true));

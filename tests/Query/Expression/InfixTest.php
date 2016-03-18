@@ -17,7 +17,7 @@ class InfixTest extends \Jivoo\TestCase
     
     public function testInstance()
     {
-        $record = $this->getMockBuilder('Jivoo\Data\Record')->getMock();
+        $record = [];
         $quoter = $this->getMockBuilder('Jivoo\Data\Query\Expression\Quoter')->getMock();
         $quoter->method('quoteLiteral')->willReturnCallback(function ($type, $value) {
             return $value;
@@ -45,7 +45,7 @@ class InfixTest extends \Jivoo\TestCase
     
     public function testLike()
     {
-        $record = $this->getMockBuilder('Jivoo\Data\Record')->getMock();
+        $record = [];
         
         $this->assertTrue($this->getInfix('test', 'like', 'test')->__invoke($record));
         $this->assertTrue($this->getInfix('test', 'like', '%test%')->__invoke($record));

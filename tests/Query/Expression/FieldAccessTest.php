@@ -8,12 +8,7 @@ class FieldAccessTest extends \Jivoo\TestCase
     
     public function testInstance()
     {
-        $record = $this->getMockBuilder('Jivoo\Data\Record')->getMock();
-        $record->method('__get')->willReturnCallback(function ($property) {
-            if ($property === 'foo') {
-                return 'bar';
-            }
-        });
+        $record = ['foo' => 'bar'];
         $quoter = $this->getMockBuilder('Jivoo\Data\Query\Expression\Quoter')->getMock();
         $quoter->method('quoteModel')->willReturnCallback(function ($model) {
             return '{' . $model . '}';

@@ -6,7 +6,6 @@
 namespace Jivoo\Data\Query\Expression;
 
 use Jivoo\Data\Query\Expression;
-use Jivoo\Data\Record;
 
 /**
  * An infix operator.
@@ -45,15 +44,15 @@ class Infix extends Node implements Expression
     /**
      * {@inheritdoc}
      */
-    public function __invoke(Record $record)
+    public function __invoke(array $data)
     {
-        $left = $this->left->__invoke($record);
+        $left = $this->left->__invoke($data);
         
         if ($this->operator == 'is' and $this->right === null) {
             return $left === null;
         }
         
-        $right = $this->right->__invoke($record);
+        $right = $this->right->__invoke($data);
         // "like" | "in" | "!=" | "<>" | ">=" | "<=" | "!<" | "!>" | "=" | "<" | ">"
         switch ($this->operator) {
             case 'like': // TODO: character groups? [abc] [^abc]

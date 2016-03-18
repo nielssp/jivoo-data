@@ -11,7 +11,6 @@ use Jivoo\Parse\RegexLexer;
 use Jivoo\Data\Query\Expression;
 use Jivoo\Assume;
 use Jivoo\Data\Query\E;
-use Jivoo\Data\Record;
 
 /**
  * A parser for simple SQL-like comparison expressions.
@@ -75,13 +74,13 @@ class ExpressionParser extends Node implements Expression
     /**
      * {@inheritdoc}
      */
-    public function __invoke(Record $record)
+    public function __invoke(array $data)
     {
         if (! isset($this->ast)) {
             $tokens = ExpressionParser::lex($this->expr, $this->vars);
             $this->ast = ExpressionParser::parseExpression($tokens);
         }
-        return $this->ast->__invoke($record);
+        return $this->ast->__invoke($data);
     }
     
     /**

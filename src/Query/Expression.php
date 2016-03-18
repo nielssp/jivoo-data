@@ -15,13 +15,13 @@ interface Expression
 {
 
     /**
-     * Apply expression to a record.
+     * Apply expression to record data.
      *
-     * @param Record $record
-     *            Record.
+     * @param array $data
+     *            Record data.
      * @return mixed Result of expression.
      */
-    public function __invoke(Record $record);
+    public function __invoke(array $data);
 
     /**
      * Convert expression to a string.

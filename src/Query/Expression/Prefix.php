@@ -6,7 +6,6 @@
 namespace Jivoo\Data\Query\Expression;
 
 use Jivoo\Data\Query\Expression;
-use Jivoo\Data\Record;
 
 /**
  * A prefix operator.
@@ -27,10 +26,10 @@ class Prefix extends Node implements Expression
     /**
      * {@inheritdoc}
      */
-    public function __invoke(Record $record)
+    public function __invoke(array $data)
     {
         if ($this->operator == 'not') {
-            return ! $this->operand->__invoke($record);
+            return ! $this->operand->__invoke($data);
         }
         trigger_error('undefined operator: ' . $this->operator, E_USER_ERROR);
     } // @codeCoverageIgnore

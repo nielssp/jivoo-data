@@ -9,7 +9,7 @@ class ExpressionParserTest extends \Jivoo\TestCase
     public function testInstance()
     {
         $e = new ExpressionParser('1 = %i', array(1));
-        $record = $this->getMockBuilder('Jivoo\Data\Record')->getMock();
+        $record = [];
         $this->assertTrue($e($record));
         $e = $e->or('1 = 2');
         $this->assertTrue($e($record));

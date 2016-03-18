@@ -6,7 +6,7 @@
 namespace Jivoo\Data;
 
 /**
- * Contains mutable data for a single record belonging to a model.
+ * Contains mutable data for a single record belonging to a {@see Model}.
  */
 interface Record extends \ArrayAccess
 {

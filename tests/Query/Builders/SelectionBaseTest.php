@@ -20,7 +20,7 @@ class SelectionBaseTest extends \Jivoo\TestCase
 
     public function testPredicate()
     {
-        $record = $this->getMockBuilder('Jivoo\Data\Record')->getMock();
+        $record = [];
         $selection = $this->getInstance();
         
         $this->assertNull($selection->getPredicate());
@@ -53,7 +53,7 @@ class SelectionBaseTest extends \Jivoo\TestCase
     
     public function testToSelection()
     {
-        $record = $this->getMockBuilder('Jivoo\Data\Record')->getMock();
+        $record = [];
         
         $selection = $this->getInstance()
             ->where('%b', true)

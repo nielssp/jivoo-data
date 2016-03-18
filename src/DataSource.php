@@ -52,7 +52,7 @@ interface DataSource
      *
      * @param Selection $selection
      *            Record selection.
-     * @return \Iterator A {@see Record} iterator.
+     * @return \Iterator An iterator of associative arrays.
      */
     public function readSelection(ReadSelection $selection);
 

@@ -12,7 +12,7 @@ class ArrayDataSource extends ArrayDataSourceBase
 {
     
     /**
-     * @var Record[]
+     * @var array[]
      */
     private $data;
     
@@ -23,7 +23,7 @@ class ArrayDataSource extends ArrayDataSourceBase
     
     /**
      * Construct data source from list of records.
-     * @param Record[] $data Records.
+     * @param array[] $data Records.
      */
     public function __construct(array $data)
     {
@@ -36,7 +36,7 @@ class ArrayDataSource extends ArrayDataSourceBase
      */
     public function insert(array $data, $replace = false)
     {
-        $this->data[$this->insertId] = new ArrayRecord($data);
+        $this->data[$this->insertId] = new $data;
         return $this->insertId++;
     }
 
@@ -72,6 +72,6 @@ class ArrayDataSource extends ArrayDataSourceBase
      */
     public function updateKey($key, array $record)
     {
-        $this->data[$key]->addData($record);
+        $this->data[$key] = array_merge($this->data[$key], $record);
     }
 }
