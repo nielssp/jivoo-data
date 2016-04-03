@@ -5,7 +5,7 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Migration;
 
-use Jivoo\Data\Database\DatabaseSchema;
+use Jivoo\Data\Database\DatabaseDefinition;
 use Jivoo\Data\Database\Migratable;
 use Jivoo\Data\Database\MigratableDatabase;
 use Jivoo\Data\Database\SchemaBuilder;
@@ -15,11 +15,11 @@ use Jivoo\Models\Schema;
 /**
  * A modifiable database schema for use with migrations.
  */
-class MigrationSchema implements DatabaseSchema, Migratable
+class MigrationSchema implements DatabaseDefinition, Migratable
 {
 
     /**
-     * @var DatabaseSchema Target schema.
+     * @var DatabaseDefinition Target schema.
      */
     private $targetSchema;
 

@@ -12,21 +12,21 @@ interface Database
 {
 
     /**
-     * Get table.
+     * Get table object.
      *
      * @param string $table
      *            Table name
      * @return Table Table.
-     * @throws InvalidTableException If the table doesn't exist.
+     * @throws InvalidTableException If the table is not defined.
      */
     public function __get($table);
 
     /**
-     * Whether or not a table exists.
+     * Whether or not a table is defined.
      *
      * @param string $table
      *            Table name.
-     * @return bool True if table exists, false otherwise.
+     * @return bool True if table is defined, false otherwise.
      */
     public function __isset($table);
 
@@ -36,11 +36,11 @@ interface Database
     public function close();
 
     /**
-     * Get schema of database.
+     * Get definition of database.
      *
-     * @return DatabaseSchema Database schema.
+     * @return DatabaseDefinition Database definition.
      */
-    public function getSchema();
+    public function getDefinition();
 
     /**
      * Begin database transaction.

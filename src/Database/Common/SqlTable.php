@@ -36,7 +36,7 @@ class SqlTable extends Table
     /**
      * @var Schema|null Table schema if set.
      */
-    private $schema = null;
+    private $definition = null;
 
     /**
      * @var bool
@@ -55,7 +55,7 @@ class SqlTable extends Table
     {
         $this->owner = $database;
         $this->name = $table;
-        $this->schema = $this->owner->getSchema()->getSchema($table);
+        $this->definition = $this->owner->getDefinition()->getDefinition($table);
         $this->caseInsensitive = $this->owner->caseInsensitiveFields();
         parent::__construct();
     }
@@ -71,17 +71,17 @@ class SqlTable extends Table
     /**
      * {@inheritdoc}
      */
-    public function getSchema()
+    public function getDefinition()
     {
-        return $this->schema;
+        return $this->definition;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setSchema(Definition $schema)
+    public function setDefinition(Definition $schema)
     {
-        $this->schema = $schema;
+        $this->definition = $schema;
     }
 
     /**

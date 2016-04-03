@@ -6,7 +6,7 @@
 namespace Jivoo\Data;
 
 /**
- * A schema describing multiple models.
+ * A schema consisting of multiple models.
  */
 interface Schema
 {

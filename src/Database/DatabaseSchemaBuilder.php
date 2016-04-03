@@ -10,7 +10,7 @@ use Jivoo\Models\Schema;
 /**
  * A database schema.
  */
-class DatabaseSchemaBuilder implements DatabaseSchema
+class DatabaseSchemaBuilder implements DatabaseDefinition
 {
 
     /**

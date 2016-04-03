@@ -24,7 +24,7 @@ class DatabaseConnection implements Database
     private $connection;
 
     /**
-     * @var DatabaseSchema Database schema.
+     * @var DatabaseDefinition Database schema.
      */
     private $schema;
 

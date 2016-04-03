@@ -6,7 +6,7 @@
 namespace Jivoo\Data;
 
 /**
- * Model data definition.
+ * Data source definition.
  */
 interface Definition
 {

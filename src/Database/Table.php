@@ -8,7 +8,15 @@ namespace Jivoo\Data\Database;
 /**
  * A database table.
  */
-interface Table extends \Jivoo\Data\Model
+interface Table extends \Jivoo\Data\DataSource
 {
+    public function getName();
     
+    public function getDefinition();
+    
+    public function exists();
+    
+    public function create();
+    
+    public function drop();
 }

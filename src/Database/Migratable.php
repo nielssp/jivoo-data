@@ -19,7 +19,7 @@ interface Migratable
      *
      * @param string $table
      *            Table name.
-     * @param Definition $schema
+     * @param Definition $definition
      *            Schema.
      */
     public function createTable($table, Definition $definition);

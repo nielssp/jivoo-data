@@ -5,9 +5,9 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data;
 
-use Jivoo\Models\Validation\ValidatorField;
-use Jivoo\InvalidPropertyException;
 use Jivoo\Assume;
+use Jivoo\Data\Validation\ValidatorField;
+use Jivoo\InvalidPropertyException;
 
 /**
  * Model field data type.

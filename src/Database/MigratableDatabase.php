@@ -12,17 +12,16 @@ interface MigratableDatabase extends Database, Migratable
 {
 
     /**
-     * Refresh schemas, i.e.
-     * update database schema to match actual database
-     * schema.
+     * Refresh definition, i.e. query the actual database definition from the
+     * database.
      */
-    public function refreshSchema();
+    public function refreshDefinition();
 
     /**
-     * Change schema of database.
+     * Change definition of database.
      *
-     * @param DatabaseSchema $schema
-     *            New database schema.
+     * @param DatabaseDefinition $definition
+     *            New database definition.
      */
-    public function setSchema(DatabaseSchema $schema);
+    public function setDefinition(DatabaseDefinition $definition);
 }

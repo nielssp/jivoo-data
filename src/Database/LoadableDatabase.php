@@ -14,9 +14,9 @@ abstract class LoadableDatabase implements MigratableDatabase
 {
 
     /**
-     * @var DatabaseSchema Schema.
+     * @var DatabaseDefinition Schema.
      */
-    private $schema;
+    private $definition;
 
     /**
      * @var string[] List of table names.
@@ -36,14 +36,14 @@ abstract class LoadableDatabase implements MigratableDatabase
     /**
      * Construct database.
      *
-     * @param DatabaseSchema $schema
-     *            Database schema.
+     * @param DatabaseDefinition $definition
+     *            Database definition.
      * @param array $options
      *            Associative array of options for driver.
      */
-    final public function __construct(DatabaseSchema $schema, $options = array())
+    final public function __construct(DatabaseDefinition $definition, $options = array())
     {
-        $this->schema = $schema;
+        $this->definition = $definition;
         $this->init($options);
         $this->migrationAdapter = $this->getMigrationAdapter();
         $this->tableNames = $this->getTables();
@@ -100,15 +100,15 @@ abstract class LoadableDatabase implements MigratableDatabase
      */
     public function getSchema()
     {
-        return $this->schema;
+        return $this->definition;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setSchema(DatabaseSchema $schema)
+    public function setSchema(DatabaseDefinition $schema)
     {
-        $this->schema = $schema;
+        $this->definition = $schema;
         foreach ($schema->getTables() as $table) {
             $tableSchema = $schema->getSchema($table);
             if (! in_array($table, $this->tableNames)) {
@@ -124,11 +124,11 @@ abstract class LoadableDatabase implements MigratableDatabase
      */
     public function refreshSchema()
     {
-        $tables = array_intersect($this->schema->getTables(), $this->tableNames);
-        $this->schema = new DatabaseSchemaBuilder();
+        $tables = array_intersect($this->definition->getTables(), $this->tableNames);
+        $this->definition = new DatabaseSchemaBuilder();
         foreach ($tables as $table) {
-            $schema = $this->getTableSchema($table);
-            $this->schema->addSchema($schema);
+            $schema = $this->getTableDefinition($table);
+            $this->definition->addSchema($schema);
             $this->$table->setSchema($schema);
         }
     }
@@ -150,7 +150,7 @@ abstract class LoadableDatabase implements MigratableDatabase
      *            Table name.
      * @return Schema Schema.
      */
-    public function getTableSchema($table)
+    public function getTableDefinition($table)
     {
         return $this->migrationAdapter->getTableSchema($table);
     }
@@ -158,11 +158,11 @@ abstract class LoadableDatabase implements MigratableDatabase
     /**
      * {@inheritdoc}
      */
-    public function createTable(DefinitionBuilder $schema)
+    public function createTable($table, \Jivoo\Data\Definition $definition)
     {
-        $this->migrationAdapter->createTable($schema);
-        $this->schema->addSchema($schema);
-        $table = $schema->getName();
+        $this->migrationAdapter->createTable($table, $definition);
+        $this->definition->addSchema($definition);
+        $table = $definition->getName();
         $this->tableNames[] = $table;
         $this->tables[$table] = $this->getTable($table);
     }

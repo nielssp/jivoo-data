@@ -210,7 +210,7 @@ class Loader implements LoggerAware
      *
      * @param string $name
      *            Name of database connection.
-     * @param DatabaseSchema $schema
+     * @param DatabaseDefinition $schema
      *            Database schema (collecton of table schemas).
      * @throws ConfigurationException If the $options-array does not
      *         contain the necessary information for a connection to be made.
@@ -219,7 +219,7 @@ class Loader implements LoggerAware
      * @throws ConnectionException If the connection fails.
      * @return LoadableDatabase A database object.
      */
-    public function connect($name, DatabaseSchema $schema = null)
+    public function connect($name, DatabaseDefinition $schema = null)
     {
         if (! isset($this->config[$name])) {
             throw new ConfigurationException(tr('Database "%1" not configured', $name));

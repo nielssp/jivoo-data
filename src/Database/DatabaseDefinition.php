@@ -5,12 +5,10 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Database;
 
-use Jivoo\Models\Schema;
-
 /**
  * A database schema.
  */
-interface DatabaseSchema
+interface DatabaseDefinition
 {
 
     /**
@@ -21,19 +19,11 @@ interface DatabaseSchema
     public function getTables();
 
     /**
-     * Get schema for table.
+     * Get definition of table.
      *
      * @param string $table
      *            Table name.
-     * @return Schema Table schema.
+     * @return \Jivoo\Data\Definition Table definition.
      */
-    public function getSchema($table);
-
-    /**
-     * Add table schema.
-     *
-     * @param Schema $schema
-     *            Table schema;
-     */
-    public function addSchema(Definition $schema);
+    public function getDefinition($table);
 }
