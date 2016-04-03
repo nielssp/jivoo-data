@@ -228,7 +228,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function getTableSchema($table)
+    public function getTableDefinition($table)
     {
         $result = $this->db->query(
             "SELECT * FROM information_schema.columns WHERE table_name = '" . $this->db->tableName($table) . "'"

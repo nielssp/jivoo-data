@@ -1,7 +1,7 @@
 <?php
 use Jivoo\Store\Document;
 use Jivoo\Data\DataType;
-use Jivoo\Data\Database\DatabaseSchemaBuilder;
+use Jivoo\Data\Database\DatabaseDefinitionBuilder;
 use Jivoo\Data\Database\SchemaBuilder;
 use Jivoo\Data\Database\Loader;
 use Jivoo\Log\Logger;
@@ -42,7 +42,7 @@ $logger->addHandler(new CallbackHandler(function (array $record) {
 $loader->setLogger($logger);
 
 // Create schema for database using the above user table schema
-$schema = new DatabaseSchemaBuilder(array(new UserSchema));
+$schema = new DatabaseDefinitionBuilder(array(new UserSchema));
 
 // Connect to "default":
 $db = $loader->connect('default', $schema);

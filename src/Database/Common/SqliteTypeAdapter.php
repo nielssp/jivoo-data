@@ -194,7 +194,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function getTableSchema($table)
+    public function getTableDefinition($table)
     {
         $result = $this->db->query('PRAGMA table_info("' . $this->db->tableName($table) . '")');
         $schema = new SchemaBuilder($table);

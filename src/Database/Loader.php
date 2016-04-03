@@ -5,9 +5,6 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Database;
 
-use Jivoo\Utilities;
-use Jivoo\Module;
-use Jivoo\App;
 use Jivoo\Assume;
 use Jivoo\Store\Document;
 use Jivoo\InvalidPropertyException;
@@ -179,17 +176,17 @@ class Loader implements LoggerAware
     }
 
     /**
-     * Read schema classes from a namespace.
+     * Read definitions from a namespace.
      *
      * @param string $namespace
      *            Namespace of schema classes.
      * @param string $dir
      *            Location of schema classes.
-     * @return DatabaseSchemaBuilder Database schema.
+     * @return DatabaseDefinitionBuilder Database schema.
      */
-    public function readSchema($namespace, $dir)
+    public function readDefinition($namespace, $dir)
     {
-        $dbSchema = new DatabaseSchemaBuilder();
+        $definition = new DatabaseDefinitionBuilder();
         Assume::that(is_dir($dir));
         $files = scandir($dir);
         if ($files !== false) {
@@ -197,12 +194,11 @@ class Loader implements LoggerAware
                 $split = explode('.', $file);
                 if (isset($split[1]) and $split[1] == 'php') {
                     $class = rtrim($namespace, '\\') . '\\' . $split[0];
-                    Assume::isSubclassOf($class, 'Jivoo\Data\Database\SchemaBuilder');
-                    $dbSchema->addSchema(new $class());
+                    $definition->addDefinition($split[0], $class::getDefinition());
                 }
             }
         }
-        return $dbSchema;
+        return $definition;
     }
 
     /**
@@ -210,8 +206,8 @@ class Loader implements LoggerAware
      *
      * @param string $name
      *            Name of database connection.
-     * @param DatabaseDefinition $schema
-     *            Database schema (collecton of table schemas).
+     * @param DatabaseDefinition $definition
+     *            Database definition (collecton of table definitions).
      * @throws ConfigurationException If the $options-array does not
      *         contain the necessary information for a connection to be made.
      * @throws InvalidSchemaException If one of the schema names listed
@@ -219,7 +215,7 @@ class Loader implements LoggerAware
      * @throws ConnectionException If the connection fails.
      * @return LoadableDatabase A database object.
      */
-    public function connect($name, DatabaseDefinition $schema = null)
+    public function connect($name, DatabaseDefinition $definition = null)
     {
         if (! isset($this->config[$name])) {
             throw new ConfigurationException(tr('Database "%1" not configured', $name));
@@ -242,10 +238,10 @@ class Loader implements LoggerAware
         try {
             $class = 'Jivoo\Data\Database\Drivers\\' . $driver . '\\' . $driver . 'Database';
             Assume::isSubclassOf($class, 'Jivoo\Data\Database\LoadableDatabase');
-            if (! isset($schema)) {
-                $schema = new DynamicDatabaseSchema();
+            if (! isset($definition)) {
+                $definition = new DynamicDatabaseSchema();
             }
-            $object = new $class($schema, $config);
+            $object = new $class($definition, $config);
             $object->setLogger($this->logger);
             $this->connections[$name] = new DatabaseConnection($object);
             return $object;

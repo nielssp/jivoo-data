@@ -5,7 +5,7 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Database;
 
-use Jivoo\Models\DataType;
+use Jivoo\Data\DataType;
 
 /**
  * Convert types from database to schema and vice versa.

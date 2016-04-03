@@ -46,12 +46,12 @@ class SqlTable extends Table
     /**
      * Construct table.
      *
-     * @param SqlDatabaseBase $database
+     * @param SqlDatabase $database
      *            Owner database.
      * @param string $table
      *            Table name (without prefix etc.).
      */
-    public function __construct(SqlDatabaseBase $database, $table)
+    public function __construct(SqlDatabase $database, $table)
     {
         $this->owner = $database;
         $this->name = $table;

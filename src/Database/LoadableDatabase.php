@@ -8,7 +8,7 @@ namespace Jivoo\Data\Database;
 use Jivoo\Data\DataType;
 
 /**
- * A database driver that can be loaded by the {@see Databases} module.
+ * A database driver that can be loaded by the {@see Loader}.
  */
 abstract class LoadableDatabase implements MigratableDatabase
 {
@@ -43,7 +43,7 @@ abstract class LoadableDatabase implements MigratableDatabase
      */
     final public function __construct(DatabaseDefinition $definition, $options = array())
     {
-        $this->definition = $definition;
+        $this->definition = new DatabaseDefinitionBuilder($definition);
         $this->init($options);
         $this->migrationAdapter = $this->getMigrationAdapter();
         $this->tableNames = $this->getTables();
@@ -98,7 +98,7 @@ abstract class LoadableDatabase implements MigratableDatabase
     /**
      * {@inheritdoc}
      */
-    public function getSchema()
+    public function getDefinition()
     {
         return $this->definition;
     }
@@ -106,30 +106,30 @@ abstract class LoadableDatabase implements MigratableDatabase
     /**
      * {@inheritdoc}
      */
-    public function setSchema(DatabaseDefinition $schema)
+    public function setDefinition(DatabaseDefinition $definition)
     {
-        $this->definition = $schema;
-        foreach ($schema->getTables() as $table) {
-            $tableSchema = $schema->getSchema($table);
+        $this->definition = $definition;
+        foreach ($definition->getTables() as $table) {
+            $tableDefinition = $definition->getDefinition($table);
             if (! in_array($table, $this->tableNames)) {
                 $this->tableNames[] = $table;
                 $this->tables[$table] = $this->getTable($table);
             }
-            $this->$table->setSchema($tableSchema);
+            $this->$table->setDefinition($tableDefinition);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function refreshSchema()
+    public function refreshDefinition()
     {
         $tables = array_intersect($this->definition->getTables(), $this->tableNames);
-        $this->definition = new DatabaseSchemaBuilder();
+        $this->definition = new DatabaseDefinitionBuilder();
         foreach ($tables as $table) {
-            $schema = $this->getTableDefinition($table);
-            $this->definition->addSchema($schema);
-            $this->$table->setSchema($schema);
+            $definition = $this->getTableDefinition($table);
+            $this->definition->addDefinition($definition);
+            $this->$table->setDefinition($definition);
         }
     }
 
@@ -144,15 +144,15 @@ abstract class LoadableDatabase implements MigratableDatabase
     }
 
     /**
-     * Get table schema.
+     * Get table definition.
      *
      * @param string $table
      *            Table name.
-     * @return Schema Schema.
+     * @return \Jivoo\Data\Definition Definition.
      */
     public function getTableDefinition($table)
     {
-        return $this->migrationAdapter->getTableSchema($table);
+        return $this->migrationAdapter->getTableDefinition($table);
     }
 
     /**
@@ -161,7 +161,7 @@ abstract class LoadableDatabase implements MigratableDatabase
     public function createTable($table, \Jivoo\Data\Definition $definition)
     {
         $this->migrationAdapter->createTable($table, $definition);
-        $this->definition->addSchema($definition);
+        $this->definition->addDefinition($table, $definition);
         $table = $definition->getName();
         $this->tableNames[] = $table;
         $this->tables[$table] = $this->getTable($table);

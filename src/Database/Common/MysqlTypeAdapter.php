@@ -219,7 +219,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function getTableSchema($table)
+    public function getTableDefinition($table)
     {
         $result = $this->db->query('SHOW COLUMNS FROM `' . $this->db->tableName($table) . '`');
         $schema = new SchemaBuilder($table);
