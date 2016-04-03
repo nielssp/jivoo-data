@@ -67,7 +67,7 @@ class DatabaseDefinitionBuilder implements DatabaseDefinition
 
     /**
      * Add a table to the definition.
-     * 
+     *
      * @param string $table Table name.
      * @param Definition $definition Table definition.
      */
