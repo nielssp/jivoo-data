@@ -86,9 +86,8 @@ abstract class SelectionBase implements Selectable, Selection
     {
         switch ($method) {
             case 'and':
-                return call_user_func_array([$this, 'andWhere'], $args);
             case 'or':
-                return call_user_func_array([$this, 'orWhere'], $args);
+                return call_user_func_array([$this, $method . 'Where'], $args);
         }
         // TODO: document this behavior
         if (is_callable([$this->source, $method])) {

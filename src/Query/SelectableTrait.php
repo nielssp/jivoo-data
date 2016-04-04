@@ -19,6 +19,78 @@ trait SelectableTrait
      * @return \Jivoo\Data\DataSource
      */
     abstract protected function getSource();
+    
+    /**
+     * Implements methods {@see Boolean::and()} and {@see Boolean::or()}.
+     *
+     * @param string $method
+     *            Method name ('and' or 'or')
+     * @param mixed[] $args
+     *            List of parameters
+     * @return static
+     */
+    public function __call($method, $args)
+    {
+        switch ($method) {
+            case 'and':
+            case 'or':
+                $args = func_get_args();
+                $selection = new SelectionBuilder($this->getSource());
+                return call_user_func_array([$selection, $method . 'Where'], $args);
+        }
+        throw new InvalidMethodException('Invalid method: ' . $method);
+    }
+
+    /**
+     * Combine expression using AND operator.
+     *
+     * @param Expression|string $expr
+     *            Expression
+     * @param mixed $vars,...
+     *            Additional values to replace placeholders in
+     *            $expr with.
+     * @return static
+     */
+    public function where($expr)
+    {
+        $args = func_get_args();
+        $selection = new SelectionBuilder($this->getSource());
+        return call_user_func_array([$selection, 'andWhere'], $args);
+    }
+
+    /**
+     * Combine expression using AND operator.
+     *
+     * @param Expression|string $expr
+     *            Expression
+     * @param mixed $vars,...
+     *            Additional values to replace placeholders in
+     *            $expr with.
+     * @return static
+     */
+    public function andWhere($expr)
+    {
+        $args = func_get_args();
+        $selection = new SelectionBuilder($this->getSource());
+        return call_user_func_array([$selection, 'andWhere'], $args);
+    }
+
+    /**
+     * Combine expression using OR operator.
+     *
+     * @param Expression|string $expr
+     *            Expression
+     * @param mixed $vars,...
+     *            Additional values to replace placeholders in
+     *            $expr with.
+     * @return static
+     */
+    public function orWhere($expr)
+    {
+        $args = func_get_args();
+        $selection = new SelectionBuilder($this->getSource());
+        return call_user_func_array([$selection, 'orWhere'], $args);
+    }
 
     /**
      * Order selection by a column or expression.
