@@ -21,6 +21,19 @@ $loader = new Loader(new Document(array(
   )
 )));
 
+class User extends \Jivoo\Data\ModelBase {
+    
+    public static function getDefinition() {
+        $def = new \Jivoo\Data\DefinitionBuilder();
+        $def->addAutoIncrementId(); // Autoincrementing INT id
+        $def->username = DataType::string(255); // Username VARCHAR(255)
+        $def->password = DataType::string(255); // Password VARCHAR(255)
+        $def->addtimeStamps(); // Timestamps: 'created' and 'updated'
+        $def->addUnique('username', 'username'); // A unique index on the username field
+        return $def;
+    }
+}
+
 // Schema for a a user table
 class UserSchema extends SchemaBuilder {
   protected function createSchema() {

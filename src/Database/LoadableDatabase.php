@@ -94,7 +94,15 @@ abstract class LoadableDatabase implements MigratableDatabase
      * @return MigrationTypeAdapter Migration and type adapter.
      */
     abstract protected function getMigrationAdapter();
-
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function tableExists($table)
+    {
+        return isset($this->tables[$table]);
+    }
+    
     /**
      * {@inheritdoc}
      */
@@ -158,8 +166,11 @@ abstract class LoadableDatabase implements MigratableDatabase
     /**
      * {@inheritdoc}
      */
-    public function createTable($table, \Jivoo\Data\Definition $definition)
+    public function createTable($table, \Jivoo\Data\Definition $definition = null)
     {
+        if (! isset($definition)) {
+            $definition = $this->definition->getDefinition($table);
+        }
         $this->migrationAdapter->createTable($table, $definition);
         $this->definition->addDefinition($table, $definition);
         $table = $definition->getName();

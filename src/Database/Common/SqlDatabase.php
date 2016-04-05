@@ -10,7 +10,7 @@ use Jivoo\Data\Database\Database;
 /**
  * An SQL database.
  */
-interface SqlDatabase extends Database
+interface SqlDatabase extends Database, \Jivoo\Data\Query\Expression\Quoter
 {
     
     /**
@@ -37,6 +37,17 @@ interface SqlDatabase extends Database
     public function insert($sql, $pk = null);
     
     /**
+     * Get SQL for LIMIT / OFFSET.
+     *
+     * @param int $limit
+     *            Limit.
+     * @param int|null $offset
+     *            Optional offset.
+     * @return string SQL.
+     */
+    public function sqlLimitOffset($limit, $offset = null);
+    
+    /**
      * Execute a raw sql statement on database.
      *
      * @param string $sql
@@ -45,6 +56,12 @@ interface SqlDatabase extends Database
      * @throws \Jivoo\Data\Database\QueryException if query failed.
      */
     public function execute($sql);
+    
+    public function tableExists($table);
+    
+    public function createTable($table);
+    
+    public function dropTable($table);
 
     /**
      * Get type adapter.

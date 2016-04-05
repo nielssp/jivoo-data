@@ -12,8 +12,6 @@ interface Table extends \Jivoo\Data\DataSource
 {
     public function getName();
     
-    public function getDefinition();
-    
     public function exists();
     
     public function create();

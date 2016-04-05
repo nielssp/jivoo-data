@@ -44,10 +44,10 @@ interface Model extends Readable, Updatable, Deletable, DataSource
     
     /**
      * Create a {@see Record} object for an existing record using the provided
-     * data. Read selection.
+     * data.
      *
      * @param array $data Record data.
-     * @param \Jivoo\Data\Query\ReadSelection $selection
+     * @param \Jivoo\Data\Query\ReadSelection $selection Read selection.
      * @return Record A record.
      */
     public function open(array $data, Query\ReadSelection $selection);

@@ -7,14 +7,13 @@ namespace Jivoo\Data\Database\Common;
 
 use Jivoo\Data\Database\LoadableDatabase;
 use Jivoo\Data\Database\MigrationTypeAdapter;
-use Jivoo\Data\Query\Expression\Quoter;
 use Jivoo\Data\DataType;
 use Jivoo\Utilities;
 
 /**
  * A generic SQL database.
  */
-abstract class SqlDatabaseBase extends LoadableDatabase implements SqlDatabase, Quoter
+abstract class SqlDatabaseBase extends LoadableDatabase implements SqlDatabase
 {
 
     /**
@@ -138,15 +137,7 @@ abstract class SqlDatabaseBase extends LoadableDatabase implements SqlDatabase, 
     }
 
     /**
-     * Get SQL for LIMIT / OFFSET.
-     * Default style ("LIMIT 0,1") is used by SQLite
-     * and MySQL, override for other implementations.
-     *
-     * @param int $limit
-     *            Limit.
-     * @param int|null $offset
-     *            Optional offset.
-     * @return string SQL.
+     * {@inheritdoc}
      */
     public function sqlLimitOffset($limit, $offset = null)
     {

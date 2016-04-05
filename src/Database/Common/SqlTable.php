@@ -1,4 +1,5 @@
 <?php
+
 // Jivoo
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
@@ -20,7 +21,7 @@ use Jivoo\Data\Database\QueryException;
 /**
  * A table in an SQL database.
  */
-class SqlTable extends Table
+class SqlTable implements Table
 {
 
     /**
@@ -32,11 +33,6 @@ class SqlTable extends Table
      * @var string Table name (without prefix etc.).
      */
     private $name = '';
-
-    /**
-     * @var Schema|null Table schema if set.
-     */
-    private $definition = null;
 
     /**
      * @var bool
@@ -55,9 +51,7 @@ class SqlTable extends Table
     {
         $this->owner = $database;
         $this->name = $table;
-        $this->definition = $this->owner->getDefinition()->getDefinition($table);
         $this->caseInsensitive = $this->owner->caseInsensitiveFields();
-        parent::__construct();
     }
 
     /**
@@ -71,78 +65,25 @@ class SqlTable extends Table
     /**
      * {@inheritdoc}
      */
-    public function getDefinition()
+    public function exists()
     {
-        return $this->definition;
+        return $this->owner->tableExists($this->name);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDefinition(Definition $schema)
+    public function create()
     {
-        $this->definition = $schema;
+        $this->owner->createTable($this->name);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createExisting(array $raw, ReadSelectionBuilder $selection)
+    public function drop()
     {
-        $typeAdapter = $this->owner->getTypeAdapter();
-        $additional = $selection->additionalFields;
-        $data = array();
-        $virtual = array();
-        $subrecords = array();
-        if ($this->caseInsensitive) {
-            $lower = array();
-            foreach ($this->getFields() as $field) {
-                $lower[strtolower($field)] = $field;
-            }
-            foreach ($additional as $field => $a) {
-                $lower[strtolower($field)] = $field;
-            }
-        }
-        foreach ($raw as $field => $value) {
-            if (isset($lower) and isset($lower[$field])) {
-                $field = $lower[$field];
-            }
-            if (isset($additional[$field])) {
-                if (isset($additional[$field]['type'])) {
-                    $value = $typeAdapter->decode($additional[$field]['type'], $value);
-                }
-                if (isset($additional[$field]['record'])) {
-                    $record = $additional[$field]['record'];
-                    if (! isset($subrecords[$record])) {
-                        $subrecords[$record] = array(
-                            'model' => $additional[$field]['model'],
-                            'null' => true,
-                            'data' => array()
-                        );
-                    }
-                    $subrecords[$record]['data'][$additional[$field]['recordField']] = $value;
-                    if (isset($value)) {
-                        $subrecords[$record]['null'] = false;
-                    }
-                } else {
-                    $virtual[$field] = $value;
-                }
-            } else {
-                $type = $this->getType($field);
-                if (! isset($type)) {
-                    throw new QueryException(tr('Schema %1 does not contain field %2', $this->getName(), $field));
-                }
-                $data[$field] = $typeAdapter->decode($this->getType($field), $value);
-            }
-        }
-        foreach ($subrecords as $field => $record) {
-            if ($record['null']) {
-                $virtual[$field] = null;
-            } else {
-                $virtual[$field] = RecordBuilder::createExisting($record['model'], $record['data']);
-            }
-        }
-        return RecordBuilder::createExisting($this, $data, $virtual);
+        $this->owner->dropTable($this->name);
     }
 
     /**
@@ -169,7 +110,7 @@ class SqlTable extends Table
      */
     protected function escapeQuery($query, $vars = array())
     {
-        if (! is_array($vars)) {
+        if (!is_array($vars)) {
             $vars = func_get_args();
             array_shift($vars);
         }
@@ -206,7 +147,7 @@ class SqlTable extends Table
         if (isset($selection->groupBy)) {
             $result = $this->owner->query(
                 'SELECT COUNT(*) as _count FROM ('
-                    . $this->convertReadSelection($selection, '1') . ') AS _selection_count'
+                . $this->convertReadSelection($selection, '1') . ') AS _selection_count'
             );
             $row = $result->fetchAssoc();
             return $row['_count'];
@@ -219,7 +160,7 @@ class SqlTable extends Table
     /**
      * {@inheritdoc}
      */
-    public function readSelection(ReadSelectionBuilder $selection)
+    public function readSelection(\Jivoo\Data\Query\ReadSelection $selection)
     {
         return $this->owner->query($this->convertReadSelection($selection));
     }
@@ -233,7 +174,7 @@ class SqlTable extends Table
      *            Projection override.
      * @return string SQL query.
      */
-    private function convertReadSelection(ReadSelectionBuilder $selection, $projection = null)
+    private function convertReadSelection(\Jivoo\Data\Query\ReadSelection $selection, $projection = null)
     {
         $sqlString = 'SELECT ';
         if ($selection->distinct) {
@@ -241,7 +182,7 @@ class SqlTable extends Table
         }
         if (isset($projection)) {
             $sqlString .= $projection;
-        } elseif (! empty($selection->fields)) {
+        } elseif (!empty($selection->fields)) {
             $fields = $selection->fields;
             array_walk($fields, array(
                 $this,
@@ -254,7 +195,7 @@ class SqlTable extends Table
             } else {
                 $sqlString .= $this->owner->quoteModel($this->name) . '.*';
             }
-            if (! empty($selection->additionalFields)) {
+            if (!empty($selection->additionalFields)) {
                 $fields = $selection->additionalFields;
                 array_walk($fields, array(
                     $this,
@@ -267,7 +208,7 @@ class SqlTable extends Table
         if (isset($selection->alias)) {
             $sqlString .= ' AS ' . $selection->alias;
         }
-        if (! empty($selection->sources)) {
+        if (!empty($selection->sources)) {
             foreach ($selection->sources as $source) {
                 if (is_string($source['source'])) {
                     $table = $source['source'];
@@ -282,33 +223,33 @@ class SqlTable extends Table
                 }
             }
         }
-        if (! empty($selection->joins)) {
+        if (!empty($selection->joins)) {
             foreach ($selection->joins as $join) {
                 $joinSource = $join['source']->asInstanceOf('Jivoo\Data\Database\Common\SqlTable');
-                if (! isset($joinSource)) {
+                if (!isset($joinSource)) {
                     throw new InvalidTableException(
                         'Unable to join SqlTable with data source of type "' . get_class($join['source']) . '"'
                     );
                 }
-                
+
                 if ($joinSource->owner !== $this->owner) {
                     throw new InvalidTableException(
                         'Unable to join SqlTable with table of different database'
                     );
                 }
                 $table = $joinSource->name;
-                
+
                 $sqlString .= ' ' . $join['type'] . ' JOIN ' . $this->owner->quoteModel($table);
                 if (isset($join['alias'])) {
                     $sqlString .= ' AS ' . $join['alias'];
                 }
                 if (isset($join['condition']) and $join['condition']->hasClauses()) {
-                    $sqlString .= ' ON ' . $this->conditionToSql($join['condition']);
+                    $sqlString .= ' ON ' . $join['condition']->toString($this->owner);
                 }
             }
         }
         if ($selection->where->hasClauses()) {
-            $sqlString .= ' WHERE ' . $this->conditionToSql($selection->where);
+            $sqlString .= ' WHERE ' . $selection->where->toString($this->owner);
         }
         if (isset($selection->groupBy)) {
             $columns = array();
@@ -320,7 +261,7 @@ class SqlTable extends Table
                 $sqlString .= ' HAVING ' . $this->conditionToSql($selection->groupBy['condition']);
             }
         }
-        if (! empty($selection->orderBy)) {
+        if (!empty($selection->orderBy)) {
             $columns = array();
             foreach ($selection->orderBy as $orderBy) {
                 $columns[] = $this->escapeQuery($orderBy['column']) . ($orderBy['descending'] ? ' DESC' : ' ASC');
@@ -336,12 +277,12 @@ class SqlTable extends Table
     /**
      * {@inheritdoc}
      */
-    public function updateSelection(UpdateSelectionBuilder $selection)
+    public function updateSelection(\Jivoo\Data\Query\UpdateSelection $selection)
     {
         $typeAdapter = $this->owner->getTypeAdapter();
         $sqlString = 'UPDATE ' . $this->owner->quoteModel($this->name);
         $sets = $selection->sets;
-        if (! empty($sets)) {
+        if (!empty($sets)) {
             $sqlString .= ' SET';
             reset($sets);
             $first = true;
@@ -362,7 +303,7 @@ class SqlTable extends Table
         if ($selection->where->hasClauses()) {
             $sqlString .= ' WHERE ' . $this->conditionToSql($selection->where);
         }
-        if (! empty($selection->orderBy)) {
+        if (!empty($selection->orderBy)) {
             $columns = array();
             foreach ($selection->orderBy as $orderBy) {
                 $columns[] = $this->escapeQuery($orderBy['column']) . ($orderBy['descending'] ? ' DESC' : ' ASC');
@@ -378,21 +319,23 @@ class SqlTable extends Table
     /**
      * {@inheritdoc}
      */
-    public function deleteSelection(DeleteSelectionBuilder $selection)
+    public function deleteSelection(\Jivoo\Data\Query\Selection $selection)
     {
         $sqlString = 'DELETE FROM ' . $this->owner->quoteModel($this->name);
-        if ($selection->where->hasClauses()) {
-            $sqlString .= ' WHERE ' . $this->conditionToSql($selection->where);
+        if ($selection->getPredicate() !== null) {
+            $sqlString .= ' WHERE ' . $selection->getPredicate()->toString($this->owner);
         }
-        if (! empty($selection->orderBy)) {
+        $ordering = $selection->getOrdering();
+        if (count($ordering)) {
             $columns = array();
-            foreach ($selection->orderBy as $orderBy) {
+            foreach ($ordering as $orderBy) {
                 $columns[] = $this->escapeQuery($orderBy['column']) . ($orderBy['descending'] ? ' DESC' : ' ASC');
             }
             $sqlString .= ' ORDER BY ' . implode(', ', $columns);
         }
-        if (isset($selection->limit)) {
-            $sqlString .= ' ' . $this->owner->sqlLimitOffset($selection->limit);
+        $limit = $selection->getLimit();
+        if (isset($limit)) {
+            $sqlString .= ' ' . $this->owner->sqlLimitOffset($limit);
         }
         return $this->owner->execute($sqlString);
     }
@@ -400,7 +343,7 @@ class SqlTable extends Table
     /**
      * {@inheritdoc}
      */
-    public function insert($data, $replace = false)
+    public function insert(array $data, $replace = false)
     {
         return $this->insertMultiple(array(
             $data
@@ -410,7 +353,7 @@ class SqlTable extends Table
     /**
      * {@inheritdoc}
      */
-    public function insertMultiple($records, $replace = false)
+    public function insertMultiple(array $records, $replace = false)
     {
         if (count($records) == 0) {
             return null;
@@ -442,5 +385,16 @@ class SqlTable extends Table
         }
         $sqlString .= implode(', ', $tuples);
         return $this->owner->insert($sqlString, $this->getAiPrimaryKey());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function joinWith(\Jivoo\Data\DataSource $other)
+    {
+        if ($other instanceof SqlTable) {
+            return $this;
+        }
+        return null;
     }
 }
