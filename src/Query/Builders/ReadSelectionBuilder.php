@@ -129,8 +129,9 @@ class ReadSelectionBuilder extends SelectionBase implements \IteratorAggregate, 
      */
     public function alias($alias)
     {
-        $this->alias = $alias;
-        return $this;
+        $clone = clone $this;
+        $clone->alias = $alias;
+        return $clone;
     }
 
     /**
@@ -138,19 +139,20 @@ class ReadSelectionBuilder extends SelectionBase implements \IteratorAggregate, 
      */
     public function select($expression, $alias = null)
     {
-        $this->projection = array();
+        $clone = clone $this;
+        $clone->projection = array();
         if (is_array($expression)) {
             foreach ($expression as $alias => $expression) {
                 if (! ($expression instanceof Expression)) {
                     $expression = new ExpressionParser($expression);
                 }
                 if (is_int($alias)) {
-                    $this->projection[] = array(
+                    $clone->projection[] = array(
                         'expression' => $expression,
                         'alias' => null
                     );
                 } else {
-                    $this->projection[] = array(
+                    $clone->projection[] = array(
                         'expression' => $expression,
                         'alias' => $alias
                     );
@@ -160,13 +162,12 @@ class ReadSelectionBuilder extends SelectionBase implements \IteratorAggregate, 
             if (! ($expression instanceof Expression)) {
                 $expression = new ExpressionParser($expression);
             }
-            $this->projection[] = array(
+            $clone->projection[] = array(
                 'expression' => $expression,
                 'alias' => $alias
             );
         }
-        $result = $this->source->readSelection($this);
-        $this->projection = array();
+        $result = $clone->source->readSelection($clone);
         return $result;
     }
 
@@ -175,32 +176,35 @@ class ReadSelectionBuilder extends SelectionBase implements \IteratorAggregate, 
      */
     public function with($field, $expression, DataType $type = null)
     {
-        $this->additionalFields[$field] = array(
+        $clone = clone $this;
+        $clone->additionalFields[$field] = array(
             'alias' => $field,
             'expression' => $expression,
             'type' => $type
         );
-        $this->source->addVirtual($field, $type);
-        return $this;
+        // TODO: virtual fields defined in source?
+//        $clone->source->addVirtual($field, $type);
+        return $clone;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function withRecord($field, Definition $schema)
+    public function withRecord($field, Definition $definition)
     {
-        foreach ($schema->getFields() as $schemaField) {
+        $clone = clone $this;
+        foreach ($definition->getFields() as $schemaField) {
             $alias = $field . '_' . $schemaField;
-            $this->additionalFields[$alias] = array(
+            $clone->additionalFields[$alias] = array(
                 'alias' => $alias,
                 'expression' => $field . '.' . $schemaField,
-                'type' => $schema->getType($schemaField),
-                'schema' => $schema,
+                'type' => $definition->getType($schemaField),
+                'definition' => $definition,
                 'record' => $field,
                 'recordField' => $schemaField
             );
         }
-        return $this;
+        return $clone;
     }
 
     /**
@@ -208,6 +212,7 @@ class ReadSelectionBuilder extends SelectionBase implements \IteratorAggregate, 
      */
     public function groupBy($columns, $predicate = null)
     {
+        $clone = clone $this;
         if (! is_array($columns)) {
             $columns = array(
                 $columns
@@ -216,9 +221,9 @@ class ReadSelectionBuilder extends SelectionBase implements \IteratorAggregate, 
         if (is_string($predicate)) {
             $predicate = new ExpressionParser($predicate);
         }
-        $this->grouping = $columns;
-        $this->groupPredicate = $predicate;
-        return $this;
+        $clone->grouping = $columns;
+        $clone->groupPredicate = $predicate;
+        return $clone;
     }
 
     /**
@@ -226,16 +231,17 @@ class ReadSelectionBuilder extends SelectionBase implements \IteratorAggregate, 
      */
     public function innerJoin(DataSource $dataSource, $predicate = null, $alias = null)
     {
+        $clone = clone $this;
         if (! ($predicate instanceof Expression)) {
             $predicate = new ExpressionParser($predicate);
         }
-        $this->joins[] = array(
+        $clone->joins[] = array(
             'source' => $dataSource,
             'type' => 'INNER',
             'alias' => $alias,
             'predicate' => $predicate
         );
-        return $this;
+        return $clone;
     }
 
     /**
@@ -243,16 +249,17 @@ class ReadSelectionBuilder extends SelectionBase implements \IteratorAggregate, 
      */
     public function leftJoin(DataSource $dataSource, $predicate, $alias = null)
     {
+        $clone = clone $this;
         if (! ($predicate instanceof Expression)) {
             $predicate = new ExpressionParser($predicate);
         }
-        $this->joins[] = array(
+        $clone->joins[] = array(
             'source' => $dataSource,
             'type' => 'LEFT',
             'alias' => $alias,
             'condition' => $predicate
         );
-        return $this;
+        return $clone;
     }
 
     /**
@@ -260,16 +267,17 @@ class ReadSelectionBuilder extends SelectionBase implements \IteratorAggregate, 
      */
     public function rightJoin(DataSource $dataSource, $predicate, $alias = null)
     {
+        $clone = clone $this;
         if (! ($predicate instanceof Expression)) {
             $predicate = new ExpressionParser($predicate);
         }
-        $this->joins[] = array(
+        $clone->joins[] = array(
             'source' => $dataSource,
             'type' => 'RIGHT',
             'alias' => $alias,
             'condition' => $predicate
         );
-        return $this;
+        return $clone;
     }
 
     /**
@@ -277,8 +285,19 @@ class ReadSelectionBuilder extends SelectionBase implements \IteratorAggregate, 
      */
     public function distinct($distinct = true)
     {
-        $this->distinct = $distinct;
-        return $this;
+        $clone = clone $this;
+        $clone->distinct = $distinct;
+        return $clone;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offset($offset)
+    {
+        $clone = clone $this;
+        $clone->offset = (int) $offset;
+        return $clone;
     }
 
     /**
@@ -335,15 +354,6 @@ class ReadSelectionBuilder extends SelectionBase implements \IteratorAggregate, 
             $array[] = $record;
         }
         return $array;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offset($offset)
-    {
-        $this->offset = (int) $offset;
-        return $this;
     }
 
     /**

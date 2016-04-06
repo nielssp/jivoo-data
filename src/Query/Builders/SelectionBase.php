@@ -9,13 +9,12 @@ use Jivoo\InvalidMethodException;
 use Jivoo\Data\Query\Selection;
 use Jivoo\Data\DataSource;
 use Jivoo\Data\Query\Expression;
-use Jivoo\Data\Query\Selectable;
 use Jivoo\Data\Query\Expression\ExpressionParser;
 
 /**
  * Base class for other selections.
  */
-abstract class SelectionBase implements Selectable, Selection
+abstract class SelectionBase implements Selection
 {
 
     /**
@@ -49,10 +48,17 @@ abstract class SelectionBase implements Selectable, Selection
      *
      * @param DataSource $source
      *            Target of selection.
+     * @param SelectionBase $copy
+     *            Optional source for ordering, limit, and predicate.
      */
-    public function __construct(DataSource $source)
+    public function __construct(DataSource $source, SelectionBase $copy = null)
     {
         $this->source = $source;
+        if (isset($copy)) {
+            $this->predicate = $copy->predicate;
+            $this->limit = $copy->limit;
+            $this->ordering = $copy->ordering;
+        }
     }
 
     /**
@@ -102,8 +108,9 @@ abstract class SelectionBase implements Selectable, Selection
      */
     public function limit($limit)
     {
-        $this->limit = (int) $limit;
-        return $this;
+        $clone = clone $this;
+        $clone->limit = (int) $limit;
+        return $clone;
     }
 
     /**
@@ -120,14 +127,15 @@ abstract class SelectionBase implements Selectable, Selection
      */
     public function andWhere($expr)
     {
+        $clone = clone $this;
         $args = func_get_args();
         if (! isset($this->predicate)) {
             $expr = array_shift($args);
-            $this->predicate = new ExpressionParser($expr, $args);
+            $clone->predicate = new ExpressionParser($expr, $args);
         } else {
-            $this->predicate = call_user_func_array([$this->predicate, 'andWhere'], $args);
+            $clone->predicate = call_user_func_array([$this->predicate, 'andWhere'], $args);
         }
-        return $this;
+        return $clone;
     }
 
     /**
@@ -135,14 +143,15 @@ abstract class SelectionBase implements Selectable, Selection
      */
     public function orWhere($expr)
     {
+        $clone = clone $this;
         $args = func_get_args();
         if (! isset($this->predicate)) {
             $expr = array_shift($args);
-            $this->predicate = new ExpressionParser($expr, $args);
+            $clone->predicate = new ExpressionParser($expr, $args);
         } else {
-            $this->predicate = call_user_func_array([$this->predicate, 'orWhere'], $args);
+            $clone->predicate = call_user_func_array([$this->predicate, 'orWhere'], $args);
         }
-        return $this;
+        return $clone;
     }
 
     /**
@@ -150,11 +159,12 @@ abstract class SelectionBase implements Selectable, Selection
      */
     public function orderBy($column)
     {
-        $this->ordering[] = array(
+        $clone = clone $this;
+        $clone->ordering[] = array(
             $column,
             false
         );
-        return $this;
+        return $clone;
     }
 
     /**
@@ -162,11 +172,12 @@ abstract class SelectionBase implements Selectable, Selection
      */
     public function orderByDescending($column)
     {
-        $this->ordering[] = array(
+        $clone = clone $this;
+        $clone->ordering[] = array(
             $column,
             true
         );
-        return $this;
+        return $clone;
     }
 
     /**
@@ -174,10 +185,14 @@ abstract class SelectionBase implements Selectable, Selection
      */
     public function reverseOrder()
     {
-        foreach ($this->ordering as $key => $column) {
-            $this->ordering[$key][1] = ! $column[1];
+        if (! count($this->ordering)) {
+            return $this;
         }
-        return $this;
+        $clone = clone $this;
+        foreach ($clone->ordering as $key => $column) {
+            $clone->ordering[$key][1] = ! $column[1];
+        }
+        return $clone;
     }
 
     /**
@@ -188,10 +203,6 @@ abstract class SelectionBase implements Selectable, Selection
      */
     public function toSelection()
     {
-        $selection = new SelectionBuilder($this->source);
-        $selection->predicate = $this->predicate;
-        $selection->limit = $this->limit;
-        $selection->ordering = $this->ordering;
-        return $selection;
+        return new SelectionBuilder($this->source, $this);
     }
 }

@@ -6,9 +6,9 @@
 namespace Jivoo\Data\Query;
 
 /**
- * An update selection.
+ * An immutable update selection.
  */
-interface UpdateSelection extends Selection
+interface UpdateSelection extends Selection, Updatable
 {
 
     /**

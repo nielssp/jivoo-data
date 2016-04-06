@@ -27,7 +27,7 @@ class SqlTable implements Table
     /**
      * @var SqlDatabase Owner database.
      */
-    private $owner = null;
+    private $owner;
 
     /**
      * @var string Table name (without prefix etc.).
@@ -38,6 +38,11 @@ class SqlTable implements Table
      * @var bool
      */
     private $caseInsensitive = false;
+    
+    /**
+     * @var \Jivoo\Data\Definition 
+     */
+    private $definition;
 
     /**
      * Construct table.
@@ -52,6 +57,12 @@ class SqlTable implements Table
         $this->owner = $database;
         $this->name = $table;
         $this->caseInsensitive = $this->owner->caseInsensitiveFields();
+        $this->definition = $this->owner->getDefinition()->getDefinition($this->name);
+    }
+    
+    protected function getType($field)
+    {
+        return $this->definition->getType($field);
     }
 
     /**
@@ -114,7 +125,7 @@ class SqlTable implements Table
             $vars = func_get_args();
             array_shift($vars);
         }
-        return ConditionBuilder::interpolate($query, $vars, $this->owner);
+        return \Jivoo\Data\Query\E::interpolate($query, $vars, $this->owner);
     }
 
     /**
@@ -142,9 +153,10 @@ class SqlTable implements Table
     /**
      * {@inheritdoc}
      */
-    public function countSelection(ReadSelectionBuilder $selection)
+    public function countSelection(\Jivoo\Data\Query\ReadSelection $selection)
     {
-        if (isset($selection->groupBy)) {
+        $group = $selection->getGrouping();
+        if (count($group)) {
             $result = $this->owner->query(
                 'SELECT COUNT(*) as _count FROM ('
                 . $this->convertReadSelection($selection, '1') . ') AS _selection_count'
@@ -177,12 +189,12 @@ class SqlTable implements Table
     private function convertReadSelection(\Jivoo\Data\Query\ReadSelection $selection, $projection = null)
     {
         $sqlString = 'SELECT ';
-        if ($selection->distinct) {
+        if ($selection->isDistinct()) {
             $sqlString .= 'DISTINCT ';
         }
         if (isset($projection)) {
             $sqlString .= $projection;
-        } elseif (!empty($selection->fields)) {
+        } elseif (!empty($selection->get)) {
             $fields = $selection->fields;
             array_walk($fields, array(
                 $this,
@@ -261,15 +273,17 @@ class SqlTable implements Table
                 $sqlString .= ' HAVING ' . $this->conditionToSql($selection->groupBy['condition']);
             }
         }
-        if (!empty($selection->orderBy)) {
+        $ordering = $selection->getOrdering();
+        if (count($ordering)) {
             $columns = array();
-            foreach ($selection->orderBy as $orderBy) {
+            foreach ($ordering as $orderBy) {
                 $columns[] = $this->escapeQuery($orderBy['column']) . ($orderBy['descending'] ? ' DESC' : ' ASC');
             }
             $sqlString .= ' ORDER BY ' . implode(', ', $columns);
         }
-        if (isset($selection->limit)) {
-            $sqlString .= ' ' . $this->owner->sqlLimitOffset($selection->limit, $selection->offset);
+        $limit = $selection->getLimit();
+        if (isset($limit)) {
+            $sqlString .= ' ' . $this->owner->sqlLimitOffset($limit);
         }
         return $sqlString;
     }
@@ -281,7 +295,7 @@ class SqlTable implements Table
     {
         $typeAdapter = $this->owner->getTypeAdapter();
         $sqlString = 'UPDATE ' . $this->owner->quoteModel($this->name);
-        $sets = $selection->sets;
+        $sets = $selection->getData();
         if (!empty($sets)) {
             $sqlString .= ' SET';
             reset($sets);
@@ -300,18 +314,20 @@ class SqlTable implements Table
                 }
             }
         }
-        if ($selection->where->hasClauses()) {
-            $sqlString .= ' WHERE ' . $this->conditionToSql($selection->where);
+        if ($selection->getPredicate() !== null) {
+            $sqlString .= ' WHERE ' . $selection->getPredicate()->toString($this->owner);
         }
-        if (!empty($selection->orderBy)) {
+        $ordering = $selection->getOrdering();
+        if (count($ordering)) {
             $columns = array();
-            foreach ($selection->orderBy as $orderBy) {
+            foreach ($ordering as $orderBy) {
                 $columns[] = $this->escapeQuery($orderBy['column']) . ($orderBy['descending'] ? ' DESC' : ' ASC');
             }
             $sqlString .= ' ORDER BY ' . implode(', ', $columns);
         }
-        if (isset($selection->limit)) {
-            $sqlString .= ' ' . $this->owner->sqlLimitOffset($selection->limit);
+        $limit = $selection->getLimit();
+        if (isset($limit)) {
+            $sqlString .= ' ' . $this->owner->sqlLimitOffset($limit);
         }
         return $this->owner->execute($sqlString);
     }

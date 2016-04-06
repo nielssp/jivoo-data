@@ -32,14 +32,15 @@ class UpdateSelectionBuilder extends SelectionBase implements Updatable, UpdateS
      */
     public function set($field, $value = null)
     {
+        $clone = clone $this;
         if (is_array($field)) {
             foreach ($field as $f => $val) {
-                $this->set($f, $val);
+                $clone->data[$f] = $val;
             }
         } else {
-            $this->data[$field] = $value;
+            $clone->data[$field] = $value;
         }
-        return $this;
+        return $clone;
     }
 
     /**
