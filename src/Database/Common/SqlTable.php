@@ -40,7 +40,7 @@ class SqlTable implements Table
     private $caseInsensitive = false;
     
     /**
-     * @var \Jivoo\Data\Definition 
+     * @var \Jivoo\Data\Definition
      */
     private $definition;
 
