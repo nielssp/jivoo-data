@@ -189,27 +189,28 @@ class SqlTable implements Table
     private function convertReadSelection(\Jivoo\Data\Query\ReadSelection $selection, $projection = null)
     {
         $sqlString = 'SELECT ';
+        $alias = $selection->getAlias();
         if ($selection->isDistinct()) {
             $sqlString .= 'DISTINCT ';
         }
         if (isset($projection)) {
             $sqlString .= $projection;
-        } elseif (!empty($selection->get)) {
-            $fields = $selection->fields;
+        } elseif (count($selection->getProjection())) {
+            $fields = $selection->getProjection();
             array_walk($fields, array(
                 $this,
                 'getColumnList'
             ));
             $sqlString .= implode(', ', $fields);
         } else {
-            if (isset($selection->alias)) {
-                $sqlString .= $selection->alias . '.*';
+            if (isset($alias)) {
+                $sqlString .= $alias . '.*';
             } else {
                 $sqlString .= $this->owner->quoteModel($this->name) . '.*';
             }
-            if (!empty($selection->additionalFields)) {
-                $fields = $selection->additionalFields;
-                array_walk($fields, array(
+            $additional = $selection->getAdditionalFields();
+            if (count($additional)) {
+                array_walk($additional, array(
                     $this,
                     'getColumnList'
                 ));
@@ -217,26 +218,27 @@ class SqlTable implements Table
             }
         }
         $sqlString .= ' FROM ' . $this->owner->quoteModel($this->name);
-        if (isset($selection->alias)) {
-            $sqlString .= ' AS ' . $selection->alias;
+        if (isset($alias)) {
+            $sqlString .= ' AS ' . $alias;
         }
-        if (!empty($selection->sources)) {
-            foreach ($selection->sources as $source) {
-                if (is_string($source['source'])) {
-                    $table = $source['source'];
-                } elseif ($source['source'] instanceof SqlTable) {
-                    $table = $source['source']->name;
-                } else {
-                    continue;
-                }
-                $sqlString .= ', ' . $this->owner->quoteModel($table);
-                if (isset($source['alias'])) {
-                    $sqlString .= ' AS ' . $source['alias'];
-                }
-            }
-        }
-        if (!empty($selection->joins)) {
-            foreach ($selection->joins as $join) {
+//        if (!empty($selection->sources)) {
+//            foreach ($selection->sources as $source) {
+//                if (is_string($source['source'])) {
+//                    $table = $source['source'];
+//                } elseif ($source['source'] instanceof SqlTable) {
+//                    $table = $source['source']->name;
+//                } else {
+//                    continue;
+//                }
+//                $sqlString .= ', ' . $this->owner->quoteModel($table);
+//                if (isset($source['alias'])) {
+//                    $sqlString .= ' AS ' . $source['alias'];
+//                }
+//            }
+//        }
+        $joins = $selection->getJoins();
+        if (count($joins)) {
+            foreach ($joins as $join) {
                 $joinSource = $join['source']->asInstanceOf('Jivoo\Data\Database\Common\SqlTable');
                 if (!isset($joinSource)) {
                     throw new InvalidTableException(
@@ -260,17 +262,19 @@ class SqlTable implements Table
                 }
             }
         }
-        if ($selection->where->hasClauses()) {
-            $sqlString .= ' WHERE ' . $selection->where->toString($this->owner);
+        if ($selection->getPredicate() !== null) {
+            $sqlString .= ' WHERE ' . $selection->getPredicate()->toString($this->owner);
         }
-        if (isset($selection->groupBy)) {
+        $grouping = $selection->getGrouping();
+        if (count($grouping)) {
             $columns = array();
-            foreach ($selection->groupBy['columns'] as $column) {
+            foreach ($grouping as $column) {
                 $columns[] = $this->escapeQuery($column);
             }
             $sqlString .= ' GROUP BY ' . implode(', ', $columns);
-            if (isset($selection->groupBy['condition']) and $selection->groupBy['condition']->hasClauses()) {
-                $sqlString .= ' HAVING ' . $this->conditionToSql($selection->groupBy['condition']);
+            $predicate = $selection->getGroupPredicate();
+            if (isset($predicate)) {
+                $sqlString .= ' HAVING ' . $predicate->toString($this->owner);
             }
         }
         $ordering = $selection->getOrdering();
@@ -295,12 +299,11 @@ class SqlTable implements Table
     {
         $typeAdapter = $this->owner->getTypeAdapter();
         $sqlString = 'UPDATE ' . $this->owner->quoteModel($this->name);
-        $sets = $selection->getData();
-        if (!empty($sets)) {
+        $data = $selection->getData();
+        if (count($data)) {
             $sqlString .= ' SET';
-            reset($sets);
             $first = true;
-            foreach ($sets as $key => $value) {
+            foreach ($data as $key => $value) {
                 if ($first) {
                     $first = false;
                 } else {
