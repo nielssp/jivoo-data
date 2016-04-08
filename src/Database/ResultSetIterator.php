@@ -5,30 +5,16 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Database;
 
-use Jivoo\Models\ModelBase;
-use Jivoo\Models\RecordIterator;
-use Jivoo\Models\Selection\ReadSelectionBuilder;
-
 /**
  * Iterator for {@see ResultSet} instances.
  */
-class ResultSetIterator implements RecordIterator
+class ResultSetIterator implements \Iterator
 {
 
     /**
      * @var ResultSet Result set.
      */
     private $resultSet;
-
-    /**
-     * @var Model Model.
-     */
-    private $model;
-
-    /**
-     * @var ReadSelection Selection.
-     */
-    private $selection;
 
     /**
      * @var int Index.
@@ -43,20 +29,14 @@ class ResultSetIterator implements RecordIterator
     /**
      * Construct iterator.
      *
-     * @param ModelBase $model
-     *            Model.
      * @param ResultSet $resultSet
      *            Result set.
-     * @param ReadSelectionBuilder $selection
-     *            The selection that created this result set.
      */
-    public function __construct(ModelBase $model, ResultSet $resultSet, ReadSelectionBuilder $selection)
+    public function __construct(ResultSet $resultSet)
     {
-        $this->model = $model;
-        $this->selection = $selection;
         $this->resultSet = $resultSet;
         if ($this->resultSet->hasRows()) {
-            $this->array[] = $this->model->createExisting($this->resultSet->fetchAssoc(), $selection);
+            $this->array[] = $this->resultSet->fetchAssoc();
         }
     }
 
@@ -92,7 +72,7 @@ class ResultSetIterator implements RecordIterator
     public function next()
     {
         if ($this->resultSet->hasRows()) {
-            $this->array[] = $this->model->createExisting($this->resultSet->fetchAssoc(), $this->selection);
+            $this->array[] = $this->resultSet->fetchAssoc();
         }
         $this->position ++;
     }

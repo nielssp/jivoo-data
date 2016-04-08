@@ -1,22 +1,21 @@
 <?php
-
 // Jivoo
 // Copyright (c) 2015 Niels Sonnich Poulsen (http://nielssp.dk)
 // Licensed under the MIT license.
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Database\Common;
 
+use Jivoo\Data\Database\InvalidTableException;
+use Jivoo\Data\Database\ResultSetIterator;
 use Jivoo\Data\Database\Table;
-use Jivoo\App;
-use Jivoo\Models\Schema;
+use Jivoo\Data\DataSource;
+use Jivoo\Data\Definition;
+use Jivoo\Data\Query\E;
+use Jivoo\Data\Query\ReadSelection;
+use Jivoo\Data\Query\Selection;
+use Jivoo\Data\Query\UpdateSelection;
 use Jivoo\Models\Condition\ConditionBuilder;
 use Jivoo\Models\Selection\ReadSelectionBuilder;
-use Jivoo\Models\Selection\UpdateSelectionBuilder;
-use Jivoo\Models\Selection\DeleteSelectionBuilder;
-use Jivoo\Models\RecordBuilder;
-use Jivoo\Models\Condition\NotCondition;
-use Jivoo\Data\Database\InvalidTableException;
-use Jivoo\Data\Database\QueryException;
 
 /**
  * A table in an SQL database.
@@ -33,14 +32,9 @@ class SqlTable implements Table
      * @var string Table name (without prefix etc.).
      */
     private $name = '';
-
-    /**
-     * @var bool
-     */
-    private $caseInsensitive = false;
     
     /**
-     * @var \Jivoo\Data\Definition
+     * @var Definition
      */
     private $definition;
 
@@ -56,7 +50,6 @@ class SqlTable implements Table
     {
         $this->owner = $database;
         $this->name = $table;
-        $this->caseInsensitive = $this->owner->caseInsensitiveFields();
         $this->definition = $this->owner->getDefinition()->getDefinition($this->name);
     }
     
@@ -125,7 +118,7 @@ class SqlTable implements Table
             $vars = func_get_args();
             array_shift($vars);
         }
-        return \Jivoo\Data\Query\E::interpolate($query, $vars, $this->owner);
+        return E::interpolate($query, $vars, $this->owner);
     }
 
     /**
@@ -153,7 +146,7 @@ class SqlTable implements Table
     /**
      * {@inheritdoc}
      */
-    public function countSelection(\Jivoo\Data\Query\ReadSelection $selection)
+    public function countSelection(ReadSelection $selection)
     {
         $group = $selection->getGrouping();
         if (count($group)) {
@@ -172,9 +165,9 @@ class SqlTable implements Table
     /**
      * {@inheritdoc}
      */
-    public function readSelection(\Jivoo\Data\Query\ReadSelection $selection)
+    public function readSelection(ReadSelection $selection)
     {
-        return $this->owner->query($this->convertReadSelection($selection));
+        return new ResultSetIterator($this->owner->query($this->convertReadSelection($selection)));
     }
 
     /**
@@ -186,7 +179,7 @@ class SqlTable implements Table
      *            Projection override.
      * @return string SQL query.
      */
-    private function convertReadSelection(\Jivoo\Data\Query\ReadSelection $selection, $projection = null)
+    private function convertReadSelection(ReadSelection $selection, $projection = null)
     {
         $sqlString = 'SELECT ';
         $alias = $selection->getAlias();
@@ -295,7 +288,7 @@ class SqlTable implements Table
     /**
      * {@inheritdoc}
      */
-    public function updateSelection(\Jivoo\Data\Query\UpdateSelection $selection)
+    public function updateSelection(UpdateSelection $selection)
     {
         $typeAdapter = $this->owner->getTypeAdapter();
         $sqlString = 'UPDATE ' . $this->owner->quoteModel($this->name);
@@ -338,7 +331,7 @@ class SqlTable implements Table
     /**
      * {@inheritdoc}
      */
-    public function deleteSelection(\Jivoo\Data\Query\Selection $selection)
+    public function deleteSelection(Selection $selection)
     {
         $sqlString = 'DELETE FROM ' . $this->owner->quoteModel($this->name);
         if ($selection->getPredicate() !== null) {
@@ -409,7 +402,7 @@ class SqlTable implements Table
     /**
      * {@inheritdoc}
      */
-    public function joinWith(\Jivoo\Data\DataSource $other)
+    public function joinWith(DataSource $other)
     {
         if ($other instanceof SqlTable) {
             return $this;
