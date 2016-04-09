@@ -29,17 +29,23 @@ class SqlTableTest extends \Jivoo\TestCase
         
         // Select all
         $selection = new ReadSelectionBuilder($table);
-        $db->expects($this->exactly(2))
+        $db->expects($this->exactly(3))
             ->method('query')
             ->withConsecutive(
-                $this->equalTo('SELECT {Foo}.* FROM {Foo}'),
-                $this->equalTo('SELECT {Foo}.* FROM {Foo} WHERE group = "user"')
+                [$this->equalTo('SELECT {Foo}.* FROM {Foo}')],
+                [$this->equalTo('SELECT {Foo}.* FROM {Foo} WHERE group = "user"')],
+                [$this->equalTo(
+                    'SELECT {Foo}.* FROM {Foo} GROUP BY group, name HAVING name IN ("foo", "bar", "foobar")'
+                )]
             )
             ->willReturn($this->getMock('Jivoo\Data\Database\ResultSet'));
         $selection->toArray();
         
         // Select with a predicate
-        $selection = $selection->where('group = "user"');
-        $selection->toArray();
+        $selection->where('group = "user"')->toArray();
+        
+        // Select with groups
+        $selection->groupBy(['group', 'name'], E::e('name IN %s()', ['foo', 'bar', 'foobar']))
+            ->toArray();
     }
 }
