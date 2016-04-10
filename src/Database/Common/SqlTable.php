@@ -114,10 +114,6 @@ class SqlTable implements Table
      */
     protected function escapeQuery($query, $vars = array())
     {
-        if (!is_array($vars)) {
-            $vars = func_get_args();
-            array_shift($vars);
-        }
         return E::interpolate($query, $vars, $this->owner);
     }
 
@@ -135,7 +131,7 @@ class SqlTable implements Table
      */
     protected function getColumnList(&$value, $key)
     {
-        $expression = $this->escapeQuery($value['expression'], array());
+        $expression = $value['expression']->toString($this->owner);
         if (isset($value['alias'])) {
             $value = $expression . ' AS ' . $value['alias'];
         } else {
@@ -151,13 +147,13 @@ class SqlTable implements Table
         $group = $selection->getGrouping();
         if (count($group)) {
             $result = $this->owner->query(
-                'SELECT COUNT(*) as _count FROM ('
+                'SELECT COUNT(*) AS _count FROM ('
                 . $this->convertReadSelection($selection, '1') . ') AS _selection_count'
             );
             $row = $result->fetchAssoc();
             return $row['_count'];
         } else {
-            $result = $selection->orderBy(null)->select('COUNT(*)', '_count');
+            $result = iterator_to_array($selection->orderBy(null)->select('COUNT(*)', '_count'));
             return intval($result[0]['_count']);
         }
     }
@@ -207,7 +203,7 @@ class SqlTable implements Table
                     $this,
                     'getColumnList'
                 ));
-                $sqlString .= ', ' . implode(', ', $fields);
+                $sqlString .= ', ' . implode(', ', $additional);
             }
         }
         $sqlString .= ' FROM ' . $this->owner->quoteModel($this->name);
@@ -232,7 +228,7 @@ class SqlTable implements Table
         $joins = $selection->getJoins();
         if (count($joins)) {
             foreach ($joins as $join) {
-                $joinSource = $join['source']->asInstanceOf('Jivoo\Data\Database\Common\SqlTable');
+                $joinSource = $join['source']->joinWith($this);
                 if (!isset($joinSource)) {
                     throw new InvalidTableException(
                         'Unable to join SqlTable with data source of type "' . get_class($join['source']) . '"'
@@ -250,7 +246,7 @@ class SqlTable implements Table
                 if (isset($join['alias'])) {
                     $sqlString .= ' AS ' . $join['alias'];
                 }
-                if (isset($join['condition']) and $join['condition']->hasClauses()) {
+                if (isset($join['condition'])) {
                     $sqlString .= ' ON ' . $join['condition']->toString($this->owner);
                 }
             }
@@ -274,13 +270,13 @@ class SqlTable implements Table
         if (count($ordering)) {
             $columns = array();
             foreach ($ordering as $orderBy) {
-                $columns[] = $this->escapeQuery($orderBy['column']) . ($orderBy['descending'] ? ' DESC' : ' ASC');
+                $columns[] = $this->escapeQuery($orderBy[0]) . ($orderBy[1] ? ' DESC' : ' ASC');
             }
             $sqlString .= ' ORDER BY ' . implode(', ', $columns);
         }
         $limit = $selection->getLimit();
         if (isset($limit)) {
-            $sqlString .= ' ' . $this->owner->sqlLimitOffset($limit);
+            $sqlString .= ' ' . $this->owner->sqlLimitOffset($limit, $selection->getOffset());
         }
         return $sqlString;
     }

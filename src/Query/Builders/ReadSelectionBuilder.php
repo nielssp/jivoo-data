@@ -177,6 +177,9 @@ class ReadSelectionBuilder extends SelectionBase implements \IteratorAggregate, 
     public function with($field, $expression, DataType $type = null)
     {
         $clone = clone $this;
+        if (! ($expression instanceof Expression)) {
+            $expression = new ExpressionParser($expression);
+        }
         $clone->additionalFields[$field] = array(
             'alias' => $field,
             'expression' => $expression,

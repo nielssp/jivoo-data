@@ -88,7 +88,7 @@ class ResultSetIterator implements \Iterator
     /**
      * Convert result set to array.
      *
-     * @return \Jivoo\Data\Database\Record[] Array of records.
+     * @return array[] Array of records.
      */
     public function toArray()
     {

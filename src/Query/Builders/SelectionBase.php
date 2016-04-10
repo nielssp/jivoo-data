@@ -160,10 +160,14 @@ abstract class SelectionBase implements Selection
     public function orderBy($column)
     {
         $clone = clone $this;
-        $clone->ordering[] = array(
-            $column,
-            false
-        );
+        if (! isset($column)) {
+            $clone->ordering = [];
+        } else {
+            $clone->ordering[] = array(
+                $column,
+                false
+            );
+        }
         return $clone;
     }
 
@@ -173,10 +177,14 @@ abstract class SelectionBase implements Selection
     public function orderByDescending($column)
     {
         $clone = clone $this;
-        $clone->ordering[] = array(
-            $column,
-            true
-        );
+        if (! isset($column)) {
+            $clone->ordering = [];
+        } else {
+            $clone->ordering[] = array(
+                $column,
+                true
+            );
+        }
         return $clone;
     }
 
