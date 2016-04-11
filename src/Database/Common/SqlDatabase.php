@@ -66,7 +66,7 @@ interface SqlDatabase extends Database, \Jivoo\Data\Query\Expression\Quoter
     /**
      * Get type adapter.
      *
-     * @return TypeAdapter Type adapter for database.
+     * @return \Jivoo\Data\Database\TypeAdapter Type adapter for database.
      */
     public function getTypeAdapter();
 }

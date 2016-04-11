@@ -57,6 +57,17 @@ class SqlTable implements Table
     {
         return $this->definition->getType($field);
     }
+    
+    protected function getAiPrimaryKey()
+    {
+        $pk = $this->definition->getPrimaryKey();
+        if (count($pk) == 1) {
+            if ($this->definition->getType($pk[0])->serial) {
+                return $pk[0];
+            }
+        }
+        return null;
+    }
 
     /**
      * {@inheritdoc}
@@ -88,18 +99,6 @@ class SqlTable implements Table
     public function drop()
     {
         $this->owner->dropTable($this->name);
-    }
-
-    /**
-     * Convert a condition to SQL.
-     *
-     * @param ConditionBuilder $where
-     *            The condition.
-     * @return string SQL subquery.
-     */
-    protected function conditionToSql(ConditionBuilder $where)
-    {
-        return $where->toString($this->owner);
     }
 
     /**
@@ -298,10 +297,10 @@ class SqlTable implements Table
                 } else {
                     $sqlString .= ',';
                 }
-                if (strpos($key, '=') !== false) {
-                    $sqlString .= ' ' . $this->escapeQuery($key, $value);
+                $sqlString .= ' ' . $key . ' = ';
+                if ($value instanceof \Jivoo\Data\Query\Expression) {
+                    $sqlString .= $value->toString($this->owner);
                 } else {
-                    $sqlString .= ' ' . $key . ' = ';
                     $sqlString .= $typeAdapter->encode($this->getType($key), $value);
                 }
             }
@@ -313,7 +312,7 @@ class SqlTable implements Table
         if (count($ordering)) {
             $columns = array();
             foreach ($ordering as $orderBy) {
-                $columns[] = $this->escapeQuery($orderBy['column']) . ($orderBy['descending'] ? ' DESC' : ' ASC');
+                $columns[] = $this->escapeQuery($orderBy[0]) . ($orderBy[1] ? ' DESC' : ' ASC');
             }
             $sqlString .= ' ORDER BY ' . implode(', ', $columns);
         }
@@ -337,7 +336,7 @@ class SqlTable implements Table
         if (count($ordering)) {
             $columns = array();
             foreach ($ordering as $orderBy) {
-                $columns[] = $this->escapeQuery($orderBy['column']) . ($orderBy['descending'] ? ' DESC' : ' ASC');
+                $columns[] = $this->escapeQuery($orderBy[0]) . ($orderBy[1] ? ' DESC' : ' ASC');
             }
             $sqlString .= ' ORDER BY ' . implode(', ', $columns);
         }

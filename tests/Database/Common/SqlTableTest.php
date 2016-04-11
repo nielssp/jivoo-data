@@ -1,24 +1,47 @@
 <?php
 namespace Jivoo\Data\Database\Common;
 
-use Jivoo\Data\Query\Builders\DeleteSelectionBuilder;
-use Jivoo\Data\Query\Builders\UpdateSelectionBuilder;
+use Jivoo\Data\Database\DatabaseDefinitionBuilder;
+use Jivoo\Data\DataType;
+use Jivoo\Data\DefinitionBuilder;
 use Jivoo\Data\Query\Builders\ReadSelectionBuilder;
+use Jivoo\Data\Query\Builders\SelectionBuilder;
+use Jivoo\Data\Query\Builders\UpdateSelectionBuilder;
 use Jivoo\Data\Query\E;
+use Jivoo\TestCase;
 
-class SqlTableTest extends \Jivoo\TestCase
+class SqlTableTest extends TestCase
 {
     
     private function getDb()
     {
-        $def = new \Jivoo\Data\Database\DatabaseDefinitionBuilder();
+        $def = new DatabaseDefinitionBuilder();
+        $tableDef = new DefinitionBuilder();
+        $tableDef->a = DataType::string();
+        $tableDef->b = DataType::string();
+        $tableDef->c = DataType::string();
+        $def->addDefinition('Foo', $tableDef);
+        
+        $typeAdapter = $this->getMockBuilder('Jivoo\Data\Database\TypeAdapter')
+            ->getMock();
+        $typeAdapter->method('encode')
+            ->willReturnCallback(function ($type, $value) {
+                return '"' . $value . '"';
+            });
+        
+        
         $db = $this->getMockBuilder('Jivoo\Data\Database\Common\SqlDatabase')
             ->getMock();
+        $db->method('getTypeAdapter')
+            ->willReturn($typeAdapter);
         $db->method('getDefinition')
             ->willReturn($def);
         $db->method('sqlLimitOffset')
             ->willReturnCallback(function ($limit, $offset) {
-                return 'LIMIT ' . $limit . ' OFFSET ' . $offset;
+                if (isset($offset)) {
+                    return 'LIMIT ' . $limit . ' OFFSET ' . $offset;
+                }
+                return 'LIMIT ' . $limit;
             });
         $db->method('quoteModel')
             ->willReturnCallback(function ($model) {
@@ -116,5 +139,82 @@ class SqlTableTest extends \Jivoo\TestCase
         
         // Count groups
         $this->assertEquals(42, $selection->groupBy('a')->count());
+    }
+    
+    public function testUpdate()
+    {
+        $db = $this->getDb();
+        
+        $table = new SqlTable($db, 'Foo');
+        
+        $selection = new UpdateSelectionBuilder($table);
+        $selection = $selection->set('a', 'foo');
+  
+        // Update all
+        $db->expects($this->exactly(3))
+            ->method('execute')
+            ->withConsecutive(
+                [$this->equalTo('UPDATE {Foo} SET a = "foo", b = "baz", c = a + b')],
+                [$this->equalTo('UPDATE {Foo} SET a = "foo" WHERE group = "user" ORDER BY name DESC')],
+                [$this->equalTo('UPDATE {Foo} SET a = "foo" LIMIT 10')]
+            )
+            ->willReturn(0);
+        $selection->set('b', 'baz')->set('c', E::e('a + b'))->update();
+        
+        // Update with predicate and ordering
+        $selection->where('group = "user"')->orderByDescending('name')->update();
+        
+        // Update with limit
+        $selection->limit(10)->update();
+    }
+    
+    public function testDelete()
+    {
+        $db = $this->getDb();
+        
+        $table = new SqlTable($db, 'Foo');
+        
+        $selection = new SelectionBuilder($table);
+  
+        // Update all
+        $db->expects($this->exactly(3))
+            ->method('execute')
+            ->withConsecutive(
+                [$this->equalTo('DELETE FROM {Foo}')],
+                [$this->equalTo('DELETE FROM {Foo} WHERE group = "user" ORDER BY name DESC')],
+                [$this->equalTo('DELETE FROM {Foo} LIMIT 10')]
+            )
+            ->willReturn(0);
+        $selection->delete();
+        
+        // Update with predicate and ordering
+        $selection->where('group = "user"')->orderByDescending('name')->delete();
+        
+        // Update with limit
+        $selection->limit(10)->delete();
+    }
+    
+    public function testInsert()
+    {
+        $db = $this->getDb();
+        
+        $table = new SqlTable($db, 'Foo');
+        
+        // Update all
+        $db->expects($this->exactly(3))
+            ->method('insert')
+            ->withConsecutive(
+                [$this->equalTo('INSERT INTO {Foo} (a, b, c) VALUES ("foo", "bar", "baz")')],
+                [$this->equalTo('INSERT INTO {Foo} (a) VALUES ("foo"), ("bar"), ("baz")')],
+                [$this->equalTo('REPLACE INTO {Foo} (a) VALUES ("foo")')]
+            )
+            ->willReturn(0);
+        $table->insert(['a' => 'foo', 'b' => 'bar', 'c' => 'baz']);
+        
+        $table->insertMultiple([['a' => 'foo'], ['a' => 'bar'], ['a' => 'baz']]);
+        
+        $table->insert(['a' => 'foo'], true);
+        
+        $table->insertMultiple([]);
     }
 }
