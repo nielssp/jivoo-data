@@ -64,6 +64,15 @@ interface SqlDatabase extends Database, \Jivoo\Data\Query\Expression\Quoter
     public function dropTable($table);
 
     /**
+     * Escape a string and surround with quotation marks.
+     *
+     * @param string $string
+     *            String.
+     * @return string String surrounded with quotation marks.
+     */
+    public function quoteString($string);
+
+    /**
      * Get type adapter.
      *
      * @return \Jivoo\Data\Database\TypeAdapter Type adapter for database.

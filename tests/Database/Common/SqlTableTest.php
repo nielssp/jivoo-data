@@ -8,70 +8,9 @@ use Jivoo\Data\Query\Builders\ReadSelectionBuilder;
 use Jivoo\Data\Query\Builders\SelectionBuilder;
 use Jivoo\Data\Query\Builders\UpdateSelectionBuilder;
 use Jivoo\Data\Query\E;
-use Jivoo\TestCase;
 
-class SqlTableTest extends TestCase
+class SqlTableTest extends SqlTestBase
 {
-    
-    private function getDb()
-    {
-        $def = new DatabaseDefinitionBuilder();
-        $tableDef = new DefinitionBuilder();
-        $tableDef->a = DataType::string();
-        $tableDef->b = DataType::string();
-        $tableDef->c = DataType::string();
-        $def->addDefinition('Foo', $tableDef);
-        
-        $typeAdapter = $this->getMockBuilder('Jivoo\Data\Database\TypeAdapter')
-            ->getMock();
-        $typeAdapter->method('encode')
-            ->willReturnCallback(function ($type, $value) {
-                return '"' . $value . '"';
-            });
-        
-        
-        $db = $this->getMockBuilder('Jivoo\Data\Database\Common\SqlDatabase')
-            ->getMock();
-        $db->method('getTypeAdapter')
-            ->willReturn($typeAdapter);
-        $db->method('getDefinition')
-            ->willReturn($def);
-        $db->method('sqlLimitOffset')
-            ->willReturnCallback(function ($limit, $offset) {
-                if (isset($offset)) {
-                    return 'LIMIT ' . $limit . ' OFFSET ' . $offset;
-                }
-                return 'LIMIT ' . $limit;
-            });
-        $db->method('quoteModel')
-            ->willReturnCallback(function ($model) {
-                return '{' . $model . '}';
-            });
-        $db->method('quoteLiteral')
-            ->willReturnCallback(function ($type, $value) {
-                return '"' . $value . '"';
-            });
-        return $db;
-    }
-    
-    private function getResultSet(array $rows)
-    {
-        $set = $this->getMockBuilder('Jivoo\Data\Database\ResultSet')->getMock();
-        $set->method('hasRows')
-            ->willReturnCallback(function () use ($rows) {
-                return count($rows) > 0;
-            });
-        $set->method('fetchRow')
-            ->willReturnCallback(function () use (&$rows) {
-                return array_values(array_shift($rows));
-            });
-        $set->method('fetchAssoc')
-            ->willReturnCallback(function () use (&$rows) {
-                return array_shift($rows);
-            });
-        return $set;
-    }
-    
     public function testRead()
     {
         $db = $this->getDb();

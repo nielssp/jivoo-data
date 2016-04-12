@@ -6,7 +6,7 @@
 namespace Jivoo\Data\Database\Common;
 
 use Jivoo\Data\Database\MigrationTypeAdapter;
-use Jivoo\Models\DataType;
+use Jivoo\Data\DataType;
 use Jivoo\Data\Database\SchemaBuilder;
 use Jivoo\Utilities;
 use Jivoo\Json;
@@ -26,10 +26,10 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
     /**
      * Construct type adapter.
      *
-     * @param SqlDatabaseBase $db
+     * @param SqlDatabase $db
      *            Database.
      */
-    public function __construct(SqlDatabaseBase $db)
+    public function __construct(SqlDatabase $db)
     {
         $this->db = $db;
     }
@@ -219,7 +219,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function getTableDefinition($table)
+    public function getDefinition($table)
     {
         $result = $this->db->query('SHOW COLUMNS FROM `' . $this->db->tableName($table) . '`');
         $schema = new SchemaBuilder($table);

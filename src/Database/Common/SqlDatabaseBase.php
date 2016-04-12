@@ -108,15 +108,6 @@ abstract class SqlDatabaseBase extends LoadableDatabase implements SqlDatabase
     }
 
     /**
-     * Escape a string and surround with quotation marks.
-     *
-     * @param string $string
-     *            String.
-     * @return string String surrounded with quotation marks.
-     */
-    abstract public function quoteString($string);
-
-    /**
      * {@inheritdoc}
      */
     public function getTypeAdapter()
