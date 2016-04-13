@@ -18,7 +18,7 @@ interface SqlDatabase extends Database, \Jivoo\Data\Query\Expression\Quoter
      *
      * @param string $sql
      *            Raw sql.
-     * @return ResultSet A result set.
+     * @return \Jivoo\Data\Database\ResultSet A result set.
      * @throws \Jivoo\Data\Database\QueryException if query failed.
      */
     public function query($sql);
@@ -62,6 +62,16 @@ interface SqlDatabase extends Database, \Jivoo\Data\Query\Expression\Quoter
     public function createTable($table);
     
     public function dropTable($table);
+    
+    /**
+     * Convert table name.
+     * E.g. "UserSession" to "prefix_user_session".
+     *
+     * @param string $name
+     *            Table name.
+     * @return string Real table name.
+     */
+    public function tableName($name);
 
     /**
      * Escape a string and surround with quotation marks.

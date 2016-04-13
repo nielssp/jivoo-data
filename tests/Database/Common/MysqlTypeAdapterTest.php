@@ -45,4 +45,41 @@ class MysqlTypeAdapterTest extends SqlTestBase
         $this->assertSame('foo bar baz', $adapter->decode(DataType::string(), 'foo bar baz'));
         $this->assertSame([], $adapter->decode(DataType::object(), '[]'));
     }
+    
+    public function testGetTables()
+    {
+        $db = $this->getDb();
+        $adapter = new MysqlTypeAdapter($db);
+        
+        $db->expects($this->once())
+            ->method('query')
+            ->with($this->equalTo('SHOW TABLES'))
+            ->willReturn($this->getResultSet([['foo_bar'], ['baz']]));
+        
+        $this->assertEquals(['FooBar', 'Baz'], $adapter->getTables());
+    }
+    
+    public function testCreateTable()
+    {
+        $db = $this->getDb();
+        $adapter = new MysqlTypeAdapter($db);
+        
+        $db->expects($this->once())
+            ->method('execute')
+            ->with($this->equalTo('CREATE TABLE `foo_bar` ('
+                . 'id INT UNSIGNED NOT NULL AUTO_INCREMENT, '
+                . 'foo VARCHAR(255) NOT NULL DEFAULT "bar", '
+                . 'PRIMARY KEY (id), '
+                . 'INDEX (foo, id), '
+                . 'UNIQUE (foo)'
+                . ') CHARACTER SET utf8'));
+        
+        $def = new \Jivoo\Data\DefinitionBuilder();
+        $def->addAutoIncrementId();
+        $def->foo = DataType::string(255, false, "bar");
+        $def->addKey(['foo', 'id']);
+        $def->addUnique('foo');
+        
+        $adapter->createTable('FooBar', $def);
+    }
 }

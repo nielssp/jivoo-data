@@ -39,6 +39,10 @@ abstract class SqlTestBase extends TestCase
                 }
                 return 'LIMIT ' . $limit;
             });
+        $db->method('tableName')
+            ->willReturnCallback(function ($table) {
+                return \Jivoo\Utilities::camelCaseToUnderscores($table);
+            });
         $db->method('quoteModel')
             ->willReturnCallback(function ($model) {
                 return '{' . $model . '}';
@@ -58,16 +62,22 @@ abstract class SqlTestBase extends TestCase
     {
         $set = $this->getMockBuilder('Jivoo\Data\Database\ResultSet')->getMock();
         $set->method('hasRows')
-            ->willReturnCallback(function () use ($rows) {
+            ->willReturnCallback(function () use (&$rows) {
                 return count($rows) > 0;
             });
         $set->method('fetchRow')
             ->willReturnCallback(function () use (&$rows) {
-                return array_values(array_shift($rows));
+                if (count($rows)) {
+                    return array_values(array_shift($rows));
+                }
+                return false;
             });
         $set->method('fetchAssoc')
             ->willReturnCallback(function () use (&$rows) {
-                return array_shift($rows);
+                if (count($rows)) {
+                    return array_shift($rows);
+                }
+                return false;
             });
         return $set;
     }

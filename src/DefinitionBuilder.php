@@ -63,7 +63,7 @@ class DefinitionBuilder implements Definition
      */
     public function addAutoIncrementId($id = 'id')
     {
-        $this->$id = DataType::integer(DataType::AUTO_INCREMENT | DataType::UNSIGNED);
+        $this->$id = DataType::integer(DataType::SERIAL | DataType::UNSIGNED);
         $this->setPrimaryKey($id);
     }
 

@@ -116,7 +116,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
                 if ($type->unsigned) {
                     $column .= ' UNSIGNED';
                 }
-                if ($type->autoIncrement) {
+                if ($type->serial) {
                     $autoIncrement = ' AUTO_INCREMENT';
                 }
                 break;
@@ -186,7 +186,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
             $intFlags |= DataType::UNSIGNED;
         }
         if (strpos($row['Extra'], 'auto_increment') !== false) {
-            $intFlags |= DataType::AUTO_INCREMENT;
+            $intFlags |= DataType::SERIAL;
         }
         switch ($actualType) {
             case 'bigint':
@@ -291,7 +291,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
         $columns = $definition->getFields();
         $first = true;
         foreach ($columns as $column) {
-            $type = $definition->$column;
+            $type = $definition->getType($column);
             if (! $first) {
                 $sql .= ', ';
             } else {
@@ -300,16 +300,17 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
             $sql .= $column;
             $sql .= ' ' . $this->fromDataType($type);
         }
-        foreach ($definition->getIndexes() as $index => $options) {
+        foreach ($definition->getKeys() as $key) {
+            $columns = $definition->getKey($key);
             $sql .= ', ';
-            if ($index == 'PRIMARY') {
+            if ($key == 'PRIMARY') {
                 $sql .= 'PRIMARY KEY (';
-            } elseif ($options['unique']) {
+            } elseif ($definition->isUnique($key)) {
                 $sql .= 'UNIQUE (';
             } else {
                 $sql .= 'INDEX (';
             }
-            $sql .= implode(', ', $options['columns']) . ')';
+            $sql .= implode(', ', $columns) . ')';
         }
         $sql .= ') CHARACTER SET utf8';
         $this->db->execute($sql);

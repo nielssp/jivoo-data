@@ -71,12 +71,7 @@ abstract class SqlDatabaseBase extends LoadableDatabase implements SqlDatabase
     }
 
     /**
-     * Convert table name.
-     * E.g. "UserSession" to "prefix_user_session".
-     *
-     * @param string $name
-     *            Table name.
-     * @return string Real table name.
+     * {@inheritdoc}
      */
     public function tableName($name)
     {
