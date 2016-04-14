@@ -369,7 +369,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
      */
     public function renameColumn($table, $column, $newName)
     {
-        $type = $this->db->$table->getSchema()->$column;
+        $type = $this->db->getDefinition()->getDefinition($table)->getType($column);
         $sql = 'ALTER TABLE `' . $this->db->tableName($table) . '` CHANGE ' . $column . ' ' . $newName;
         $sql .= ' ' . $this->fromDataType($type);
         $this->db->execute($sql);
@@ -378,18 +378,18 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function createIndex($table, $index, $options = array())
+    public function createIndex($table, $index, array $columns, $unique = true)
     {
         $sql = 'ALTER TABLE `' . $this->db->tableName($table) . '`';
         if ($index == 'PRIMARY') {
             $sql .= ' ADD PRIMARY KEY';
-        } elseif ($options['unique']) {
+        } elseif ($unique) {
             $sql .= ' ADD UNIQUE ' . $index;
         } else {
             $sql .= ' ADD INDEX ' . $index;
         }
         $sql .= ' (';
-        $sql .= implode(', ', $options['columns']);
+        $sql .= implode(', ', $columns);
         $sql .= ')';
         $this->db->execute($sql);
     }
@@ -411,7 +411,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function alterIndex($table, $index, $options = array())
+    public function alterIndex($table, $index, array $columns, $unique = true)
     {
         $sql = 'ALTER TABLE `' . $this->db->tableName($table) . '`';
         if ($index == 'PRIMARY') {
@@ -421,14 +421,14 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
         }
         $sql .= ', ';
         if ($index == 'PRIMARY') {
-            $sql .= ' ADD PRIMARY KEY';
-        } elseif ($options['unique']) {
-            $sql .= ' ADD UNIQUE ' . $index;
+            $sql .= 'ADD PRIMARY KEY';
+        } elseif ($unique) {
+            $sql .= 'ADD UNIQUE ' . $index;
         } else {
-            $sql .= ' ADD INDEX ' . $index;
+            $sql .= 'ADD INDEX ' . $index;
         }
         $sql .= ' (';
-        $sql .= implode(', ', $options['columns']);
+        $sql .= implode(', ', $columns);
         $sql .= ')';
         $this->db->execute($sql);
     }

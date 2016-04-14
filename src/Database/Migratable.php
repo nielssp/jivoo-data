@@ -91,22 +91,16 @@ interface Migratable
     /**
      * Create an index.
      *
-     * Format of options array:
-     * <code>
-     * array(
-     * 'unique' => ..., // Whether or not index is unique (bool)
-     * 'columns' => array(...) // List of column names (string[])
-     * )
-     * </code>
-     *
      * @param string $table
      *            Table name.
      * @param string $index
      *            Index name.
-     * @param array $options
-     *            Options.
+     * @param string[] $columns
+     *            Columns.
+     * @param bool $unique
+     *            Uniqueness.
      */
-    public function createIndex($table, $index, $options = array());
+    public function createIndex($table, $index, array $columns, $unique = true);
 
     /**
      * Delete an index
@@ -121,20 +115,14 @@ interface Migratable
     /**
      * Alter an index.
      *
-     * Format of options array:
-     * <code>
-     * array(
-     * 'unique' => ..., // Whether or not index is unique (bool)
-     * 'columns' => array(...) // List of column names (string[])
-     * )
-     * </code>
-     *
      * @param string $table
      *            Table name.
      * @param string $index
      *            Index name.
-     * @param array $options
-     *            Options.
+     * @param string[] $columns
+     *            Columns.
+     * @param bool $unique
+     *            Uniqueness.
      */
-    public function alterIndex($table, $index, $options = array());
+    public function alterIndex($table, $index, array $columns, $unique = true);
 }
