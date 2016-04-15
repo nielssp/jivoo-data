@@ -3,7 +3,6 @@
 namespace Jivoo\Data\Database\Common;
 
 use Jivoo\Data\DataType;
-use Jivoo\Json;
 
 class MysqlTypeAdapterTest extends SqlTestBase
 {
@@ -44,6 +43,72 @@ class MysqlTypeAdapterTest extends SqlTestBase
         $this->assertEquals($time, $adapter->decode(DataType::dateTime(), $matches[1]));
         $this->assertSame('foo bar baz', $adapter->decode(DataType::string(), 'foo bar baz'));
         $this->assertSame([], $adapter->decode(DataType::object(), '[]'));
+    }
+    
+    public function testGetDefinition()
+    {
+        $db = $this->getDb();
+        $adapter = new MysqlTypeAdapter($db);
+        
+        $db->expects($this->exactly(2))
+            ->method('query')
+            ->withConsecutive(
+                [$this->equalTo('SHOW COLUMNS FROM `foo_bar`')],
+                [$this->equalTo('SHOW INDEX FROM `foo_bar`')]
+            )->willReturnCallback(function ($query) {
+                if (strpos($query, 'COLUMNS') !== false) {
+                    return $this->getResultSet([
+                        [
+                            'Field' => 'id',
+                            'Type' => 'INT UNSIGNED',
+                            'Extra' => 'auto_increment',
+                            'Default' => '',
+                            'Null' => 'NO'
+                        ],
+                        [
+                            'Field' => 'foo',
+                            'Type' => 'VARCHAR(42)',
+                            'Extra' => '',
+                            'Default' => 'baz',
+                            'Null' => 'NO'
+                        ]
+                    ]);
+                } else {
+                    return $this->getResultSet([
+                        [
+                            'Key_name' => 'PRIMARY',
+                            'Column_name' => 'id',
+                            'Non_unique' => '0'
+                        ],
+                        [
+                            'Key_name' => 'foo_id',
+                            'Column_name' => 'id',
+                            'Non_unique' => '1'
+                        ],
+                        [
+                            'Key_name' => 'foo_id',
+                            'Column_name' => 'foo',
+                            'Non_unique' => '1'
+                        ]
+                    ]);
+                }
+            });
+            
+        $def = $adapter->getDefinition('FooBar');
+        $this->assertEquals(['id', 'foo'], $def->getFields());
+        $this->assertTrue($def->getType('id')->isInteger());
+        $this->assertTrue($def->getType('id')->unsigned);
+        $this->assertTrue($def->getType('id')->serial);
+        $this->assertFalse($def->getType('id')->null);
+        $this->assertTrue($def->getType('foo')->isString());
+        $this->assertEquals(42, $def->getType('foo')->length);
+        $this->assertEquals('baz', $def->getType('foo')->default);
+        $this->assertFalse($def->getType('foo')->null);
+        
+        $this->assertEquals(['PRIMARY', 'foo_id'], $def->getKeys());
+        $this->assertEquals(['id'], $def->getPrimaryKey());
+        $this->assertEquals(['id', 'foo'], $def->getKey('foo_id'));
+        $this->assertFalse($def->isUnique('foo_id'));
     }
     
     public function testTableExists()

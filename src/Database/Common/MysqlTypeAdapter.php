@@ -7,7 +7,7 @@ namespace Jivoo\Data\Database\Common;
 
 use Jivoo\Data\Database\MigrationTypeAdapter;
 use Jivoo\Data\DataType;
-use Jivoo\Data\Database\SchemaBuilder;
+use Jivoo\Data\DefinitionBuilder;
 use Jivoo\Utilities;
 use Jivoo\Json;
 use Jivoo\Data\Database\TypeException;
@@ -222,10 +222,10 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
     public function getDefinition($table)
     {
         $result = $this->db->query('SHOW COLUMNS FROM `' . $this->db->tableName($table) . '`');
-        $schema = new SchemaBuilder($table);
+        $schema = new DefinitionBuilder($table);
         while ($row = $result->fetchAssoc()) {
             $column = $row['Field'];
-            $schema->addField($column, $this->toDataType($row));
+            $schema->$column = $this->toDataType($row);
         }
         $result = $this->db->query('SHOW INDEX FROM `' . $this->db->tableName($table) . '`');
         $indexes = array();
@@ -246,9 +246,9 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
         }
         foreach ($indexes as $name => $index) {
             if ($index['unique']) {
-                $schema->addUnique($name, $index['columns']);
+                $schema->addUnique($index['columns'], $name);
             } else {
-                $schema->addIndex($name, $index['columns']);
+                $schema->addKey($index['columns'], $name);
             }
         }
         return $schema;
