@@ -222,7 +222,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
     public function getDefinition($table)
     {
         $result = $this->db->query('SHOW COLUMNS FROM `' . $this->db->tableName($table) . '`');
-        $schema = new DefinitionBuilder($table);
+        $schema = new DefinitionBuilder();
         while ($row = $result->fetchAssoc()) {
             $column = $row['Field'];
             $schema->$column = $this->toDataType($row);

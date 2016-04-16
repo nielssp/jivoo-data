@@ -6,10 +6,11 @@
 namespace Jivoo\Data\Database\Common;
 
 use Jivoo\Data\Database\MigrationTypeAdapter;
-use Jivoo\Data\Database\SchemaBuilder;
-use Jivoo\Models\DataType;
+use Jivoo\Data\DefinitionBuilder;
+use Jivoo\Data\DataType;
+use Jivoo\Data\Query\E;
 use Jivoo\Utilities;
-use Jivoo\Models\Condition\ConditionBuilder;
+use Jivoo\Json;
 use Jivoo\Data\Database\TypeException;
 
 /**
@@ -29,7 +30,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
      * @param SqlDatabaseBase $db
      *            Database.
      */
-    public function __construct(SqlDatabaseBase $db)
+    public function __construct(SqlDatabase $db)
     {
         $this->db = $db;
     }
@@ -115,7 +116,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
                 } else {
                     $column = 'INTEGER';
                 }
-                if ($isPrimaryKey and $type->autoIncrement) {
+                if ($isPrimaryKey and $type->serial) {
                     $primaryKey .= ' AUTOINCREMENT';
                 }
                 break;
@@ -150,7 +151,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
         }
         $column .= ' NULL';
         if (isset($type->default)) {
-            $column .= ConditionBuilder::interpolate(' DEFAULT %_', array(
+            $column .= E::interpolate(' DEFAULT %_', array(
                 $type,
                 $type->default
             ), $this->db);
@@ -194,19 +195,19 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function getTableDefinition($table)
+    public function getDefinition($table)
     {
         $result = $this->db->query('PRAGMA table_info("' . $this->db->tableName($table) . '")');
-        $schema = new SchemaBuilder($table);
+        $definition = new DefinitionBuilder();
         $primaryKey = array();
         while ($row = $result->fetchAssoc()) {
             $column = $row['name'];
             if (isset($row['pk']) and $row['pk'] == '1') {
                 $primaryKey[] = $column;
             }
-            $schema->addField($column, $this->toDataType($row));
+            $definition->$column = $this->toDataType($row);
         }
-        $schema->setPrimaryKey($primaryKey);
+        $definition->setPrimaryKey($primaryKey);
         $result = $this->db->query('PRAGMA index_list("' . $this->db->tableName($table) . '")');
         while ($row = $result->fetchAssoc()) {
             $index = $row['name'];
@@ -227,12 +228,12 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
                 $columns[] = $row['name'];
             }
             if ($unique) {
-                $schema->addUnique($name, $columns);
+                $definition->addUnique($columns, $name);
             } else {
-                $schema->addIndex($name, $columns);
+                $definition->addKey($columns, $name);
             }
         }
-        return $schema;
+        return $definition;
     }
 
     /**
@@ -274,7 +275,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
         $primaryKey = $definition->getPrimaryKey();
         $singlePrimary = count($primaryKey) == 1;
         foreach ($columns as $column) {
-            $type = $definition->$column;
+            $type = $definition->getType($column);
             if (! $first) {
                 $sql .= ', ';
             } else {
@@ -288,19 +289,19 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
         }
         $sql .= ')';
         $this->db->execute($sql);
-        foreach ($definition->getIndexes() as $index => $options) {
-            if ($index == 'PRIMARY') {
+        foreach ($definition->getKeys() as $key) {
+            if ($key == 'PRIMARY') {
                 continue;
             }
             $sql = 'CREATE';
-            if ($options['unique']) {
+            if ($definition->isUnique($key)) {
                 $sql .= ' UNIQUE';
             }
             $sql .= ' INDEX "';
-            $sql .= $this->db->tableName($table) . '_' . $index;
+            $sql .= $this->db->tableName($table) . '_' . $key;
             $sql .= '" ON "' . $this->db->tableName($table);
             $sql .= '" (';
-            $sql .= implode(', ', $options['columns']) . ')';
+            $sql .= implode(', ', $definition->getKey($key)) . ')';
             $this->db->execute($sql);
         }
     }
@@ -311,11 +312,10 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
     public function renameTable($table, $newName)
     {
         try {
-            $current = $this->db->getSchema()->getSchema($table);
+            $definition = $this->db->getDefinition()->getDefinition($table);
             $this->db->beginTransaction();
-            $newSchema = $current->copy($newName);
-            $this->createTable($newSchema);
-            $sql = 'INSERT INTO ' . $this->db->quoteModel($newSchema->getName());
+            $this->createTable($newName, $definition);
+            $sql = 'INSERT INTO ' . $this->db->quoteModel($newName);
             $sql .= ' SELECT * FROM ' . $this->db->quoteModel($table);
             $this->db->execute($sql);
             $this->dropTable($table);
@@ -351,22 +351,22 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
     public function deleteColumn($table, $column)
     {
         try {
-            $current = $this->db->getSchema()->getSchema($table);
+            $definition = $this->db->getDefinition()->getDefinition($table);
             $this->db->beginTransaction();
-            $temp = $current->copy($table . '_MigrationBackup');
-            $this->createTable($temp);
-            $sql = 'INSERT INTO ' . $this->db->quoteModel($temp->getName());
+            $tempName = $table . '_MigrationBackup';
+            $this->createTable($tempName, $definition);
+            $sql = 'INSERT INTO ' . $this->db->quoteModel($tempName);
             $sql .= ' SELECT * FROM ' . $this->db->quoteModel($table);
             $this->db->execute($sql);
             $this->dropTable($table);
-            $newSchema = $current->copy($table);
-            unset($newSchema->$column);
-            $this->createTable($newSchema);
+            $newDefinition = new DefinitionBuilder($definition);
+            unset($newDefinition->$column);
+            $this->createTable($table, $newDefinition);
             $sql = 'INSERT INTO ' . $this->db->quoteModel($table);
-            $sql .= ' SELECT ' . implode(', ', $newSchema->getFields());
-            $sql .= ' FROM ' . $this->db->quoteModel($temp->getName());
-            $this->db->insert($sql);
-            $this->dropTable($temp->getName());
+            $sql .= ' SELECT ' . implode(', ', $newDefinition->getFields());
+            $sql .= ' FROM ' . $this->db->quoteModel($tempName);
+            $this->db->execute($sql);
+            $this->dropTable($tempName);
             $this->db->commit();
         } catch (\Exception $e) {
             $this->db->rollback();
@@ -380,21 +380,21 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
     public function alterColumn($table, $column, DataType $type)
     {
         try {
-            $current = $this->db->getSchema()->getSchema($table);
+            $definition = $this->db->getDefinition()->getDefinition($table);
             $this->db->beginTransaction();
-            $temp = $current->copy($table . '_MigrationBackup');
-            $this->createTable($temp);
-            $sql = 'INSERT INTO ' . $this->db->quoteModel($temp->getName());
+            $tempName = $table . '_MigrationBackup';
+            $this->createTable($tempName, $definition);
+            $sql = 'INSERT INTO ' . $this->db->quoteModel($tempName);
             $sql .= ' SELECT * FROM ' . $this->db->quoteModel($table);
-            $this->db->rawQuery($sql);
+            $this->db->execute($sql);
             $this->dropTable($table);
-            $newSchema = $current->copy($table);
-            $newSchema->$column = $type;
-            $this->createTable($newSchema);
+            $newDefinition = new DefinitionBuilder($definition);
+            $newDefinition->$column = $type;
+            $this->createTable($table, $newDefinition);
             $sql = 'INSERT INTO ' . $this->db->quoteModel($table);
-            $sql .= ' SELECT * FROM ' . $this->db->quoteModel($temp->getName());
-            $this->db->rawQuery($sql);
-            $this->dropTable($temp->getName());
+            $sql .= ' SELECT * FROM ' . $this->db->quoteModel($tempName);
+            $this->db->execute($sql);
+            $this->dropTable($tempName);
             $this->db->commit();
         } catch (\Exception $e) {
             $this->db->rollback();
@@ -408,30 +408,30 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
     public function renameColumn($table, $column, $newName)
     {
         try {
-            $current = $this->db->getSchema()->getSchema($table);
+            $definition = $this->db->getDefinition()->getDefinition($table);
             $this->db->beginTransaction();
-            $temp = $current->copy($table . '_MigrationBackup');
-            $this->createTable($temp);
-            $sql = 'INSERT INTO ' . $this->db->quoteModel($temp->getName());
+            $tempName = $table . '_MigrationBackup';
+            $this->createTable($tempName, $definition);
+            $sql = 'INSERT INTO ' . $this->db->quoteModel($tempName);
             $sql .= ' SELECT * FROM ' . $this->db->quoteModel($table);
-            $this->db->rawQuery($sql);
+            $this->db->execute($sql);
             $this->dropTable($table);
-            $newSchema = $current->copy($table);
-            $type = $newSchema->$column;
-            unset($newSchema->$column);
-            $newSchema->$newName = $type;
-            $this->createTable($newSchema);
+            $newDefinition = new DefinitionBuilder($definition);
+            $type = $newDefinition->getType($column);
+            unset($newDefinition->$column);
+            $newDefinition->$newName = $type;
+            $this->createTable($table, $newDefinition);
             $columns = array();
-            foreach ($temp->getFields() as $field) {
+            foreach ($definition->getFields() as $field) {
                 if ($field != $column) {
                     $columns[] = $field;
                 }
             }
             $columns[] = $column;
             $sql = 'INSERT INTO ' . $this->db->quoteModel($table);
-            $sql .= ' SELECT ' . implode(', ', $columns) . ' FROM ' . $this->db->quoteModel($temp->getName());
+            $sql .= ' SELECT ' . implode(', ', $columns) . ' FROM ' . $this->db->quoteModel($tempName);
             $this->db->execute($sql);
-            $this->dropTable($temp->getName());
+            $this->dropTable($tempName);
             $this->db->commit();
         } catch (\Exception $e) {
             $this->db->rollback();
@@ -442,17 +442,17 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function createIndex($table, $index, $options = array())
+    public function createIndex($table, $index, array $columns, $unique = true)
     {
         $sql = 'CREATE';
-        if ($options['unique']) {
+        if ($unique) {
             $sql .= ' UNIQUE';
         }
         $sql .= ' INDEX "';
         $sql .= $this->db->tableName($table) . '_' . $index;
         $sql .= '" ON "' . $this->db->tableName($table);
         $sql .= '" (';
-        $sql .= implode(', ', $options['columns']) . ')';
+        $sql .= implode(', ', $columns) . ')';
         $this->db->execute($sql);
     }
 
@@ -469,12 +469,12 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function alterIndex($table, $index, $options = array())
+    public function alterIndex($table, $index, array $columns, $unique = true)
     {
         try {
             $this->db->beginTransaction();
             $this->deleteIndex($table, $index);
-            $this->createIndex($table, $index, $options);
+            $this->createIndex($table, $index, $columns, $unique);
             $this->db->commit();
         } catch (\Exception $e) {
             $this->db->rollback();

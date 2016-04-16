@@ -22,6 +22,26 @@ class DefinitionBuilder implements Definition
      * @var array List of keys.
      */
     private $keys = array();
+    
+    public function __construct(Definition $copy = null)
+    {
+        if (isset($copy)) {
+            if ($copy instanceof self) {
+                $this->fields = $copy->fields;
+                $this->keys = $copy->keys;
+            } else {
+                foreach ($copy->getFields() as $field) {
+                    $this->fields[$field] = $copy->getType($field);
+                }
+                foreach ($copy->getKeys() as $key) {
+                    $this->keys[$key] = [
+                        'columns' => $copy->getKey($key),
+                        'unique' => $copy->isUnique($key)
+                    ];
+                }
+            }
+        }
+    }
 
     /**
      * Set type of field.
