@@ -6,8 +6,9 @@
 namespace Jivoo\Data\Database\Common;
 
 use Jivoo\Data\Database\MigrationTypeAdapter;
-use Jivoo\Models\DataType;
-use Jivoo\Data\Database\SchemaBuilder;
+use Jivoo\Data\DataType;
+use Jivoo\Data\Definition;
+use Jivoo\Data\DefinitionBuilder;
 use Jivoo\Utilities;
 use Jivoo\Json;
 use Jivoo\Data\Database\TypeException;
@@ -26,10 +27,10 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
     /**
      * Construct type adapter.
      *
-     * @param SqlDatabaseBase $db
+     * @param SqlDatabase $db
      *            Database.
      */
-    public function __construct(SqlDatabaseBase $db)
+    public function __construct(SqlDatabase $db)
     {
         $this->db = $db;
     }
@@ -41,7 +42,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
     {
         $value = $type->convert($value);
         if (! isset($value)) {
-            if ($type->isInteger() and $type->autoIncrement) {
+            if ($type->isInteger() and $type->serial) {
                 return 'DEFAULT';
             }
             return 'NULL';
@@ -96,7 +97,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
     }
 
     /**
-     * Convert a schema type to a PostgreSQL type.
+     * Convert a DataType to a PostgreSQL type.
      *
      * @param DataType $type
      *            Type.
@@ -104,7 +105,6 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
      */
     private function fromDataType(DataType $type)
     {
-        $autoIncrement = '';
         switch ($type->type) {
             case DataType::INTEGER:
                 $column = '';
@@ -115,7 +115,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
                 } elseif ($type->size == DataType::TINY) {
                         $column = 'small';
                 }
-                if ($type->autoIncrement) {
+                if ($type->serial) {
                     $column .= 'serial';
                 } else {
                     $column .= 'int';
@@ -157,7 +157,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
         if (isset($type->default)) {
             $column .= ' DEFAULT ' . $this->encode($type, $type->default);
         }
-        return $column . $autoIncrement;
+        return $column;
     }
 
     /**
@@ -180,7 +180,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
         if (strpos($type, 'int') !== false) {
             $intFlags = 0;
             if (preg_match('/^nextval\(/', $default) === 1) {
-                $intFlags = DataType::AUTO_INCREMENT;
+                $intFlags = DataType::SERIAL;
                 $default = null;
             } elseif (isset($default)) {
                 $default = intval($default);
@@ -207,7 +207,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
         }
         
         if (strpos($type, 'character') !== false) {
-            $length = $row['character_maximum_length'];
+            $length = intval($row['character_maximum_length']);
             return DataType::string($length, $null, $default);
         }
         if (strpos($type, 'date') !== false) {
@@ -228,15 +228,15 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function getTableDefinition($table)
+    public function getDefinition($table)
     {
         $result = $this->db->query(
             "SELECT * FROM information_schema.columns WHERE table_name = '" . $this->db->tableName($table) . "'"
         );
-        $schema = new SchemaBuilder($table);
+        $definition = new DefinitionBuilder();
         while ($row = $result->fetchAssoc()) {
             $column = $row['column_name'];
-            $schema->addField($column, $this->toDataType($row));
+            $definition->$column = $this->toDataType($row);
         }
         
         $sql = 'SELECT i.relname AS index_name, a.attname AS column_name, indisunique, indisprimary FROM';
@@ -249,7 +249,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
         while ($row = $result->fetchAssoc()) {
             $index = $row['index_name'];
             $column = $row['column_name'];
-            $unique = $row['indisunique'] == 0 ? true : false;
+            $unique = $row['indisunique'] != 0;
             if (isset($indexes[$index])) {
                 $indexes[$index]['columns'][] = $column;
             } else {
@@ -273,12 +273,12 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
                 continue;
             }
             if ($index['unique']) {
-                $schema->addUnique($name, $index['columns']);
+                $definition->addUnique($index['columns'], $name);
             } else {
-                $schema->addIndex($name, $index['columns']);
+                $definition->addKey($index['columns'], $name);
             }
         }
-        return $schema;
+        return $definition;
     }
 
     /**
@@ -322,7 +322,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
         $columns = $definition->getFields();
         $first = true;
         foreach ($columns as $column) {
-            $type = $definition->$column;
+            $type = $definition->getType($column);
             if (! $first) {
                 $sql .= ', ';
             } else {
@@ -342,20 +342,20 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
         }
         $sql .= ')';
         $this->db->execute($sql);
-        foreach ($definition->getIndexes() as $index => $options) {
-            if ($index == 'PRIMARY') {
+        foreach ($definition->getKeys() as $key) {
+            if ($key == 'PRIMARY') {
                 continue;
             }
             $sql = 'CREATE';
-            if ($options['unique']) {
+            if ($definition->isUnique($key)) {
                 $sql .= ' UNIQUE';
             }
-            $sql .= ' INDEX "' . $this->db->tableName($table) . '_' . $index . '"';
+            $sql .= ' INDEX "' . $this->db->tableName($table) . '_' . $key . '"';
             $sql .= ' ON ' . $this->db->quoteModel($table);
             $columns = array_map(array(
                 $this->db,
                 'quoteField'
-            ), $options['columns']);
+            ), $definition->getKey($key));
             $sql .= ' (' . implode(', ', $columns) . ')';
             $this->db->execute($sql);
         }
@@ -421,33 +421,32 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
         $sql = 'ALTER TABLE ' . $this->db->quoteModel($table);
         $sql .= ' RENAME ' . $this->db->quoteField($column);
         $sql .= ' TO ' . $this->db->quoteField($newName);
-        $type = $this->db->$table->getSchema()->$column;
         $this->db->execute($sql);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createIndex($table, $index, $options = array())
+    public function createIndex($table, $index, array $columns, $unique = true)
     {
         $columns = array_map(array(
             $this->db,
             'quoteField'
-        ), $options['columns']);
+        ), $columns);
         $columns = '(' . implode(', ', $columns) . ')';
         
         if ($index == 'PRIMARY') {
             $sql = 'ALTER TABLE ' . $this->db->quoteModel($table);
-            $sql .= 'ADD CONSTRAINT "' . $this->db->tableName($table) . '_PRIMARY" PRIMARY KEY ' . $columns;
+            $sql .= ' ADD CONSTRAINT "' . $this->db->tableName($table) . '_PRIMARY" PRIMARY KEY ' . $columns;
             $this->db->execute($sql);
             return;
         }
         $sql = 'CREATE';
-        if ($options['unique']) {
+        if ($unique) {
             $sql .= ' UNIQUE';
         }
         $sql .= ' INDEX "' . $this->db->tableName($table) . '_' . $index . '"';
-        $sql .= ' ON ' . $this->db->quoteModel($schema->getName());
+        $sql .= ' ON ' . $this->db->quoteModel($table);
         $sql .= ' ' . $columns;
         $this->db->execute($sql);
     }
@@ -459,7 +458,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
     {
         if ($index == 'PRIMARY') {
             $sql = 'ALTER TABLE ' . $this->db->quoteModel($table);
-            $sql .= 'DROP CONSTRAINT "' . $this->db->tableName($table) . '_PRIMARY"';
+            $sql .= ' DROP CONSTRAINT "' . $this->db->tableName($table) . '_PRIMARY"';
             $this->db->execute($sql);
             return;
         }
@@ -472,12 +471,12 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function alterIndex($table, $index, $options = array())
+    public function alterIndex($table, $index, array $columns, $unique = true)
     {
         try {
             $this->db->beginTransaction();
             $this->deleteIndex($table, $index);
-            $this->createIndex($table, $index, $options);
+            $this->createIndex($table, $index, $columns, $unique);
             $this->db->commit();
         } catch (\Exception $e) {
             $this->db->rollback();

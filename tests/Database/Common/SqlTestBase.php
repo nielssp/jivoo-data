@@ -47,6 +47,10 @@ abstract class SqlTestBase extends TestCase
             ->willReturnCallback(function ($model) {
                 return '{' . $model . '}';
             });
+        $db->method('quoteField')
+            ->willReturnCallback(function ($field) {
+                return $field;
+            });
         $db->method('quoteLiteral')
             ->willReturnCallback(function ($type, $value) {
                 return '"' . $value . '"';
