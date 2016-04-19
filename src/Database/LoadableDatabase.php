@@ -229,9 +229,9 @@ abstract class LoadableDatabase implements MigratableDatabase
     /**
      * {@inheritdoc}
      */
-    public function createIndex($table, $index, $options = array())
+    public function createIndex($table, $index, array $columns, $unique = true)
     {
-        $this->migrationAdapter->createIndex($table, $index, $options);
+        $this->migrationAdapter->createIndex($table, $index, $columns, $unique);
     }
 
     /**
@@ -245,8 +245,8 @@ abstract class LoadableDatabase implements MigratableDatabase
     /**
      * {@inheritdoc}
      */
-    public function alterIndex($table, $index, $options = array())
+    public function alterIndex($table, $index, array $columns, $unique = true)
     {
-        $this->migrationAdapter->alterIndex($table, $index, $options);
+        $this->migrationAdapter->alterIndex($table, $index, $columns, $unique);
     }
 }
