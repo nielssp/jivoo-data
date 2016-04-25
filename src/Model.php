@@ -10,7 +10,7 @@ use Jivoo\Data\Query\Updatable;
 use Jivoo\Data\Query\Deletable;
 
 /**
- * A selectable data source with a schema.
+ * A selectable data source with a definition.
  */
 interface Model extends Readable, Updatable, Deletable, DataSource
 {
