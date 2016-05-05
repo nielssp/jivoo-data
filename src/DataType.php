@@ -105,7 +105,7 @@ class DataType
      *            Integer flags.
      * @param int|null $length
      *            String length.
-     * @throws InvalidDataTypeException When type is invalid.
+     * @throws \InvalidArgumentException When type is invalid.
      */
     protected function __construct($type, $null = false, $default = null, $flags = 0, $length = null)
     {
@@ -763,6 +763,6 @@ class DataType
         if (Enum::classExists($placeholder)) {
             return self::enum($placeholder);
         }
-        throw new InvalidDataTypeException('Invalid data type placeholder: %' . $placeholder);
+        throw new \Jivoo\InvalidArgumentException('Invalid data type placeholder: %' . $placeholder);
     }
 }

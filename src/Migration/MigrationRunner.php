@@ -5,33 +5,19 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Migration;
 
-use Jivoo\LoadableModule;
 use Jivoo\Data\Database\SchemaBuilder;
 use Jivoo\Models\DataType;
 use Jivoo\Utilities;
 use Jivoo\Data\Database\MigratableDatabase;
 use Jivoo\Autoloader;
-use Jivoo\Assume;
 
 /**
- * Schema and data migration module.
+ * Schema and data migration runner.
  */
-class Migrations extends LoadableModule
+class MigrationRunner
 {
-
-    /**
-     * {@inheritdoc}
-     */
-    protected static $loadAfter = array(
-        'Setup'
-    );
-
-    /**
-     * {@inheritdoc}
-     */
-    protected $modules = array(
-        'Databases'
-    );
+    
+    private $config;
 
     /**
      * @var MigratableDatabase[] Database connections.
@@ -54,10 +40,12 @@ class Migrations extends LoadableModule
     private $migrationDirs = array();
 
     /**
-     * {@inheritdoc}
+     * Construct migration runner.
      */
-    protected function init()
+    public function __construct(\Jivoo\Store\Document $config)
     {
+        $this->config = $config;
+        
         $this->config->defaults = array(
             'automigrate' => false,
             'silent' => false,
@@ -73,8 +61,6 @@ class Migrations extends LoadableModule
             foreach ($this->app->manifest['migrations'] as $name) {
                 $this->attachDatabase($name, $this->p('app', 'migrations/' . $name));
             }
-        } elseif (isset($this->m->Databases->default)) {
-            $this->attachDatabase('default', $this->p('app', 'migrations'));
         }
     }
 
@@ -97,33 +83,33 @@ class Migrations extends LoadableModule
     /**
      * Attach a database for migrations.
      *
-     * @param string $name
-     *            Database name.
+     * @param string $name Database name.
+     * @param MigratableDatabase $db
+     *            Database.
      * @param string $migrationDir
      *            Location of migrations.
      */
-    public function attachDatabase($name, $migrationDir)
+    public function attachDatabase($name, MigratableDatabase $db, $migrationDir)
     {
-        $db = $this->m->Databases->$name->getConnection();
-        Assume::that($db instanceof MigratableDatabase);
         $this->migrationDirs[$name] = $migrationDir;
         $this->connections[$name] = $db;
-        if ($this->config['automigrate'] and isset($this->m->Setup)) {
-            if (! $this->m->Setup->isActive() and is_dir($this->migrationDirs[$name])) {
-                $mtime = filemtime($this->migrationDirs[$name] . '/.');
-                if (! isset($this->config['mtimes'][$name]) or $this->config['mtimes'][$name] != $mtime) {
-                    if ($this->config['silent']) {
-                        $missing = $this->check($name);
-                        foreach ($missing as $migration) {
-                            $this->run($name, $migration);
-                        }
-                        $this->finalize($name);
-                    } else {
-                        $this->m->Setup->trigger('Jivoo\Data\Migration\MigrationUpdater');
-                    }
-                }
-            }
-        }
+//        TODO:
+//        if ($this->config['automigrate'] and isset($this->m->Setup)) {
+//            if (! $this->m->Setup->isActive() and is_dir($this->migrationDirs[$name])) {
+//                $mtime = filemtime($this->migrationDirs[$name] . '/.');
+//                if (! isset($this->config['mtimes'][$name]) or $this->config['mtimes'][$name] != $mtime) {
+//                    if ($this->config['silent']) {
+//                        $missing = $this->check($name);
+//                        foreach ($missing as $migration) {
+//                            $this->run($name, $migration);
+//                        }
+//                        $this->finalize($name);
+//                    } else {
+//                        $this->m->Setup->trigger('Jivoo\Data\Migration\MigrationUpdater');
+//                    }
+//                }
+//            }
+//        }
     }
 
     /**
