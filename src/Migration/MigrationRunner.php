@@ -5,11 +5,11 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\Migration;
 
-use Jivoo\Data\Database\SchemaBuilder;
 use Jivoo\Models\DataType;
 use Jivoo\Utilities;
 use Jivoo\Data\Database\MigratableDatabase;
 use Jivoo\Autoloader;
+use Jivoo\Data\DefinitionBuilder;
 
 /**
  * Schema and data migration runner.
@@ -27,7 +27,7 @@ class MigrationRunner
     /**
      * @var Schema Table schema for SchemaRevision-table.
      */
-    private $schema;
+    private $definition;
 
     /**
      * @var MigrationSchema[] Array of schemas.
@@ -53,9 +53,9 @@ class MigrationRunner
         );
         
         // Initialize SchemaRevision schema
-        $this->schema = new SchemaBuilder('SchemaRevision');
-        $this->schema->revision = DataType::string(255);
-        $this->schema->setPrimaryKey('revision');
+        $this->definition = new \Jivoo\Data\DefinitionBuilder();
+        $this->definition->revision = DataType::string(255);
+        $this->definition->setPrimaryKey('revision');
         
         if (isset($this->app->manifest['migrations'])) {
             foreach ($this->app->manifest['migrations'] as $name) {
@@ -176,7 +176,7 @@ class MigrationRunner
     {
         $db = $this->getDatabase($name);
         $this->logger->info('Creating SchemaRevision table for ' . $name);
-        $db->createTable($this->schema);
+        $db->createTable('SchemaRevision', $this->definition);
         $records = array();
         foreach ($this->getMigrations($name) as $migration) {
             $records[] = array(
@@ -223,7 +223,7 @@ class MigrationRunner
     public function check($name)
     {
         $db = $this->getDatabase($name);
-        $db->SchemaRevision->setSchema($this->schema);
+        $db->SchemaRevision->setSchema($this->definition);
         // Schedule necessary migrations
         $currentState = array();
         foreach ($db->SchemaRevision->select('revision') as $row) {
