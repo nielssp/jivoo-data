@@ -56,12 +56,6 @@ class MigrationRunner
         $this->definition = new \Jivoo\Data\DefinitionBuilder();
         $this->definition->revision = DataType::string(255);
         $this->definition->setPrimaryKey('revision');
-        
-        if (isset($this->app->manifest['migrations'])) {
-            foreach ($this->app->manifest['migrations'] as $name) {
-                $this->attachDatabase($name, $this->p('app', 'migrations/' . $name));
-            }
-        }
     }
 
     /**
