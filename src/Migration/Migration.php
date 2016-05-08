@@ -6,8 +6,8 @@
 namespace Jivoo\Data\Migration;
 
 use Jivoo\Data\Database\MigratableDatabase;
-use Jivoo\Data\Database\SchemaBuilder;
-use Jivoo\Models\DataType;
+use Jivoo\Data\DefinitionBuilder;
+use Jivoo\Data\DataType;
 
 /**
  * Base class for migrations.
@@ -71,14 +71,14 @@ abstract class Migration
     /**
      * Create a table.
      *
-     * @param SchemaBuilder $schema
+     * @param DefinitionBuilder $definition
      *            Schema for table.
      */
-    protected function createTable(DefinitionBuilder $schema)
+    protected function createTable(DefinitionBuilder $definition)
     {
         try {
-            $this->db->createTable($schema);
-            $this->schema->createTable($schema);
+            $this->db->createTable($definition);
+            $this->schema->createTable($definition);
         } catch (\Exception $e) {
             if (! $this->ignoreExceptions) {
                 throw $e;
