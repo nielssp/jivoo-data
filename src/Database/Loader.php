@@ -243,7 +243,7 @@ class Loader implements LoggerAware
             }
             $object = new $class($definition, $config);
             $object->setLogger($this->logger);
-            $this->connections[$name] = new DatabaseConnection($object);
+            $this->connections[$name] = new DatabaseSchema($object);
             return $object;
         } catch (ConnectionException $exception) {
             throw new ConnectionException(

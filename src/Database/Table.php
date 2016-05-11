@@ -10,11 +10,28 @@ namespace Jivoo\Data\Database;
  */
 interface Table extends \Jivoo\Data\DataSource
 {
+    
+    /**
+     * Get table name.
+     *
+     * @return string Table name.
+     */
     public function getName();
     
+    /**
+     * Whether table exists.
+     *
+     * @return bool True if table exists, false otherwise.
+     */
     public function exists();
     
+    /**
+     * Create table.
+     */
     public function create();
     
+    /**
+     * Drop table.
+     */
     public function drop();
 }
