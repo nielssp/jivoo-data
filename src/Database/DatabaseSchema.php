@@ -43,7 +43,11 @@ class DatabaseSchema implements \Jivoo\Data\Schema
     public function __get($model)
     {
         if (!isset($this->models[$model])) {
-            $this->models[$model] = new SimpleModel($this->database->$model, $this->definition->getDefinition($model));
+            $this->models[$model] = new SimpleModel(
+                $model,
+                $this->database->$model,
+                $this->definition->getDefinition($model)
+            );
         }
         return $this->models[$model];
     }

@@ -80,6 +80,14 @@ abstract class ModelBase implements Model
     /**
      * {@inheritDoc}
      */
+    public function openSelection(Query\ReadSelection $selection)
+    {
+        return new RecordIterator($this->readSelection($selection), $this, $selection);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
     public function selectRecord(Record $record)
     {
         $definition = $this->getDefinition();

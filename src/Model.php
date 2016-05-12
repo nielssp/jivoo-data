@@ -51,6 +51,14 @@ interface Model extends Readable, Updatable, Deletable, DataSource
      * @return Record A record.
      */
     public function open(array $data, Query\ReadSelection $selection);
+    
+    /**
+     * Like {@see readSelection}, but returns a {@see Record} iterator.
+     *
+     * @param \Jivoo\Data\Query\ReadSelection $selection Read selection.
+     * @return \Iterator A {@see Record} iterator.
+     */
+    public function openSelection(Query\ReadSelection $selection);
 
     /**
      * Make a selection that selects a single record.
