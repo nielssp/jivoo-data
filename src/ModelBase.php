@@ -17,6 +17,8 @@ abstract class ModelBase implements Model
 {
     use SelectableTrait, UpdatableTrait, DeletableTrait, ReadableTrait;
     
+    private $validator = null;
+    
     /**
      * Return the data source to make selections on.
      *
@@ -25,6 +27,17 @@ abstract class ModelBase implements Model
     protected function getSource()
     {
         return $this;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public function getValidator()
+    {
+        if (! isset($this->validator)) {
+            $this->validator = new Validation\ValidatorBuilder();
+        }
+        return $this->validator;
     }
         
     /**

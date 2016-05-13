@@ -28,6 +28,13 @@ interface Model extends Readable, Updatable, Deletable, DataSource
      * @return Definition
      */
     public function getDefinition();
+    
+    /**
+     * Get record validator.
+     *
+     * @return Validation\Validator
+     */
+    public function getValidator();
 
     /**
      * Create a new record (without saving it).

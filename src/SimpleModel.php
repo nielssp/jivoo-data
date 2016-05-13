@@ -30,10 +30,10 @@ class SimpleModel extends ModelBase
      * Construct simple model.
      *
      * @param type $name Model name.
-     * @param \Jivoo\Data\DataSource $source Data source.
-     * @param \Jivoo\Data\Jivoo\Data\Definition $definition Data definition.
+     * @param DataSource $source Data source.
+     * @param Definition $definition Data definition.
      */
-    public function __construct($name, DataSource $source, Jivoo\Data\Definition $definition)
+    public function __construct($name, DataSource $source, Definition $definition)
     {
         $this->name = $name;
         $this->source = $source;
