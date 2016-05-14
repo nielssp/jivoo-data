@@ -7,7 +7,7 @@ class SelectionBaseTest extends \Jivoo\TestCase
     
     protected function setUp()
     {
-        $this->dataSource = $this->getMockBuilder('Jivoo\Data\DataSource')->getMock();
+        $this->dataSource = $this->getMockBuilder('Jivoo\Data\RecordSource')->getMock();
     }
     
     protected function getInstance()

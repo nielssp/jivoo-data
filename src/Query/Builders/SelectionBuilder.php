@@ -276,6 +276,6 @@ class SelectionBuilder extends SelectionBase implements
      */
     public function getIterator()
     {
-        return $this->source->readSelection($this->copyBasicAttr(new ReadSelectionBuilder($this->source)));
+        return $this->source->openSelection($this->copyBasicAttr(new ReadSelectionBuilder($this->source)));
     }
 }
