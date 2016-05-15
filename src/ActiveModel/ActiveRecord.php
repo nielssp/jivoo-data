@@ -224,7 +224,7 @@ class ActiveRecord implements Record, ActionRecord, Linkable
         if (array_key_exists($field, $this->virtualData)) {
             return $this->virtualData[$field];
         }
-        throw new InvalidPropertyException(tr('Invalid property: %1', $field));
+        throw new InvalidPropertyException('Invalid property: ' . $field);
     }
 
     /**
@@ -253,7 +253,7 @@ class ActiveRecord implements Record, ActionRecord, Linkable
                 $this->virtualData[$field] = $value;
             }
         } else {
-            throw new InvalidPropertyException(tr('Invalid property: %1', $field));
+            throw new InvalidPropertyException('Invalid property: ' . $field);
         }
     }
 
@@ -278,7 +278,7 @@ class ActiveRecord implements Record, ActionRecord, Linkable
         if (array_key_exists($field, $this->virtualData)) {
             return isset($this->virtualData[$field]);
         }
-        throw new InvalidPropertyException(tr('Invalid property: %1', $field));
+        throw new InvalidPropertyException('Invalid property: ' . $field);
     }
 
     /**
@@ -300,7 +300,7 @@ class ActiveRecord implements Record, ActionRecord, Linkable
         } elseif (array_key_exists($field, $this->virtualData)) {
             $this->virtualData[$field] = null;
         } else {
-            throw new InvalidPropertyException(tr('Invalid property: %1', $field));
+            throw new InvalidPropertyException('Invalid property: ' . $field);
         }
             ;
     }
@@ -326,7 +326,7 @@ class ActiveRecord implements Record, ActionRecord, Linkable
         if (is_callable($function)) {
             return call_user_func_array($function, $parameters);
         }
-        throw new InvalidMethodException(tr('Invalid method: %1', $method));
+        throw new InvalidMethodException('Invalid method: ' . $method);
     }
 
     /**
@@ -415,7 +415,7 @@ class ActiveRecord implements Record, ActionRecord, Linkable
         $this->model->triggerEvent('beforeSave', new ActiveModelEvent($this));
         if ($validate and ! $this->isValid()) {
             foreach ($this->getErrors() as $field => $error) {
-                $this->model->getLogger()->info(tr('Form error (%1): %2', $field, $error));
+                $this->model->getLogger()->info('Form error (' . $field . '): ' . $error);
             }
             return false;
         }

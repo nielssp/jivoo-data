@@ -207,13 +207,13 @@ abstract class ActiveModel extends ModelBase implements EventListener
         }
         $table = $this->table;
         if (! isset($this->schema->$table)) {
-            throw new InvalidTableException(tr('Table "%1" not found in database', $table));
+            throw new InvalidTableException('Table "' . $table . '" not found in schema');
         }
         $this->source = $this->schema->$table;
         
         $this->schema = $this->source->getSchema();
         if (! isset($this->schema)) {
-            throw new InvalidTableException('Schema for table "' . $table . '" not found');
+            throw new InvalidTableException('Definition for table "' . $table . '" not found');
         }
         $pk = $this->schema->getPrimaryKey();
         if (count($pk) == 1) {
@@ -224,7 +224,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
                 $this->aiPrimaryKey = $pk;
             }
         } else {
-            throw new InvalidActiveModelException(tr('ActiveModel does not support multi-field primary keys'));
+            throw new InvalidActiveModelException('ActiveModel does not support multi-field primary keys');
         }
         
         $this->nonVirtualFields = $this->schema->getFields();
@@ -486,7 +486,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
             $this->createAssociations();
         }
         if (! isset($this->associations[$association])) {
-            throw new InvalidAssociationException(tr('Unknown association: %1', $association));
+            throw new InvalidAssociationException('Unknown association: ' . $association);
         }
         $association = $this->associations[$association];
         $association['name'] = $name;
@@ -513,7 +513,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
             foreach ($this->$type as $name => $options) {
                 if (! is_string($name)) {
                     if (! is_string($options) or ! ($type == 'belongsTo' or $type == 'hasOne')) {
-                        throw new InvalidAssociationException(tr('Invalid "%1"-association in %2', $type, $this->name));
+                        throw new InvalidAssociationException('Invalid "' . $type . '"-association in ' . $this->name);
                     }
                     $name = lcfirst($options);
                     $options = array(
@@ -547,7 +547,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
         $options['name'] = $name;
         $otherModel = $options['model'];
         if (! isset($this->schema->$otherModel)) {
-            throw new InvalidAssociationException(tr('Model %1 not found in  %2', $otherModel, $this->name));
+            throw new InvalidAssociationException('Model ' . $otherModel . ' not found in ' . $this->name);
         }
         $options['model'] = $this->schema->$otherModel;
         if (! isset($options['thisKey'])) {
@@ -760,7 +760,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
         if (! isset($this->labels[$field])) {
             $this->labels[$field] = ucfirst(strtolower(preg_replace('/([A-Z])/', ' $1', lcfirst($field))));
         }
-        return tr($this->labels[$field]);
+        return \Jivoo\I18n\I18n::get($this->labels[$field]);
     }
 
     /**
@@ -866,7 +866,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
             $this->createAssociations();
         }
         if (! isset($this->associations[$association])) {
-            throw new InvalidAssociationException(tr('Unknown association: %1', $association));
+            throw new InvalidAssociationException('Unknown association: ' . $association);
         }
         $field = $association;
         $association = $this->associations[$field];
@@ -888,7 +888,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
                 $field
             );
         } else {
-            throw new InvalidAssociationException(tr('Association must be of type "belongsTo" or "hasOne"'));
+            throw new InvalidAssociationException('Association must be of type "belongsTo" or "hasOne"');
         }
         return $selection->withRecord($field, $model);
     }
@@ -913,7 +913,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
             $this->createAssociations();
         }
         if (! isset($this->associations[$association])) {
-            throw new InvalidAssociationException(tr('Unknown association: %1', $association));
+            throw new InvalidAssociationException('Unknown association: ' . $association);
         }
         $field = $association;
         $association = $this->associations[$field];
@@ -936,7 +936,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
                 $field
             );
         } else {
-            throw new InvalidAssociationException(tr('Association must be of type "belongsTo" or "hasOne"'));
+            throw new InvalidAssociationException('Association must be of type "belongsTo" or "hasOne"');
         }
         $aSelection->distinct()
             ->select(where('%c.*', $field), $model)
@@ -963,7 +963,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
             $this->createAssociations();
         }
         if (! isset($this->associations[$association])) {
-            throw new InvalidAssociationException(tr('Unknown association: %1', $association));
+            throw new InvalidAssociationException('Unknown association: ' . $association);
         }
         $field = $association;
         $association = $this->associations[$field];
@@ -1034,7 +1034,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
                 }
                 return $collection;
         }
-        throw new InvalidAssociationException(tr('Unknown association type: %1', $association['type']));
+        throw new InvalidAssociationException('Unknown association type: ' . $association['type']);
     }
 
     /**
@@ -1063,7 +1063,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
                 $id = $this->primaryKey;
                 return $association['join']->where($key . ' = ?', $record->$id)->countSelection() != 0;
         }
-        throw new InvalidAssociationException(tr('Unknown association type: %1', $association['type']));
+        throw new InvalidAssociationException('Unknown association type: ' . $association['type']);
     }
 
     /**
@@ -1096,7 +1096,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
                 $association['join']->where($key . ' = ?', $record->$id)->deleteSelection();
                 return;
         }
-        throw new InvalidAssociationException(tr('Unknown association type: %1', $association['type']));
+        throw new InvalidAssociationException('Unknown association type: ' . $association['type']);
     }
 
     /**
@@ -1159,6 +1159,6 @@ abstract class ActiveModel extends ModelBase implements EventListener
             case 'hasAndBelongsToMany':
                 return;
         }
-        throw new InvalidAssociationException(tr('Unknown association type: %1', $association['type']));
+        throw new InvalidAssociationException('Unknown association type: ' . $association['type']);
     }
 }

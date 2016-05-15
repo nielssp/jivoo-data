@@ -35,7 +35,7 @@ class ValidatorRule
     {
         $this->rules = $rules;
         if (isset($this->rules['message'])) {
-            $this->message = tr($this->rules['message']);
+            $this->message = \Jivoo\I18n\I18n::get($this->rules['message']);
             unset($this->rules['message']);
         }
     }

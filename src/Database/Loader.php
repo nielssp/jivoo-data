@@ -114,15 +114,15 @@ class Loader implements LoggerAware
     public function checkDriver($driver)
     {
         if (! file_exists($this->drivers . '/' . $driver . '/' . $driver . 'Database.php')) {
-            throw new InvalidDriverException(tr('Driver class not found: %1', $driver));
+            throw new InvalidDriverException('Driver class not found: ' . $driver);
         }
         if (! file_exists($this->drivers . '/' . $driver . '/driver.json')) {
-            throw new InvalidDriverException(tr('Driver manifest not found: %1', $driver));
+            throw new InvalidDriverException('Driver manifest not found: ' . $driver);
         }
         try {
             $info = Json::decodeFile($this->drivers . '/' . $driver . '/driver.json');
         } catch (JsonException $e) {
-            throw new InvalidDriverException(tr('Invalid driver manifest: %1 (%2)', $driver, $e->getMessage()), 0, $e);
+            throw new InvalidDriverException('Invalid driver manifest: ' . $driver . ' (' . $e->getMessage() . ')', 0, $e);
         }
         if (! isset($info['required'])) {
             $info['required'] = array();
@@ -218,28 +218,28 @@ class Loader implements LoggerAware
     public function connect($name, DatabaseDefinition $definition = null)
     {
         if (! isset($this->config[$name])) {
-            throw new ConfigurationException(tr('Database "%1" not configured', $name));
+            throw new ConfigurationException('Database "' . $name . '" not configured');
         }
         $config = $this->config->getSubset($name);
         $driver = $config->get('driver', null);
         if (! isset($driver)) {
-            throw new ConfigurationException(tr('Database driver not set'));
+            throw new ConfigurationException('Database driver not set');
         }
         try {
             $driverInfo = $this->checkDriver($driver);
         } catch (InvalidDriverException $e) {
-            throw new ConnectionException(tr('Invalid database driver: %1', $e->getMessage()), 0, $e);
+            throw new ConnectionException('Invalid database driver: ' . $e->getMessage(), 0, $e);
         }
         foreach ($driverInfo['requiredOptions'] as $option) {
             if (! isset($config[$option])) {
-                throw new ConfigurationException(tr('Database option missing: "%1"', $option));
+                throw new ConfigurationException('Database option missing: "' . $option . '"');
             }
         }
         try {
             $class = 'Jivoo\Data\Database\Drivers\\' . $driver . '\\' . $driver . 'Database';
             Assume::isSubclassOf($class, 'Jivoo\Data\Database\LoadableDatabase');
             if (! isset($definition)) {
-                $definition = new DynamicDatabaseSchema();
+                $definition = new DatabaseDefinitionBuilder();
             }
             $object = new $class($definition, $config);
             $object->setLogger($this->logger);

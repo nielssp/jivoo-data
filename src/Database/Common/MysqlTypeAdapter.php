@@ -213,7 +213,7 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
             case 'text':
                 return DataType::text($null, $default);
         }
-        throw new TypeException(tr('Unsupported MySQL type for column: %1', $row['Field']));
+        throw new TypeException('Unsupported MySQL type for column: ' . $row['Field']);
     }
 
     /**

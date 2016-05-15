@@ -27,7 +27,7 @@ abstract class MetaSchema extends SchemaBuilder
     {
         $class = Utilities::getClassName($this);
         if (preg_match('/^(.+)MetaSchema$/', $class, $matches) !== 1) {
-            throw new InvalidMixinException(tr('Invalid meta class name format.'));
+            throw new InvalidMixinException('Invalid meta class name format.');
         }
         return lcfirst($matches[1]) . 'Id';
     }

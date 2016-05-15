@@ -62,7 +62,7 @@ abstract class LoadableDatabase implements MigratableDatabase
     public function __get($table)
     {
         if (! isset($this->tables[$table])) {
-            throw new InvalidTableException(tr('Table not found: "%1"', $table));
+            throw new InvalidTableException('Table not found: ' . $table);
         }
         return $this->tables[$table];
     }

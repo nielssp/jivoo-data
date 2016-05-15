@@ -170,7 +170,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
     private function toDataType($row)
     {
         if (preg_match('/ *([^ (]+) *(\(([0-9]+)\))? */i', $row['type'], $matches) !== 1) {
-            throw new TypeException(tr('Cannot read type "%1" for column: %2', $row['type'], $row['name']));
+            throw new TypeException('Cannot read type "' . $row['type'] . '" for column: ' . $row['name']);
         }
         $actualType = strtolower($matches[1]);
         $length = isset($matches[3]) ? $matches[3] : 0;
@@ -189,7 +189,7 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
             case 'blob':
                 return DataType::binary($null, $default);
         }
-        throw new TypeException(tr('Unsupported SQLite type for column: %1', $row['name']));
+        throw new TypeException('Unsupported SQLite type for column: ' . $row['name']);
     }
 
     /**

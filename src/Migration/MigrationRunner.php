@@ -71,7 +71,7 @@ class MigrationRunner
         if (isset($this->connections[$name])) {
             return $this->connections[$name];
         }
-        throw new MigrationException(tr('"%1" is not a migratable database', $name));
+        throw new MigrationException('"' . $name . '" is not a migratable database');
     }
 
     /**
@@ -263,7 +263,7 @@ class MigrationRunner
             ));
         } catch (\Exception $e) {
             $migration->revert();
-            throw new MigrationException(tr('Migration failed: ' . $migrationName), null, $e);
+            throw new MigrationException('Migration failed: ' . $migrationName, null, $e);
         }
     }
 

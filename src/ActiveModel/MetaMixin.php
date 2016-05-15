@@ -49,7 +49,7 @@ class MetaMixin extends ActiveModelMixin
         $other = $this->options['model'];
         $db = $this->model->getDatabase();
         if (! isset($db->$other)) {
-            throw new InvalidModelException(tr('Model %1 not found in %2', $other, $this->model->getName()));
+            throw new InvalidModelException('Model ' . $other . ' not found in ' . $this->model->getName());
         }
         $this->other = $db->$other;
     }
