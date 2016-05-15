@@ -122,7 +122,11 @@ class Loader implements LoggerAware
         try {
             $info = Json::decodeFile($this->drivers . '/' . $driver . '/driver.json');
         } catch (JsonException $e) {
-            throw new InvalidDriverException('Invalid driver manifest: ' . $driver . ' (' . $e->getMessage() . ')', 0, $e);
+            throw new InvalidDriverException(
+                'Invalid driver manifest: ' . $driver . ' (' . $e->getMessage() . ')',
+                0,
+                $e
+            );
         }
         if (! isset($info['required'])) {
             $info['required'] = array();
