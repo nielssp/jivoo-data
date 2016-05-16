@@ -10,7 +10,7 @@ use Jivoo\Data\DataType;
 /**
  * A database driver that can be loaded by the {@see Loader}.
  */
-abstract class LoadableDatabase implements MigratableDatabase
+abstract class LoadableDatabase implements MigratableDatabase, \Psr\Log\LoggerAwareInterface
 {
 
     /**
@@ -32,6 +32,11 @@ abstract class LoadableDatabase implements MigratableDatabase
      * @var Table[] Tables.
      */
     private $tables;
+    
+    /**
+     * @var \Psr\Log\LoggerAwareInterface Logger.
+     */
+    protected $logger;
 
     /**
      * Construct database.
@@ -43,6 +48,7 @@ abstract class LoadableDatabase implements MigratableDatabase
      */
     final public function __construct(DatabaseDefinition $definition, $options = array())
     {
+        $this->logger = new \Jivoo\Log\NullLogger;
         $this->definition = new DatabaseDefinitionBuilder($definition);
         $this->init($options);
         $this->migrationAdapter = $this->getMigrationAdapter();
@@ -50,6 +56,14 @@ abstract class LoadableDatabase implements MigratableDatabase
         foreach ($this->tableNames as $table) {
             $this->tables[$table] = $this->getTable($table);
         }
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function setLogger(\Psr\Log\LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 
     /**

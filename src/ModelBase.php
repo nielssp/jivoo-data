@@ -13,7 +13,7 @@ use Jivoo\Data\Query\SelectableTrait;
 /**
  * A selectable data source with a schema.
  */
-abstract class ModelBase implements Model
+abstract class ModelBase implements \IteratorAggregate, Model
 {
     use SelectableTrait, UpdatableTrait, DeletableTrait, ReadableTrait;
     

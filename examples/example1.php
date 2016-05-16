@@ -29,7 +29,7 @@ $logger->addHandler(new CallbackHandler(function (array $record) {
 $loader->setLogger($logger);
 
 // Connect to "default":
-$db = $loader->connect('default');
+$db = new \Jivoo\Data\Database\DatabaseSchema($loader->connect('default'));
 
 echo '<pre>';
 
