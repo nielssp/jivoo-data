@@ -114,7 +114,7 @@ class RecordBuilder implements Record
     /**
      * {@inheritdoc}
      */
-    public function addData($data, $allowedFields = null)
+    public function addData(array $data, $allowedFields = null)
     {
         if (! is_array($data)) {
             return;
@@ -249,9 +249,12 @@ class RecordBuilder implements Record
         }
         if ($this->new) {
             $insertId = $this->model->insert($this->data);
-            $pk = $this->model->getAiPrimaryKey();
-            if (isset($pk)) {
-                $this->data[$pk] = $insertId;
+            $pk = $this->model->getDefinition()->getPrimaryKey();
+            if (count($pk) == 1) {
+                $pk = $pk[0];
+                if ($this->model->getDefinition()->getType($pk)->serial) {
+                    $this->data[$pk] = $insertId;
+                }
             }
             $this->new = false;
         } elseif (count($this->updatedData) > 0) {

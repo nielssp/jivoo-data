@@ -6,8 +6,8 @@
 namespace Jivoo\Data\Database;
 
 /**
- * Thrown table is undefined.
+ * Thrown when a database query fails.
  */
-class InvalidTableException extends \UnexpectedValueException implements \Jivoo\Exception
+class QueryException extends \RuntimeException implements \Jivoo\Exception
 {
 }

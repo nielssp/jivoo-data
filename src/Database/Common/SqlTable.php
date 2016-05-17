@@ -58,7 +58,7 @@ class SqlTable implements Table
         return $this->definition->getType($field);
     }
     
-    protected function getAiPrimaryKey()
+    protected function getSerialPrimaryKey()
     {
         $pk = $this->definition->getPrimaryKey();
         if (count($pk) == 1) {
@@ -391,7 +391,7 @@ class SqlTable implements Table
             $tuples[] = $tupleSql;
         }
         $sqlString .= implode(', ', $tuples);
-        return $this->owner->insert($sqlString, $this->getAiPrimaryKey());
+        return $this->owner->insert($sqlString, $this->getSerialPrimaryKey());
     }
 
     /**

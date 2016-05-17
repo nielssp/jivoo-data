@@ -187,7 +187,6 @@ abstract class LoadableDatabase implements MigratableDatabase, \Psr\Log\LoggerAw
         }
         $this->migrationAdapter->createTable($table, $definition);
         $this->definition->addDefinition($table, $definition);
-        $table = $definition->getName();
         $this->tableNames[] = $table;
         $this->tables[$table] = $this->getTable($table);
     }

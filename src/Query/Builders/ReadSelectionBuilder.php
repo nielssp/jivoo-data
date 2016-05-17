@@ -344,7 +344,21 @@ class ReadSelectionBuilder extends SelectionBase implements \IteratorAggregate, 
      */
     public function rowNumber(Record $record)
     {
-        return $this->source->rowNumberSelection($this, $record);
+        if (! count($this->ordering)) {
+            throw new \Jivoo\InvalidArgumentException('Can\'t find row number in selection without ordering');
+        }
+        // TODO: undefined method
+        $definition = $this->source->getDefinition();
+        $selection = $this;
+        foreach ($this->ordering as $column) {
+            $type = $definition->getType($column[0]);
+            if ($column[1]) {
+                $selection = $selection->and('%c > %_', $column[0], $type, $record->$column);
+            } else {
+                $selection = $selection->and('%c < %_', $column[0], $type, $record->$column);
+            }
+        }
+        return $selection->count() + 1;
     }
 
     /**
@@ -364,6 +378,8 @@ class ReadSelectionBuilder extends SelectionBase implements \IteratorAggregate, 
      */
     public function getIterator()
     {
+        // TODO: openSelection is on RecordSource not DataSource...
+//        return $this->source->openSelection($this);
         return $this->source->readSelection($this);
     }
 }

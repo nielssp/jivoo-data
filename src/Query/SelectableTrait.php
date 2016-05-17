@@ -38,7 +38,7 @@ trait SelectableTrait
                 $selection = new SelectionBuilder($this->getSource());
                 return call_user_func_array([$selection, $method . 'Where'], $args);
         }
-        throw new InvalidMethodException('Invalid method: ' . $method);
+        throw new \Jivoo\InvalidMethodException('Invalid method: ' . $method);
     }
 
     /**
