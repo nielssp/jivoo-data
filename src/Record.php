@@ -30,6 +30,13 @@ interface Record extends \ArrayAccess
      * @throws \Jivoo\InvalidPropertyException If the field does not exist.
      */
     public function __isset($field);
+    
+    /**
+     * Get model.
+     *
+     * @return Model Model.
+     */
+    public function getModel();
 
     /**
      * Get all data as an associative array.
