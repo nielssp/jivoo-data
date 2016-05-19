@@ -6,7 +6,6 @@
 namespace Jivoo\Data\Query;
 
 use Jivoo\Data\Query\Expression\Quoter;
-use Jivoo\Data\Record;
 
 /**
  * A record expression.

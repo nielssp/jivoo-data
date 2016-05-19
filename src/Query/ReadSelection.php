@@ -31,7 +31,7 @@ interface ReadSelection extends Selection, Readable
 
     /**
      *
-     * @return Predicate|null Grouping predicate.
+     * @return Expression|null Grouping predicate.
      */
     public function getGroupPredicate();
 
@@ -46,7 +46,7 @@ interface ReadSelection extends Selection, Readable
      * Each array is of the following format:
      * <code>
      * array(
-     * 'source' => ..., // Data source to join with ({@see DataSource})
+     * 'source' => ..., // Data source to join with ({@see \Jivoo\Data\DataSource})
      * 'type' => ..., // Type of join: 'INNER', 'RIGHT' or 'LEFT'
      * 'alias' => ..., // Alias for other data source (string|null)
      * 'predicate' => ... // Join predicate ({@see Expression})
