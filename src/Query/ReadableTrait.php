@@ -216,6 +216,19 @@ trait ReadableTrait
     }
     
     /**
+     * Find row number of a record in selection.
+     *
+     * @param \Jivoo\Data\Record $record
+     *            A record.
+     * @return int Row number.
+     */
+    public function rowNumber(Record $record)
+    {
+        $selection = new ReadSelectionBuilder($this->getSource());
+        return $selection->rowNumber($record);
+    }
+    
+    /**
      * Convert selection to an array.
      *
      * @return Record[] Array of records.
