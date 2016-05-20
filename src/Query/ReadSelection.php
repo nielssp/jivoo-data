@@ -8,7 +8,7 @@ namespace Jivoo\Data\Query;
 /**
  * An immutable read selection.
  */
-interface ReadSelection extends Selection, Readable
+interface ReadSelection extends Selection
 {
 
     /**

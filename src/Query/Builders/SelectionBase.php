@@ -14,7 +14,7 @@ use Jivoo\Data\Query\Expression\ExpressionParser;
 /**
  * Base class for other selections.
  */
-abstract class SelectionBase implements Selection
+abstract class SelectionBase implements Selection, \Jivoo\Data\Query\Selectable
 {
 
     /**
@@ -39,7 +39,7 @@ abstract class SelectionBase implements Selection
     /**
      * The data source.
      *
-     * @var DataSource
+     * @var \Jivoo\Data\RecordSource
      */
     protected $source = null;
 
@@ -47,11 +47,11 @@ abstract class SelectionBase implements Selection
      * Construct selection base.
      *
      * @param DataSource $source
-     *            Target of selection.
+     *            Optional selectable target.
      * @param SelectionBase $copy
      *            Optional source for ordering, limit, and predicate.
      */
-    public function __construct(DataSource $source, SelectionBase $copy = null)
+    public function __construct(\Jivoo\Data\RecordSource $source = null, SelectionBase $copy = null)
     {
         $this->source = $source;
         if (isset($copy)) {

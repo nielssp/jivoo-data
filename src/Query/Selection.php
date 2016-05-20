@@ -8,7 +8,7 @@ namespace Jivoo\Data\Query;
 /**
  * An immutable record selection with a predicate, an ordering and a limit.
  */
-interface Selection extends Selectable
+interface Selection
 {
 
     /**

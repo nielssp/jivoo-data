@@ -101,6 +101,26 @@ abstract class ModelBase implements \IteratorAggregate, Model
     /**
      * {@inheritDoc}
      */
+    public function rowNumberSelection(Query\ReadSelection $selection, Record $record)
+    {
+        if (! count($selection->ordering)) {
+            throw new \Jivoo\InvalidArgumentException('Can\'t find row number in selection without ordering');
+        }
+        $definition = $this->getDefinition();
+        foreach ($this->ordering as $column) {
+            $type = $definition->getType($column[0]);
+            if ($column[1]) {
+                $selection = $selection->and('%c > %_', $column[0], $type, $record->$column);
+            } else {
+                $selection = $selection->and('%c < %_', $column[0], $type, $record->$column);
+            }
+        }
+        return $selection->count() + 1;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
     public function selectRecord(Record $record)
     {
         $definition = $this->getDefinition();

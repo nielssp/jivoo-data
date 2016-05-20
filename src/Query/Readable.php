@@ -148,6 +148,15 @@ interface Readable extends Selectable, \Traversable, \Countable
     public function last();
 
     /**
+     * Find row number of a record in selection.
+     *
+     * @param \Jivoo\Data\Record $record
+     *            A record.
+     * @return int Row number.
+     */
+    public function rowNumber(\Jivoo\Data\Record $record);
+    
+    /**
      * Count number of records in selection.
      *
      * @return int Number of records.

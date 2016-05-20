@@ -29,4 +29,13 @@ interface RecordSource extends DataSource
      * @return \Iterator A {@see Record} iterator.
      */
     public function openSelection(Query\ReadSelection $selection);
+    
+    /**
+     * Find row number of a record in selection.
+     *
+     * @param \Jivoo\Data\Query\ReadSelection $selection Read selection.
+     * @param Record $record A record.
+     * @return int Row number.
+     */
+    public function rowNumberSelection(Query\ReadSelection $selection, Record $record);
 }
