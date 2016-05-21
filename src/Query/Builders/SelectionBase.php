@@ -39,7 +39,7 @@ abstract class SelectionBase implements Selection, \Jivoo\Data\Query\Selectable
     /**
      * The data source.
      *
-     * @var \Jivoo\Data\RecordSource
+     * @var \Jivoo\Data\DataSource
      */
     protected $source = null;
 
@@ -51,7 +51,7 @@ abstract class SelectionBase implements Selection, \Jivoo\Data\Query\Selectable
      * @param SelectionBase $copy
      *            Optional source for ordering, limit, and predicate.
      */
-    public function __construct(\Jivoo\Data\RecordSource $source = null, SelectionBase $copy = null)
+    public function __construct(\Jivoo\Data\DataSource $source = null, SelectionBase $copy = null)
     {
         $this->source = $source;
         if (isset($copy)) {

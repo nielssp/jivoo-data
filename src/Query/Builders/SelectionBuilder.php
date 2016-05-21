@@ -251,7 +251,6 @@ class SelectionBuilder extends SelectionBase implements
      */
     public function rowNumber(Record $record)
     {
-        // TODO: reimplement this functionality somwehere
         return $this->copyBasicAttr(new ReadSelectionBuilder($this->source))->rowNumber($record);
     }
 
@@ -276,6 +275,9 @@ class SelectionBuilder extends SelectionBase implements
      */
     public function getIterator()
     {
-        return $this->source->openSelection($this->copyBasicAttr(new ReadSelectionBuilder($this->source)));
+        if ($this->source instanceof \Jivoo\Data\RecordSource) {
+            return $this->source->openSelection($this);
+        }
+        return $this->source->readSelection($this);
     }
 }

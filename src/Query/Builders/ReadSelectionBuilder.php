@@ -360,6 +360,9 @@ class ReadSelectionBuilder extends SelectionBase implements \IteratorAggregate, 
      */
     public function getIterator()
     {
-        return $this->source->openSelection($this);
+        if ($this->source instanceof \Jivoo\Data\RecordSource) {
+            return $this->source->openSelection($this);
+        }
+        return $this->source->readSelection($this);
     }
 }
