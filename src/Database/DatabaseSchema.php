@@ -65,7 +65,7 @@ class DatabaseSchema implements \Jivoo\Data\Schema
     
     /**
      * Convert models in schema.
-     * 
+     *
      * @param \Jivoo\Data\Database\callable $callable A function that accepts
      * a {@see Model} and returns a {@see Model}.
      * @return self
