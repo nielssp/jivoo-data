@@ -43,12 +43,12 @@ $logger->addHandler(new CallbackHandler(function (array $record) {
 $loader->setLogger($logger);
 
 // Create schema for database using the above user table schema
-$schema = new DatabaseDefinitionBuilder([
+$definition = new DatabaseDefinitionBuilder([
     'User' => User::getDefinition()
 ]);
 
 // Connect to "default":
-$db = $loader->connect('default', $schema);
+$db = $loader->connect('default', $definition);
 
 echo '<pre>';
 

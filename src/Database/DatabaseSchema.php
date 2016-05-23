@@ -8,7 +8,7 @@ namespace Jivoo\Data\Database;
 use Jivoo\Data\Model;
 
 /**
- * A wrapper for another database driver.
+ * A database schema.
  */
 class DatabaseSchema implements \Jivoo\Data\Schema
 {
@@ -40,6 +40,9 @@ class DatabaseSchema implements \Jivoo\Data\Schema
         $this->definition = $database->getDefinition();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function __get($model)
     {
         if (!isset($this->models[$model])) {
@@ -52,11 +55,21 @@ class DatabaseSchema implements \Jivoo\Data\Schema
         return $this->models[$model];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function __isset($model)
     {
         return in_array($model, $this->getModels());
     }
     
+    /**
+     * Convert models in schema.
+     * 
+     * @param \Jivoo\Data\Database\callable $callable A function that accepts
+     * a {@see Model} and returns a {@see Model}.
+     * @return self
+     */
     public function map(callable $callable)
     {
         foreach ($this->getModels() as $model) {
@@ -65,6 +78,9 @@ class DatabaseSchema implements \Jivoo\Data\Schema
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getModels()
     {
         return $this->definition->getTables();
