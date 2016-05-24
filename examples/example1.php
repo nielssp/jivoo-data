@@ -42,7 +42,7 @@ $users = $db->User
   ->orderBy('created');
 
 foreach ($users as $user) {
-  echo h($user->username) . PHP_EOL;
+  echo $user->username . PHP_EOL;
 }
 
 echo '</pre>';

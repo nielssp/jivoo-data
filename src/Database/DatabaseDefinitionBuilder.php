@@ -23,18 +23,26 @@ class DatabaseDefinitionBuilder implements DatabaseDefinition
      * @var string[] List of table names.
      */
     private $tables = array();
+    
+    /**
+     * @var boolean
+     */
+    private $dynamic = false;
 
     /**
      * Construct database definition.
      *
      * @param Definition[]|DatabaseDefinition $definitions Associative array of
      * table names and definitions or another instance of {@see DatabaseDefinition}.
+     * @param boolean $dynamic
      */
-    public function __construct($definitions = array())
+    public function __construct($definitions = array(), $dynamic = false)
     {
+        $this->dynamic = $dynamic;
         if ($definitions instanceof DatabaseDefinitionBuilder) {
             $this->tables = $definitions->tables;
             $this->definitions = $definitions->definitions;
+            $this->dynamic = $definitions->dynamic;
         } elseif ($definitions instanceof DatabaseDefinition) {
             foreach ($definitions->getTables() as $table) {
                 $this->addDefinition($table, $definitions->getDefinition($table));
@@ -61,7 +69,12 @@ class DatabaseDefinitionBuilder implements DatabaseDefinition
     {
         if (isset($this->definitions[$table])) {
             return $this->definitions[$table];
+        } elseif ($this->dynamic) {
+            $this->addDefinition($table, new \Jivoo\Data\DefinitionBuilder());
+            return $this->definitions[$table];
         }
+        echo $table;
+        exit;
         return null;
     }
 
