@@ -28,8 +28,12 @@ $logger->addHandler(new CallbackHandler(function (array $record) {
 }));
 $loader->setLogger($logger);
 
+$definition = new Jivoo\Data\Database\DatabaseDefinitionBuilder();
+$definition->addDefinition('User', Jivoo\Data\DefinitionBuilder::auto(['username', 'created']));
+
 // Connect to "default":
-$db = new \Jivoo\Data\Database\DatabaseSchema($loader->connect('default'));
+$db = new \Jivoo\Data\Database\DatabaseSchema($loader->connect('default', $definition));
+
 
 echo '<pre>';
 

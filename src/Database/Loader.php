@@ -243,7 +243,7 @@ class Loader implements LoggerAware
             $class = 'Jivoo\Data\Database\Drivers\\' . $driver . '\\' . $driver . 'Database';
             Assume::isSubclassOf($class, 'Jivoo\Data\Database\LoadableDatabase');
             if (! isset($definition)) {
-                $definition = new DatabaseDefinitionBuilder([], true);
+                $definition = new DatabaseDefinitionBuilder([]);
             }
             $object = new $class($definition, $config);
             $object->setLogger($this->logger);

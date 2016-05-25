@@ -23,7 +23,7 @@ interface DatabaseDefinition
      *
      * @param string $table
      *            Table name.
-     * @return \Jivoo\Data\Definition Table definition.
+     * @return \Jivoo\Data\Definition|null Table definition if defined.
      */
     public function getDefinition($table);
 }

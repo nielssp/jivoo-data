@@ -46,10 +46,14 @@ class DatabaseSchema implements \Jivoo\Data\Schema
     public function __get($model)
     {
         if (!isset($this->models[$model])) {
+            $definition = $this->definition->getDefinition($model);
+            if (! isset($definition)) {
+                throw new \Jivoo\Data\UndefinedModelException('Undefined model: ' . $model);
+            }
             $this->models[$model] = new \Jivoo\Data\SimpleModel(
                 $model,
                 $this->database->$model,
-                $this->definition->getDefinition($model)
+                $definition
             );
         }
         return $this->models[$model];

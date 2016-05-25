@@ -17,6 +17,7 @@ interface Schema
      * @param string $model
      *            Model name
      * @return Modle Model.
+     * @throws UndefinedModelException If model is undefined.
      */
     public function __get($model);
 

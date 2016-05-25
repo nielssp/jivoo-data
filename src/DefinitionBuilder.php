@@ -268,4 +268,19 @@ class DefinitionBuilder implements Definition
         }
         return false;
     }
+    
+    /**
+     * Create a definition from the provided field names.
+     *
+     * @param string[] $fields Field names.
+     * @return DefinitionBuilder
+     */
+    public static function auto(array $fields)
+    {
+        $definition = new DefinitionBuilder();
+        foreach ($fields as $field) {
+            $definition->$field = DataType::text(true);
+        }
+        return $definition;
+    }
 }
