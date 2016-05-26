@@ -5,37 +5,32 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\ActiveModel;
 
-use Jivoo\EventListener;
-use Jivoo\Event;
-use Jivoo\Models\ModelBase;
-use Jivoo\App;
-use Jivoo\Utilities;
-use Jivoo\Models\Selection\UpdateSelectionBuilder;
-use Jivoo\Models\Selection\DeleteSelectionBuilder;
-use Jivoo\Models\Selection\ReadSelectionBuilder;
-use Jivoo\Models\Validation\ValidatorBuilder;
-use Jivoo\Data\Database\ResultSetIterator;
-use Jivoo\Models\DataType;
-use Jivoo\Models\Condition\ConditionBuilder;
-use Jivoo\Models\Selection\BasicSelectionBase;
-use Jivoo\Models\Selection\SelectionBuilder;
-use Jivoo\Models\Selection\ReadSelection;
-use Jivoo\Models\RecordBuilder;
-use Jivoo\Data\Database\InvalidTableException;
 use Jivoo\Assume;
-use Jivoo\Data\Database\Loader;
+use Jivoo\Data\Database\InvalidTableException;
+use Jivoo\Data\Database\ResultSetIterator;
+use Jivoo\Data\Database\Table;
+use Jivoo\Data\DataType;
+use Jivoo\Data\ModelBase;
+use Jivoo\Data\Query\Builders\DeleteSelectionBuilder;
+use Jivoo\Data\Query\Builders\ReadSelectionBuilder;
+use Jivoo\Data\Query\Builders\SelectionBuilder;
+use Jivoo\Data\Query\Builders\UpdateSelectionBuilder;
+use Jivoo\Data\Query\ReadSelection;
+use Jivoo\Data\Query\Selection;
+use Jivoo\Data\RecordBuilder;
+use Jivoo\Data\Schema;
+use Jivoo\Data\Validation\Validator;
+use Jivoo\Data\Validation\ValidatorBuilder;
+use Jivoo\EventListener;
+use Jivoo\I18n\I18n;
 use Jivoo\InvalidMethodException;
+use Jivoo\Utilities;
 
 /**
  * An active model containing active records, see also {@see ActiveRecord}.
  */
 abstract class ActiveModel extends ModelBase implements EventListener
 {
-
-    /**
-     * @var string Name of database used by model.
-     */
-    protected $schema = 'default';
 
     /**
      * @var string Name of database table used by model, null for default based
@@ -139,6 +134,11 @@ abstract class ActiveModel extends ModelBase implements EventListener
     private $schema;
 
     /**
+     * @var \Jivoo\Data\Definition Model definition.
+     */
+    private $definition;
+
+    /**
      * @var string[] Names of all model fields.
      */
     private $fields = array();
@@ -198,7 +198,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
      * @throws InvalidAssociationException If association models are invalid.
      * @throws InvalidMixinException If a mixin is invalid.
      */
-    final public function __construct(\Jivoo\Data\Schema $schema)
+    final public function __construct(Schema $schema)
     {
         $this->name = Utilities::getClassName(get_class($this));
         $this->schema = $schema;
@@ -211,15 +211,15 @@ abstract class ActiveModel extends ModelBase implements EventListener
         }
         $this->source = $this->schema->$table;
         
-        $this->schema = $this->source->getSchema();
-        if (! isset($this->schema)) {
+        $this->definition = $this->source->getDefinition();
+        if (! isset($this->definition)) {
             throw new InvalidTableException('Definition for table "' . $table . '" not found');
         }
-        $pk = $this->schema->getPrimaryKey();
+        $pk = $this->definition->getPrimaryKey();
         if (count($pk) == 1) {
             $pk = $pk[0];
             $this->primaryKey = $pk;
-            $type = $this->schema->$pk;
+            $type = $this->definition->$pk;
             if ($type->isInteger() and $type->autoIncrement) {
                 $this->aiPrimaryKey = $pk;
             }
@@ -227,7 +227,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
             throw new InvalidActiveModelException('ActiveModel does not support multi-field primary keys');
         }
         
-        $this->nonVirtualFields = $this->schema->getFields();
+        $this->nonVirtualFields = $this->definition->getFields();
         $this->fields = $this->nonVirtualFields;
         foreach ($this->virtual as $field) {
             $this->fields[] = $field;
@@ -235,10 +235,10 @@ abstract class ActiveModel extends ModelBase implements EventListener
         }
         
         $this->validator = new ValidatorBuilder($this, $this->validate);
-        $this->schema->createValidationRules($this->validator);
+        $this->definition->createValidationRules($this->validator);
         
         foreach ($this->nonVirtualFields as $field) {
-            $type = $this->schema->$field;
+            $type = $this->definition->$field;
             if (isset($type->default)) {
                 $this->defaults[$field] = $type->default;
             }
@@ -272,8 +272,6 @@ abstract class ActiveModel extends ModelBase implements EventListener
                 );
             }
         }
-        
-        $this->schema->$table = $this;
         
         $this->init();
     }
@@ -403,11 +401,11 @@ abstract class ActiveModel extends ModelBase implements EventListener
     }
 
     /**
-     * Get name of associated database.
+     * Get name of associated schema.
      *
-     * @return string Name of database connection.
+     * @return Schema
      */
-    public function getDatabase()
+    public function getSchema()
     {
         return $this->schema;
     }
@@ -687,9 +685,9 @@ abstract class ActiveModel extends ModelBase implements EventListener
     /**
      * {@inheritdoc}
      */
-    public function getSchema()
+    public function getDefinition()
     {
-        return $this->schema;
+        return $this->definition;
     }
 
     /**
