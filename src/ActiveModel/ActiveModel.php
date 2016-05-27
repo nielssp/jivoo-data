@@ -22,7 +22,6 @@ use Jivoo\Data\Schema;
 use Jivoo\Data\Validation\Validator;
 use Jivoo\Data\Validation\ValidatorBuilder;
 use Jivoo\EventListener;
-use Jivoo\I18n\I18n;
 use Jivoo\InvalidMethodException;
 use Jivoo\Utilities;
 

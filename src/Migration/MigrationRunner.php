@@ -30,7 +30,7 @@ class MigrationRunner
     private $definition;
 
     /**
-     * @var MigrationSchema[] Array of schemas.
+     * @var MigrationDefinition[] Array of schemas.
      */
     private $migrationSchemas = array();
 
@@ -251,7 +251,7 @@ class MigrationRunner
         
         // The migration schema keeps track of the state of the database
         if (! isset($this->migrationSchemas[$dbName])) {
-            $this->migrationSchemas[$dbName] = new MigrationSchema($db);
+            $this->migrationSchemas[$dbName] = new MigrationDefinition($db);
         }
         $migrationSchema = $this->migrationSchemas[$dbName];
         

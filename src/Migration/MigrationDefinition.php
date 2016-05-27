@@ -13,15 +13,15 @@ use Jivoo\Models\DataType;
 use Jivoo\Models\Schema;
 
 /**
- * A modifiable database schema for use with migrations.
+ * A modifiable database definitiion for use with migrations.
  */
-class MigrationSchema implements DatabaseDefinition, Migratable
+class MigrationDefinition implements DatabaseDefinition, Migratable
 {
 
     /**
-     * @var DatabaseDefinition Target schema.
+     * @var DatabaseDefinition Target definition.
      */
-    private $targetSchema;
+    private $targetDefinition;
 
     /**
      * @var MigratableDatabase Database.
@@ -29,9 +29,9 @@ class MigrationSchema implements DatabaseDefinition, Migratable
     private $db;
 
     /**
-     * @var Schema[] List of table schemas
+     * @var \Jivoo\Data\Definition[] List of table definitions
      */
-    private $schemas = array();
+    private $definitions = array();
 
     /**
      * @var string[] List of table names.
@@ -39,39 +39,38 @@ class MigrationSchema implements DatabaseDefinition, Migratable
     private $tables = array();
 
     /**
-     * Construct migration schema.
+     * Construct migration definition.
      *
-     * @param
-     *            MigratableDatabase The database to migrate.
+     * @param MigratableDatabase $db The database to migrate.
      */
     public function __construct(MigratableDatabase $db)
     {
         $this->db = $db;
-        $this->targetSchema = $db->getSchema();
-        $db->refreshSchema();
-        $current = $db->getSchema();
+        $this->targetDefinition = $db->getDefinition();
+        $db->refreshDefinition();
+        $current = $db->getDefinition();
         foreach ($current->getTables() as $table) {
             $this->tables[] = $table;
-            $this->schemas[$table] = $current->getSchema($table);
+            $this->definitions[$table] = $current->getDefinition($table);
         }
-        $db->setSchema($this);
+        $db->setDefinition($this);
     }
 
     /**
-     * Finalize migration, sets target schema on database.
+     * Finalize migration, sets target definition on database.
      */
     public function finalize()
     {
-        $this->db->setSchema($this->targetSchema);
+        $this->db->getDefinition($this->targetDefinition);
     }
 
     /**
-     * Updates the schema of the associated database to match this migration
-     * schema.
+     * Updates the definition of the associated database to match this migration
+     * definition.
      */
     private function reload()
     {
-        $this->db->setSchema($this);
+        $this->db->getDefinition($this);
     }
 
     /**
@@ -85,10 +84,10 @@ class MigrationSchema implements DatabaseDefinition, Migratable
     /**
      * {@inheritdoc}
      */
-    public function getSchema($table)
+    public function getDefinition($table)
     {
-        if (isset($this->schemas[$table])) {
-            return $this->schemas[$table];
+        if (isset($this->definitions[$table])) {
+            return $this->definitions[$table];
         }
         return null;
     }
@@ -96,19 +95,18 @@ class MigrationSchema implements DatabaseDefinition, Migratable
     /**
      * {@inheritdoc}
      */
-    public function addSchema(Definition $schema)
+    public function addDefinition($table, Definition $definition)
     {
-        $this->schemas[$schema->getName()] = $schema;
+        $this->definitions[$table] = $definition;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createTable(DefinitionBuilder $schema)
+    public function createTable($table, Definition $definition)
     {
-        $table = $schema->getName();
         $this->tables[] = $table;
-        $this->schemas[$table] = $schema;
+        $this->definitions[$table] = $definition;
         $this->reload();
     }
 
@@ -120,10 +118,10 @@ class MigrationSchema implements DatabaseDefinition, Migratable
         $this->tables = array_diff($this->tables, array(
             $table
         ));
-        $schema = $this->schemas[$table];
+        $definition = $this->definitions[$table];
         // TODO: Change name somehow...
-        unset($this->schemas[$table]);
-        $this->schemas[$newName] = $schema;
+        unset($this->definitions[$table]);
+        $this->definitions[$newName] = $definition;
         $this->reload();
     }
 
@@ -135,7 +133,7 @@ class MigrationSchema implements DatabaseDefinition, Migratable
         $this->tables = array_diff($this->tables, array(
             $table
         ));
-        unset($this->schemas[$table]);
+        unset($this->definitions[$table]);
         $this->reload();
     }
 
@@ -144,7 +142,7 @@ class MigrationSchema implements DatabaseDefinition, Migratable
      */
     public function addColumn($table, $column, DataType $type)
     {
-        $this->schemas[$table]->$column = $type;
+        $this->definitions[$table]->$column = $type;
     }
 
     /**
@@ -152,7 +150,7 @@ class MigrationSchema implements DatabaseDefinition, Migratable
      */
     public function deleteColumn($table, $column)
     {
-        unset($this->schemas[$table]->$column);
+        unset($this->definitions[$table]->$column);
     }
 
     /**
@@ -160,25 +158,25 @@ class MigrationSchema implements DatabaseDefinition, Migratable
      */
     public function alterColumn($table, $column, DataType $type)
     {
-        $this->schemas[$table]->$column = $type;
+        $this->definitions[$table]->$column = $type;
     }
 
     public function renameColumn($table, $column, $newName)
     {
-        $type = $this->schemas[$table]->$column;
-        unset($this->schemas[$table]->$column);
-        $this->schemas[$table]->$newName = $type;
+        $type = $this->definitions[$table]->$column;
+        unset($this->definitions[$table]->$column);
+        $this->definitions[$table]->$newName = $type;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createIndex($table, $index, $options = array())
+    public function createIndex($table, $index, array $columns, $unique = false)
     {
-        if ($options['unique']) {
-            $this->schemas[$table]->addUnique($index, $options['columns']);
+        if ($unique) {
+            $this->definitions[$table]->addUnique($index, $columns);
         } else {
-            $this->schemas[$table]->addIndex($index, $options['columns']);
+            $this->definitions[$table]->addIndex($index, $columns);
         }
     }
 
@@ -187,15 +185,15 @@ class MigrationSchema implements DatabaseDefinition, Migratable
      */
     public function deleteIndex($table, $index)
     {
-        $this->schemas[$table]->removeIndex($index);
+        $this->definitions[$table]->removeIndex($index);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function alterIndex($table, $index, $options = array())
+    public function alterIndex($table, $index, array $columns, $unique = false)
     {
         $this->delteIndex($table, $index);
-        $this->createIndex($table, $index, $options);
+        $this->createIndex($table, $index, $columns, $unique);
     }
 }

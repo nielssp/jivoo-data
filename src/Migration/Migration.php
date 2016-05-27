@@ -21,7 +21,7 @@ abstract class Migration
     private $db = null;
 
     /**
-     * @var MigrationSchema Schema.
+     * @var MigrationDefinition Schema.
      */
     private $schema = null;
 
@@ -35,10 +35,10 @@ abstract class Migration
      *
      * @param MigratableDatabase $db
      *            Database to run migration on.
-     * @param MigrationSchema $schema
+     * @param MigrationDefinition $schema
      *            A migration schema.
      */
-    final public function __construct(MigratableDatabase $db, MigrationSchema $schema)
+    final public function __construct(MigratableDatabase $db, MigrationDefinition $schema)
     {
         $this->db = $db;
         $this->schema = $schema;
