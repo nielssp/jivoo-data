@@ -13,13 +13,13 @@ use Jivoo\Models\DataType;
 use Jivoo\Models\Schema;
 
 /**
- * A modifiable database schema for use with migrations.
+ * A modifiable database definitiion for use with migrations.
  */
 class MigrationDefinition implements DatabaseDefinition, Migratable
 {
 
     /**
-     * @var DatabaseDefinition Target schema.
+     * @var DatabaseDefinition Target definition.
      */
     private $targetDefinition;
 
@@ -29,7 +29,7 @@ class MigrationDefinition implements DatabaseDefinition, Migratable
     private $db;
 
     /**
-     * @var Definition[] List of table schemas
+     * @var \Jivoo\Data\Definition[] List of table definitions
      */
     private $definitions = array();
 
@@ -39,10 +39,9 @@ class MigrationDefinition implements DatabaseDefinition, Migratable
     private $tables = array();
 
     /**
-     * Construct migration schema.
+     * Construct migration definition.
      *
-     * @param
-     *            MigratableDatabase The database to migrate.
+     * @param MigratableDatabase $db The database to migrate.
      */
     public function __construct(MigratableDatabase $db)
     {
@@ -58,7 +57,7 @@ class MigrationDefinition implements DatabaseDefinition, Migratable
     }
 
     /**
-     * Finalize migration, sets target schema on database.
+     * Finalize migration, sets target definition on database.
      */
     public function finalize()
     {
@@ -66,8 +65,8 @@ class MigrationDefinition implements DatabaseDefinition, Migratable
     }
 
     /**
-     * Updates the schema of the associated database to match this migration
-     * schema.
+     * Updates the definition of the associated database to match this migration
+     * definition.
      */
     private function reload()
     {
