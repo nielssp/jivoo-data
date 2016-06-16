@@ -236,7 +236,7 @@ class PostgresqlTypeAdapterTest extends SqlTestBase
         $adapter->renameColumn('Foo', 'b', 'd');
     }
     
-    public function testCreateIndex()
+    public function testCreateKey()
     {
         $db = $this->getDb();
         $adapter = new PostgresqlTypeAdapter($db);
@@ -249,12 +249,12 @@ class PostgresqlTypeAdapterTest extends SqlTestBase
                 [$this->equalTo('CREATE INDEX "foo_bar_id_foo" ON {FooBar} (id, foo)')]
             );
         
-        $adapter->createIndex('FooBar', 'PRIMARY', ['id']);
-        $adapter->createIndex('FooBar', 'foo', ['foo']);
-        $adapter->createIndex('FooBar', 'id_foo', ['id', 'foo'], false);
+        $adapter->createKey('FooBar', 'PRIMARY', ['id']);
+        $adapter->createKey('FooBar', 'foo', ['foo']);
+        $adapter->createKey('FooBar', 'id_foo', ['id', 'foo'], false);
     }
     
-    public function testDeleteIndex()
+    public function testDeleteKey()
     {
         $db = $this->getDb();
         $adapter = new PostgresqlTypeAdapter($db);
@@ -266,11 +266,11 @@ class PostgresqlTypeAdapterTest extends SqlTestBase
                 [$this->equalTo('DROP INDEX "foo_bar_foo"')]
             );
         
-        $adapter->deleteIndex('FooBar', 'PRIMARY');
-        $adapter->deleteIndex('FooBar', 'foo');
+        $adapter->deleteKey('FooBar', 'PRIMARY');
+        $adapter->deleteKey('FooBar', 'foo');
     }
     
-    public function testAlterIndex()
+    public function testAlterKey()
     {
         $db = $this->getDb();
         $adapter = new PostgresqlTypeAdapter($db);
@@ -286,8 +286,8 @@ class PostgresqlTypeAdapterTest extends SqlTestBase
                 [$this->equalTo('CREATE INDEX "foo_bar_id_foo" ON {FooBar} (id, foo)')]
             );
         
-        $adapter->alterIndex('FooBar', 'PRIMARY', ['id']);
-        $adapter->alterIndex('FooBar', 'foo', ['foo']);
-        $adapter->alterIndex('FooBar', 'id_foo', ['id', 'foo'], false);
+        $adapter->alterKey('FooBar', 'PRIMARY', ['id']);
+        $adapter->alterKey('FooBar', 'foo', ['foo']);
+        $adapter->alterKey('FooBar', 'id_foo', ['id', 'foo'], false);
     }
 }

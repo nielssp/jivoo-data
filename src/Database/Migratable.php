@@ -89,40 +89,40 @@ interface Migratable
     public function renameColumn($table, $column, $newName);
 
     /**
-     * Create an index.
+     * Create a key.
      *
      * @param string $table
      *            Table name.
-     * @param string $index
-     *            Index name.
+     * @param string $key
+     *            Key name.
      * @param string[] $columns
      *            Columns.
      * @param bool $unique
      *            Uniqueness.
      */
-    public function createIndex($table, $index, array $columns, $unique = true);
+    public function createKey($table, $key, array $columns, $unique = true);
 
     /**
-     * Delete an index
+     * Delete a key.
      *
      * @param string $table
      *            Table name.
-     * @param string $index
-     *            Index name.
+     * @param string $key
+     *            Key name.
      */
-    public function deleteIndex($table, $index);
+    public function deleteKey($table, $key);
 
     /**
-     * Alter an index.
+     * Alter a key.
      *
      * @param string $table
      *            Table name.
-     * @param string $index
-     *            Index name.
+     * @param string $key
+     *            Key name.
      * @param string[] $columns
      *            Columns.
      * @param bool $unique
      *            Uniqueness.
      */
-    public function alterIndex($table, $index, array $columns, $unique = true);
+    public function alterKey($table, $key, array $columns, $unique = true);
 }

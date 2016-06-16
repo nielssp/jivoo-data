@@ -112,9 +112,9 @@ class DefinitionBuilder implements Definition
         foreach ($this->fields as $field => $type) {
             $type->createValidationRules($validator->$field);
         }
-        foreach ($this->keys as $index) {
-            if ($index['unique'] and count($index['columns']) == 1) {
-                $field = $index['columns'][0];
+        foreach ($this->keys as $key) {
+            if ($key['unique'] and count($key['columns']) == 1) {
+                $field = $key['columns'][0];
                 $validator->$field->unique = true;
             }
         }
@@ -237,12 +237,12 @@ class DefinitionBuilder implements Definition
     }
 
     /**
-     * Remove an index.
+     * Remove a key.
      *
      * @param string $name
-     *            Index name.
+     *            Key name.
      */
-    public function removeIndex($name)
+    public function removeKey($name)
     {
         unset($this->keys[$name]);
     }

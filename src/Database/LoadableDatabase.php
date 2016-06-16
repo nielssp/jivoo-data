@@ -242,24 +242,24 @@ abstract class LoadableDatabase implements MigratableDatabase, \Psr\Log\LoggerAw
     /**
      * {@inheritdoc}
      */
-    public function createIndex($table, $index, array $columns, $unique = true)
+    public function createKey($table, $key, array $columns, $unique = true)
     {
-        $this->migrationAdapter->createIndex($table, $index, $columns, $unique);
+        $this->migrationAdapter->createKey($table, $key, $columns, $unique);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function deleteIndex($table, $index)
+    public function deleteKey($table, $key)
     {
-        $this->migrationAdapter->deleteIndex($table, $index);
+        $this->migrationAdapter->deleteKey($table, $key);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function alterIndex($table, $index, array $columns, $unique = true)
+    public function alterKey($table, $key, array $columns, $unique = true)
     {
-        $this->migrationAdapter->alterIndex($table, $index, $columns, $unique);
+        $this->migrationAdapter->alterKey($table, $key, $columns, $unique);
     }
 }

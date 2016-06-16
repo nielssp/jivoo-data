@@ -228,15 +228,15 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
             $schema->$column = $this->toDataType($row);
         }
         $result = $this->db->query('SHOW INDEX FROM `' . $this->db->tableName($table) . '`');
-        $indexes = array();
+        $keys = array();
         while ($row = $result->fetchAssoc()) {
-            $index = $row['Key_name'];
+            $key = $row['Key_name'];
             $column = $row['Column_name'];
             $unique = $row['Non_unique'] == 0 ? true : false;
-            if (isset($indexes[$index])) {
-                $indexes[$index]['columns'][] = $column;
+            if (isset($keys[$key])) {
+                $keys[$key]['columns'][] = $column;
             } else {
-                $indexes[$index] = array(
+                $keys[$key] = array(
                     'columns' => array(
                         $column
                     ),
@@ -244,11 +244,11 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
                 );
             }
         }
-        foreach ($indexes as $name => $index) {
-            if ($index['unique']) {
-                $schema->addUnique($index['columns'], $name);
+        foreach ($keys as $name => $key) {
+            if ($key['unique']) {
+                $schema->addUnique($key['columns'], $name);
             } else {
-                $schema->addKey($index['columns'], $name);
+                $schema->addKey($key['columns'], $name);
             }
         }
         return $schema;
@@ -378,15 +378,15 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function createIndex($table, $index, array $columns, $unique = true)
+    public function createKey($table, $key, array $columns, $unique = true)
     {
         $sql = 'ALTER TABLE `' . $this->db->tableName($table) . '`';
-        if ($index == 'PRIMARY') {
+        if ($key == 'PRIMARY') {
             $sql .= ' ADD PRIMARY KEY';
         } elseif ($unique) {
-            $sql .= ' ADD UNIQUE ' . $index;
+            $sql .= ' ADD UNIQUE ' . $key;
         } else {
-            $sql .= ' ADD INDEX ' . $index;
+            $sql .= ' ADD INDEX ' . $key;
         }
         $sql .= ' (';
         $sql .= implode(', ', $columns);
@@ -397,13 +397,13 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function deleteIndex($table, $index)
+    public function deleteKey($table, $key)
     {
         $sql = 'ALTER TABLE `' . $this->db->tableName($table) . '`';
-        if ($index == 'PRIMARY') {
+        if ($key == 'PRIMARY') {
             $sql .= ' DROP PRIMARY KEY';
         } else {
-            $sql .= ' DROP INDEX ' . $index;
+            $sql .= ' DROP INDEX ' . $key;
         }
         $this->db->execute($sql);
     }
@@ -411,21 +411,21 @@ class MysqlTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function alterIndex($table, $index, array $columns, $unique = true)
+    public function alterKey($table, $key, array $columns, $unique = true)
     {
         $sql = 'ALTER TABLE `' . $this->db->tableName($table) . '`';
-        if ($index == 'PRIMARY') {
+        if ($key == 'PRIMARY') {
             $sql .= ' DROP PRIMARY KEY';
         } else {
-            $sql .= ' DROP INDEX ' . $index;
+            $sql .= ' DROP INDEX ' . $key;
         }
         $sql .= ', ';
-        if ($index == 'PRIMARY') {
+        if ($key == 'PRIMARY') {
             $sql .= 'ADD PRIMARY KEY';
         } elseif ($unique) {
-            $sql .= 'ADD UNIQUE ' . $index;
+            $sql .= 'ADD UNIQUE ' . $key;
         } else {
-            $sql .= 'ADD INDEX ' . $index;
+            $sql .= 'ADD INDEX ' . $key;
         }
         $sql .= ' (';
         $sql .= implode(', ', $columns);

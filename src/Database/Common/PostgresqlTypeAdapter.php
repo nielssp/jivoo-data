@@ -427,7 +427,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function createIndex($table, $index, array $columns, $unique = true)
+    public function createKey($table, $key, array $columns, $unique = true)
     {
         $columns = array_map(array(
             $this->db,
@@ -435,7 +435,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
         ), $columns);
         $columns = '(' . implode(', ', $columns) . ')';
         
-        if ($index == 'PRIMARY') {
+        if ($key == 'PRIMARY') {
             $sql = 'ALTER TABLE ' . $this->db->quoteModel($table);
             $sql .= ' ADD CONSTRAINT "' . $this->db->tableName($table) . '_PRIMARY" PRIMARY KEY ' . $columns;
             $this->db->execute($sql);
@@ -445,7 +445,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
         if ($unique) {
             $sql .= ' UNIQUE';
         }
-        $sql .= ' INDEX "' . $this->db->tableName($table) . '_' . $index . '"';
+        $sql .= ' INDEX "' . $this->db->tableName($table) . '_' . $key . '"';
         $sql .= ' ON ' . $this->db->quoteModel($table);
         $sql .= ' ' . $columns;
         $this->db->execute($sql);
@@ -454,9 +454,9 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function deleteIndex($table, $index)
+    public function deleteKey($table, $key)
     {
-        if ($index == 'PRIMARY') {
+        if ($key == 'PRIMARY') {
             $sql = 'ALTER TABLE ' . $this->db->quoteModel($table);
             $sql .= ' DROP CONSTRAINT "' . $this->db->tableName($table) . '_PRIMARY"';
             $this->db->execute($sql);
@@ -464,19 +464,19 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
         }
         
         $sql = 'DROP INDEX ';
-        $sql .= '"' . $this->db->tableName($table) . '_' . $index . '"';
+        $sql .= '"' . $this->db->tableName($table) . '_' . $key . '"';
         $this->db->execute($sql);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function alterIndex($table, $index, array $columns, $unique = true)
+    public function alterKey($table, $key, array $columns, $unique = true)
     {
         try {
             $this->db->beginTransaction();
-            $this->deleteIndex($table, $index);
-            $this->createIndex($table, $index, $columns, $unique);
+            $this->deleteKey($table, $key);
+            $this->createKey($table, $key, $columns, $unique);
             $this->db->commit();
         } catch (\Exception $e) {
             $this->db->rollback();

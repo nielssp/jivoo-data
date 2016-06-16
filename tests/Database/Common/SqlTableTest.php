@@ -32,7 +32,7 @@ class SqlTableTest extends SqlTestBase
                 [$this->equalTo('SELECT DISTINCT a FROM {Foo}')],
                 [$this->equalTo('SELECT {Foo}.*, 2 + 2 AS ans FROM {Foo}')]
             )
-            ->willReturn($this->getMock('Jivoo\Data\Database\ResultSet'));
+            ->willReturn($this->getMockBuilder('Jivoo\Data\Database\ResultSet')->getMock());
         $selection->toArray();
         
         // Select with a predicate and ordering

@@ -210,19 +210,19 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
         $definition->setPrimaryKey($primaryKey);
         $result = $this->db->query('PRAGMA index_list("' . $this->db->tableName($table) . '")');
         while ($row = $result->fetchAssoc()) {
-            $index = $row['name'];
+            $key = $row['name'];
             $unique = $row['unique'] == 1;
             $name = preg_replace(
                 '/^' . preg_quote($this->db->tableName($table) . '_', '/') . '/',
                 '',
-                $index,
+                $key,
                 1,
                 $count
             );
             if ($count == 0) {
                 continue;
             }
-            $columnResult = $this->db->query('PRAGMA index_info("' . $index . '")');
+            $columnResult = $this->db->query('PRAGMA index_info("' . $key . '")');
             $columns = array();
             while ($row = $columnResult->fetchAssoc()) {
                 $columns[] = $row['name'];
@@ -442,14 +442,14 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function createIndex($table, $index, array $columns, $unique = true)
+    public function createKey($table, $key, array $columns, $unique = true)
     {
         $sql = 'CREATE';
         if ($unique) {
             $sql .= ' UNIQUE';
         }
         $sql .= ' INDEX "';
-        $sql .= $this->db->tableName($table) . '_' . $index;
+        $sql .= $this->db->tableName($table) . '_' . $key;
         $sql .= '" ON "' . $this->db->tableName($table);
         $sql .= '" (';
         $sql .= implode(', ', $columns) . ')';
@@ -459,22 +459,22 @@ class SqliteTypeAdapter implements MigrationTypeAdapter
     /**
      * {@inheritdoc}
      */
-    public function deleteIndex($table, $index)
+    public function deleteKey($table, $key)
     {
         $sql = 'DROP INDEX "';
-        $sql .= $this->db->tableName($table) . '_' . $index . '"';
+        $sql .= $this->db->tableName($table) . '_' . $key . '"';
         $this->db->execute($sql);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function alterIndex($table, $index, array $columns, $unique = true)
+    public function alterKey($table, $key, array $columns, $unique = true)
     {
         try {
             $this->db->beginTransaction();
-            $this->deleteIndex($table, $index);
-            $this->createIndex($table, $index, $columns, $unique);
+            $this->deleteKey($table, $key);
+            $this->createKey($table, $key, $columns, $unique);
             $this->db->commit();
         } catch (\Exception $e) {
             $this->db->rollback();

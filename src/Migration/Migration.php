@@ -21,7 +21,7 @@ abstract class Migration
     private $db = null;
 
     /**
-     * @var MigrationSchema Schema.
+     * @var MigrationDefinition Schema.
      */
     private $schema = null;
 
@@ -35,10 +35,10 @@ abstract class Migration
      *
      * @param MigratableDatabase $db
      *            Database to run migration on.
-     * @param MigrationSchema $schema
+     * @param MigrationDefinition $schema
      *            A migration schema.
      */
-    final public function __construct(MigratableDatabase $db, MigrationSchema $schema)
+    final public function __construct(MigratableDatabase $db, MigrationDefinition $schema)
     {
         $this->db = $db;
         $this->schema = $schema;
@@ -191,21 +191,21 @@ abstract class Migration
     }
 
     /**
-     * Create an index.
+     * Create a key.
      *
      * @param string $table
      *            Table name.
-     * @param string $index
-     *            Index name.
+     * @param string $key
+     *            Key name.
      * @param array $options
      *            Associative array of index options, with keys
      *            'unique' and 'columns'.
      */
-    protected function createIndex($table, $index, $options = array())
+    protected function createKey($table, $key, $options = array())
     {
         try {
-            $this->db->createIndex($table, $index, $options);
-            $this->schema->createIndex($table, $index, $options);
+            $this->db->createKey($table, $key, $options);
+            $this->schema->createKey($table, $key, $options);
         } catch (\Exception $e) {
             if (! $this->ignoreExceptions) {
                 throw $e;
@@ -214,18 +214,18 @@ abstract class Migration
     }
 
     /**
-     * Delete an index.
+     * Delete a key.
      *
      * @param string $table
      *            Table name.
-     * @param string $index
-     *            Index name.
+     * @param string $key
+     *            Key name.
      */
-    protected function deleteIndex($table, $index)
+    protected function deleteKey($table, $key)
     {
         try {
-            $this->db->deleteIndex($table, $index);
-            $this->schema->deleteIndex($table, $index);
+            $this->db->deleteKey($table, $key);
+            $this->schema->deleteKey($table, $key);
         } catch (\Exception $e) {
             if (! $this->ignoreExceptions) {
                 throw $e;
@@ -234,22 +234,22 @@ abstract class Migration
     }
 
     /**
-     * Alter an index.
+     * Alter a key.
      *
      * @param string $table
      *            Table name.
-     * @param string $index
-     *            Index name.
+     * @param string $key
+     *            Ket name.
      * @param array $options
      *            Associative array of index options, with keys
      *            'unique' and 'columns'.
      * @throws \Exception
      */
-    protected function alterIndex($table, $index, $options = array())
+    protected function alterKey($table, $key, $options = array())
     {
         try {
-            $this->alterIndex($table, $index, $options);
-            $this->schema->alterIndex($table, $index, $options);
+            $this->alterKey($table, $key, $options);
+            $this->schema->alterKey($table, $key, $options);
         } catch (\Exception $e) {
             if (! $this->ignoreExceptions) {
                 throw $e;
