@@ -229,7 +229,7 @@ class Loader implements LoggerAware
                 throw new ConfigurationException('Database "' . $name . '" not configured');
             }
             $config = $this->config->getSubset($name);
-        } else if (is_array($name)) {
+        } elseif (is_array($name)) {
             $config = new Document($name);
             unset($name);
         } else {
