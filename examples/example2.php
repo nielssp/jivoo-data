@@ -1,29 +1,22 @@
 <?php
-use Jivoo\Store\Document;
-use Jivoo\Data\DataType;
+
 use Jivoo\Data\Database\DatabaseDefinitionBuilder;
-use Jivoo\Data\Database\SchemaBuilder;
+use Jivoo\Data\Database\DatabaseSchema;
 use Jivoo\Data\Database\Loader;
-use Jivoo\Log\Logger;
+use Jivoo\Data\DataType;
+use Jivoo\Data\DefinitionBuilder;
 use Jivoo\Log\CallbackHandler;
+use Jivoo\Log\Logger;
 
 // Include Jivoo by using composer:
 require '../vendor/autoload.php';
 
-// Initialize database loader with connection settings for "default" database:
-$loader = new Loader(new Document(array(
-  'default' => array(
-    'driver' => 'PdoMysql',
-    'server' => 'localhost',
-    'username' => 'jivoo',
-    'database' => 'jivoo',
-    'tablePrefix' => 'test_'
-  )
-)));
+// Initialize database loader
+$loader = new Loader();
 
 class User {
     public static function getDefinition() {
-        $def = new \Jivoo\Data\DefinitionBuilder();
+        $def = new DefinitionBuilder();
         $def->addAutoIncrementId(); // Autoincrementing INT id
         $def->username = DataType::string(255); // Username VARCHAR(255)
         $def->password = DataType::string(255); // Password VARCHAR(255)
@@ -47,8 +40,16 @@ $definition = new DatabaseDefinitionBuilder([
     'User' => User::getDefinition()
 ]);
 
-// Connect to "default":
-$db = $loader->connect('default', $definition);
+// Connect to database
+$db = $loader->connect(
+    [
+        'driver' => 'PdoMysql',
+        'server' => 'localhost',
+        'username' => 'jivoo',
+        'database' => 'jivoo'
+    ],
+    $definition
+);
 
 echo '<pre>';
 
@@ -60,15 +61,15 @@ if ($db->User->exists()) {
 // Create table
 $db->User->create();
 
-$schema = new Jivoo\Data\Database\DatabaseSchema($db);
+$schema = new DatabaseSchema($db);
 
 // Insert a user (array style)
-$schema->User->insert(array(
+$schema->User->insert([
   'username' => 'root',
   'password' => 'secret',
   'created' => time(),
   'updated' => time()
-));
+]);
 
 // Insert a user (active record style)
 $user = $schema->User->create();

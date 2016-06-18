@@ -42,9 +42,12 @@ class Loader implements LoggerAware
     /**
      * Construct database loader.
      */
-    public function __construct(Document $config)
+    public function __construct(Document $config = null)
     {
         $this->logger = new NullLogger();
+        if (! isset($config)) {
+            $config = new Document();
+        }
         $this->config = $config;
         $this->drivers = dirname(__FILE__) . '/Drivers';
     }
@@ -208,7 +211,7 @@ class Loader implements LoggerAware
     /**
      * Make a database connection.
      *
-     * @param string $name
+     * @param string|Document|array $name
      *            Name of database connection.
      * @param DatabaseDefinition $definition
      *            Database definition (collecton of table definitions).
@@ -221,10 +224,19 @@ class Loader implements LoggerAware
      */
     public function connect($name, DatabaseDefinition $definition = null)
     {
-        if (! isset($this->config[$name])) {
-            throw new ConfigurationException('Database "' . $name . '" not configured');
+        if (is_string($name)) {
+            if (! isset($this->config[$name])) {
+                throw new ConfigurationException('Database "' . $name . '" not configured');
+            }
+            $config = $this->config->getSubset($name);
+        } else if (is_array($name)) {
+            $config = new Document($name);
+            unset($name);
+        } else {
+            Assume::isInstanceOf($name, 'Jivoo\Store\Document');
+            $config = $name;
+            unset($name);
         }
-        $config = $this->config->getSubset($name);
         $driver = $config->get('driver', null);
         if (! isset($driver)) {
             throw new ConfigurationException('Database driver not set');
@@ -247,7 +259,9 @@ class Loader implements LoggerAware
             }
             $object = new $class($definition, $config);
             $object->setLogger($this->logger);
-            $this->connections[$name] = new DatabaseSchema($object);
+            if (isset($name)) {
+                $this->connections[$name] = new DatabaseSchema($object);
+            }
             return $object;
         } catch (ConnectionException $exception) {
             throw new ConnectionException(
