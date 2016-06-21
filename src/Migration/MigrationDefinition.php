@@ -95,7 +95,7 @@ class MigrationDefinition implements DatabaseDefinition, Migratable
     /**
      * {@inheritdoc}
      */
-    public function createTable($table, DefinitionBuilder $definition)
+    public function createTable($table, \Jivoo\Data\Definition $definition)
     {
         $this->tables[] = $table;
         $this->definitions[$table] = $definition;

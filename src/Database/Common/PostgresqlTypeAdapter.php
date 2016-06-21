@@ -245,15 +245,15 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
         $sql .= " AND a.attnum = ANY(ix.indkey) AND t.relkind = 'r'";
         $sql .= " AND t.relname = '" . $this->db->tableName($table) . "'";
         $result = $this->db->query($sql);
-        $indexes = array();
+        $keys = array();
         while ($row = $result->fetchAssoc()) {
-            $index = $row['index_name'];
+            $key = $row['index_name'];
             $column = $row['column_name'];
             $unique = $row['indisunique'] != 0;
-            if (isset($indexes[$index])) {
-                $indexes[$index]['columns'][] = $column;
+            if (isset($keys[$key])) {
+                $keys[$key]['columns'][] = $column;
             } else {
-                $indexes[$index] = array(
+                $keys[$key] = array(
                     'columns' => array(
                         $column
                     ),
@@ -261,7 +261,7 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
                 );
             }
         }
-        foreach ($indexes as $name => $index) {
+        foreach ($keys as $name => $key) {
             $name = preg_replace(
                 '/^' . preg_quote($this->db->tableName($table) . '_', '/') . '/',
                 '',
@@ -272,10 +272,10 @@ class PostgresqlTypeAdapter implements MigrationTypeAdapter
             if ($count == 0) {
                 continue;
             }
-            if ($index['unique']) {
-                $definition->addUnique($index['columns'], $name);
+            if ($key['unique']) {
+                $definition->addUnique($key['columns'], $name);
             } else {
-                $definition->addKey($index['columns'], $name);
+                $definition->addKey($key['columns'], $name);
             }
         }
         return $definition;

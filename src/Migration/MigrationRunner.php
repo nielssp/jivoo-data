@@ -30,9 +30,9 @@ class MigrationRunner
     private $definition;
 
     /**
-     * @var MigrationDefinition[] Array of schemas.
+     * @var MigrationDefinition[] Array of definitions.
      */
-    private $migrationSchemas = array();
+    private $migrationDefinitions = array();
 
     /**
      * @var string[] Associative array of database names and migration dirs.
@@ -249,11 +249,11 @@ class MigrationRunner
         $this->logger->info('Initializing migration ' . $migrationName);
         Utilities::assumeSubclassOf($migrationName, 'Jivoo\Data\Migration\Migration');
         
-        // The migration schema keeps track of the state of the database
-        if (! isset($this->migrationSchemas[$dbName])) {
-            $this->migrationSchemas[$dbName] = new MigrationDefinition($db);
+        // The migration definition keeps track of the state of the database
+        if (! isset($this->migrationDefinitions[$dbName])) {
+            $this->migrationDefinitions[$dbName] = new MigrationDefinition($db);
         }
-        $migrationSchema = $this->migrationSchemas[$dbName];
+        $migrationSchema = $this->migrationDefinitions[$dbName];
         
         $migration = new $migrationName($db, $migrationSchema);
         try {
@@ -275,8 +275,8 @@ class MigrationRunner
      */
     public function finalize($name)
     {
-        if (isset($this->migrationSchemas[$name])) {
-            $this->migrationSchemas[$name]->finalize();
+        if (isset($this->migrationDefinitions[$name])) {
+            $this->migrationDefinitions[$name]->finalize();
         }
         $mtime = filemtime($this->migrationDirs[$name] . '/.');
         $this->config['mtimes'][$name] = $mtime;

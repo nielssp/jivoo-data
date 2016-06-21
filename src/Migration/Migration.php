@@ -16,14 +16,14 @@ abstract class Migration
 {
 
     /**
-     * @var MigratableDatabase Database.
+     * @var MigratableDatabase
      */
     private $db = null;
 
     /**
-     * @var MigrationDefinition Schema.
+     * @var MigrationDefinition
      */
-    private $schema = null;
+    private $definition = null;
 
     /**
      * @var bool Whether to ignore exceptions.
@@ -35,13 +35,13 @@ abstract class Migration
      *
      * @param MigratableDatabase $db
      *            Database to run migration on.
-     * @param MigrationDefinition $schema
-     *            A migration schema.
+     * @param MigrationDefinition $definition
+     *            A migration definition.
      */
-    final public function __construct(MigratableDatabase $db, MigrationDefinition $schema)
+    final public function __construct(MigratableDatabase $db, MigrationDefinition $definition)
     {
         $this->db = $db;
-        $this->schema = $schema;
+        $this->definition = $definition;
     }
 
     /**
@@ -65,20 +65,20 @@ abstract class Migration
      */
     public function __isset($table)
     {
-        return isset($this->db->table);
+        return isset($this->db->$table);
     }
 
     /**
      * Create a table.
      *
-     * @param DefinitionBuilder $definition
-     *            Schema for table.
+     * @param string $table Table name.
+     * @param DefinitionBuilder $definition Table definition.
      */
-    protected function createTable(DefinitionBuilder $definition)
+    protected function createTable($table, DefinitionBuilder $definition)
     {
         try {
-            $this->db->createTable($definition);
-            $this->schema->createTable($definition);
+            $this->db->createTable($table, $definition);
+            $this->definition->createTable($table, $definition);
         } catch (\Exception $e) {
             if (! $this->ignoreExceptions) {
                 throw $e;
@@ -96,7 +96,7 @@ abstract class Migration
     {
         try {
             $this->db->dropTable($table);
-            $this->schema->dropTable($table);
+            $this->definition->dropTable($table);
         } catch (\Exception $e) {
             if (! $this->ignoreExceptions) {
                 throw $e;
@@ -118,7 +118,7 @@ abstract class Migration
     {
         try {
             $this->db->addColumn($table, $column, $type);
-            $this->schema->addColumn($table, $column, $type);
+            $this->definition->addColumn($table, $column, $type);
         } catch (\Exception $e) {
             if (! $this->ignoreExceptions) {
                 throw $e;
@@ -138,7 +138,7 @@ abstract class Migration
     {
         try {
             $this->db->deleteColumn($table, $column);
-            $this->schema->deleteColumn($table, $column);
+            $this->definition->deleteColumn($table, $column);
         } catch (\Exception $e) {
             if (! $this->ignoreExceptions) {
                 throw $e;
@@ -160,7 +160,7 @@ abstract class Migration
     {
         try {
             $this->db->alterColumn($table, $column, $type);
-            $this->schema->alterColumn($table, $column, $type);
+            $this->definition->alterColumn($table, $column, $type);
         } catch (\Exception $e) {
             if (! $this->ignoreExceptions) {
                 throw $e;
@@ -182,7 +182,7 @@ abstract class Migration
     {
         try {
             $this->db->renameColumn($table, $column, $newName);
-            $this->schema->renameColumn($table, $column, $newName);
+            $this->definition->renameColumn($table, $column, $newName);
         } catch (\Exception $e) {
             if (! $this->ignoreExceptions) {
                 throw $e;
@@ -197,15 +197,16 @@ abstract class Migration
      *            Table name.
      * @param string $key
      *            Key name.
-     * @param array $options
-     *            Associative array of index options, with keys
-     *            'unique' and 'columns'.
+     * @param string[] $columns
+     *            Columns.
+     * @param bool $unique
+     *            Uniqueness.
      */
-    protected function createKey($table, $key, $options = array())
+    protected function createKey($table, $key, array $columns, $unique = true)
     {
         try {
-            $this->db->createKey($table, $key, $options);
-            $this->schema->createKey($table, $key, $options);
+            $this->db->createKey($table, $key, $columns, $unique);
+            $this->definition->createKey($table, $key, $columns, $unique);
         } catch (\Exception $e) {
             if (! $this->ignoreExceptions) {
                 throw $e;
@@ -225,7 +226,7 @@ abstract class Migration
     {
         try {
             $this->db->deleteKey($table, $key);
-            $this->schema->deleteKey($table, $key);
+            $this->definition->deleteKey($table, $key);
         } catch (\Exception $e) {
             if (! $this->ignoreExceptions) {
                 throw $e;
@@ -239,17 +240,17 @@ abstract class Migration
      * @param string $table
      *            Table name.
      * @param string $key
-     *            Ket name.
-     * @param array $options
-     *            Associative array of index options, with keys
-     *            'unique' and 'columns'.
-     * @throws \Exception
+     *            Key name.
+     * @param string[] $columns
+     *            Columns.
+     * @param bool $unique
+     *            Uniqueness.
      */
-    protected function alterKey($table, $key, $options = array())
+    protected function alterKey($table, $key, array $columns, $unique = true)
     {
         try {
-            $this->alterKey($table, $key, $options);
-            $this->schema->alterKey($table, $key, $options);
+            $this->db->alterKey($table, $key, $columns, $unique);
+            $this->definition->alterKey($table, $key, $columns, $unique);
         } catch (\Exception $e) {
             if (! $this->ignoreExceptions) {
                 throw $e;
