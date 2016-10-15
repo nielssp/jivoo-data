@@ -23,7 +23,7 @@
     "ext-json": "*",
     "psr/log": "1.0",
     "psr/cache": "1.0",
-    "jivoo/core": "dev-master",
+    "jivoo/core": "^1.0",
     "composer/semver": "^1.2"
   },
   "require-dev": {
