@@ -51,7 +51,6 @@ abstract class PdoDatabase extends SqlDatabaseBase
             throw new QueryException($errorInfo[0] . ' - ' . $errorInfo[1] . ' - ' . $errorInfo[2]);
         }
         return $result;
-        
     }
     
     /**

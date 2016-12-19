@@ -7,28 +7,29 @@ namespace Jivoo\Data\ActiveModel;
 
 use Jivoo\Assume;
 use Jivoo\Data\Database\InvalidTableException;
-use Jivoo\Data\Database\ResultSetIterator;
 use Jivoo\Data\Database\Table;
+use Jivoo\Data\DataSource;
 use Jivoo\Data\DataType;
+use Jivoo\Data\Definition;
 use Jivoo\Data\ModelBase;
-use Jivoo\Data\Query\Builders\DeleteSelectionBuilder;
-use Jivoo\Data\Query\Builders\ReadSelectionBuilder;
 use Jivoo\Data\Query\Builders\SelectionBuilder;
-use Jivoo\Data\Query\Builders\UpdateSelectionBuilder;
 use Jivoo\Data\Query\ReadSelection;
 use Jivoo\Data\Query\Selection;
+use Jivoo\Data\Query\UpdateSelection;
+use Jivoo\Data\Record;
 use Jivoo\Data\RecordBuilder;
+use Jivoo\Data\RecordIterator;
 use Jivoo\Data\Schema;
 use Jivoo\Data\Validation\Validator;
 use Jivoo\Data\Validation\ValidatorBuilder;
-use Jivoo\EventListener;
+use Jivoo\I18n\I18n;
 use Jivoo\InvalidMethodException;
 use Jivoo\Utilities;
 
 /**
  * An active model containing active records, see also {@see ActiveRecord}.
  */
-abstract class ActiveModel extends ModelBase implements EventListener
+abstract class ActiveModel extends ModelBase
 {
 
     /**
@@ -38,82 +39,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
     protected $table = null;
 
     /**
-     * @var string Name of custom {@see ActiveRecord} implementation to use.
-     */
-    protected $record = null;
-
-    /**
-     * @var array Array containing one-to-many association definitions.
-     */
-    protected $hasMany = array();
-
-    /**
-     * @var array Array containing many-to-many association definitions.
-     */
-    protected $hasAndBelongsToMany = array();
-
-    /**
-     * @var array Array containing one-to-one association definitions.
-     */
-    protected $belongsTo = array();
-
-    /**
-     * @var array Array containing one-to-one association definititions.
-     */
-    protected $hasOne = array();
-
-    /**
-     * @var array Array containing validation rules, see {@see Validator}.
-     */
-    protected $validate = array();
-
-    /**
-     * @var string[] Maps field names to GUI labels, will be translated.
-     */
-    protected $labels = array();
-
-    /**
-     * @var string[] List of mxin classes to load, must extend
-     *      {@see ActiveModelMixin}.
-     */
-    protected $mixins = array();
-
-    /**
-     * @var string[] List of virtual field names.
-     */
-    protected $virtual = array();
-
-    /**
-     * @var string[] Custom getters, maps field name to method name.
-     */
-    protected $getters = array();
-
-    /**
-     * @var string[] Custom setters, maps field name to method name.
-     */
-    protected $setters = array();
-
-    /**
-     * @var stiring[] Associative array mapping between actions and routes.
-     */
-    protected $actions = array();
-
-    /**
-     * {@inheritdoc}
-     */
-    protected $events = array(
-        'beforeSave',
-        'afterSave',
-        'beforeValidate',
-        'afterValidate',
-        'afterCreate',
-        'afterLoad',
-        'beforeDelete',
-        'install'
-    );
-
-    /**
-     * @var Table Model source.
+     * @var \Jivoo\Data\Model Model source.
      */
     private $source;
 
@@ -123,17 +49,12 @@ abstract class ActiveModel extends ModelBase implements EventListener
     private $name;
 
     /**
-     * @var ActiveModelMixin[] Mixin objects.
-     */
-    private $mixinObjects = array();
-
-    /**
      * @var Schema Model schema.
      */
     private $schema;
 
     /**
-     * @var \Jivoo\Data\Definition Model definition.
+     * @var ActiveDefinition Model definition.
      */
     private $definition;
 
@@ -214,12 +135,15 @@ abstract class ActiveModel extends ModelBase implements EventListener
         if (! isset($this->definition)) {
             throw new InvalidTableException('Definition for table "' . $table . '" not found');
         }
+        if (!($this->definition instanceof ActiveDefinition)) {
+            $this->definition = new ActiveDefinition($this->name, $this->definition);
+        }
         $pk = $this->definition->getPrimaryKey();
         if (count($pk) == 1) {
             $pk = $pk[0];
             $this->primaryKey = $pk;
-            $type = $this->definition->$pk;
-            if ($type->isInteger() and $type->autoIncrement) {
+            $type = $this->definition->getType($pk);
+            if ($type->isInteger() and $type->serial) {
                 $this->aiPrimaryKey = $pk;
             }
         } else {
@@ -232,43 +156,13 @@ abstract class ActiveModel extends ModelBase implements EventListener
             $this->fields[] = $field;
             $this->virtualFields[] = $field;
         }
-        
-        $this->validator = new ValidatorBuilder($this, $this->validate);
-        $this->definition->createValidationRules($this->validator);
+    
+        $this->validator = $this->definition->getValidator();
         
         foreach ($this->nonVirtualFields as $field) {
-            $type = $this->definition->$field;
+            $type = $this->definition->getType($field);
             if (isset($type->default)) {
                 $this->defaults[$field] = $type->default;
-            }
-        }
-        
-        if (isset($this->record)) {
-            Utilities::assumeSubclassOf($this->record, 'Jivoo\Data\ActiveModel\ActiveRecord');
-        }
-        
-        $this->attachEventListener($this);
-        foreach ($this->mixins as $mixin => $options) {
-            if (! is_string($mixin)) {
-                $mixin = $options;
-                $options = array();
-            }
-            if (class_exists('Jivoo\Data\ActiveModel\\' . $mixin . 'Mixin')) {
-                $mixin = 'Jivoo\Data\ActiveModel\\' . $mixin . 'Mixin';
-            } elseif (class_exists($mixin . 'Mixin')) {
-                    $mixin .= 'Mixin';
-            } elseif (! class_exists($mixin)) {
-                    throw new InvalidMixinException('Mixin class not found: ' . $mixin);
-            }
-            Assume::isSubclassOf($mixin, 'Jivoo\Data\ActiveModel\ActiveModelMixin');
-            $mixin = new $mixin($this->app, $this, $options);
-            $this->attachEventListener($mixin);
-            $this->mixinObjects[] = $mixin;
-            foreach ($mixin->getMethods() as $method) {
-                $this->methods[$method] = array(
-                    $mixin,
-                    $method
-                );
             }
         }
         
@@ -345,15 +239,15 @@ abstract class ActiveModel extends ModelBase implements EventListener
     /**
      * {@inheritdoc}
      */
-    public function create($data = array(), $allowedFields = null)
+    public function create(array $data = [], $allowedFields = null)
     {
-        return ActiveRecord::createNew($this, $data, $allowedFields, $this->record);
+        return ActiveRecord::create($this, $data, $allowedFields, $this->record);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createExisting($data = array(), ReadSelectionBuilder $selection = null)
+    public function open(array $data, ReadSelection $selection)
     {
         if (isset($data[$this->primaryKey])) {
             $id = $data[$this->primaryKey];
@@ -361,7 +255,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
                 return $this->cache[$id];
             }
         }
-        return $this->convert($this->source->createExisting($data, $selection));
+        return $this->convert(parent::open($data, $selection));
     }
 
     /**
@@ -371,20 +265,17 @@ abstract class ActiveModel extends ModelBase implements EventListener
      *            Record.
      * @return ActiveRecord Active record.
      */
-    public function convert(RecordBuilder $record)
+    public function convert(Record $record)
     {
-        return ActiveRecord::createExisting($this, $record->getData(), $record->getVirtualData(), $this->record);
+        return ActiveRecord::open($this, $record->getData(), [], $this->record);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function asInstanceOf($class)
+    public function joinWith(DataSource $other)
     {
-        if ($this->source instanceof $class) {
-            return $this->source;
-        }
-        return parent::asInstanceOf($class);
+        return $this->source->joinWith($other);
     }
 
     /**
@@ -698,22 +589,6 @@ abstract class ActiveModel extends ModelBase implements EventListener
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function isRequired($field)
-    {
-        return $this->validator->isRequired($field);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFields()
-    {
-        return $this->fields;
-    }
-
-    /**
      * Get list of virtual fields.
      *
      * @return string[] List of virtual field names.
@@ -757,13 +632,13 @@ abstract class ActiveModel extends ModelBase implements EventListener
         if (! isset($this->labels[$field])) {
             $this->labels[$field] = ucfirst(strtolower(preg_replace('/([A-Z])/', ' $1', lcfirst($field))));
         }
-        return \Jivoo\I18n\I18n::get($this->labels[$field]);
+        return I18n::get($this->labels[$field]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function updateSelection(UpdateSelectionBuilder $selection)
+    public function updateSelection(UpdateSelection $selection)
     {
         return $this->source->updateSelection($selection);
     }
@@ -771,7 +646,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
     /**
      * {@inheritdoc}
      */
-    public function deleteSelection(DeleteSelectionBuilder $selection)
+    public function deleteSelection(Selection $selection)
     {
         return $this->source->deleteSelection($selection);
     }
@@ -779,7 +654,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
     /**
      * {@inheritdoc}
      */
-    public function countSelection(ReadSelectionBuilder $selection)
+    public function countSelection(ReadSelection $selection)
     {
         return $this->source->countSelection($selection);
     }
@@ -787,49 +662,7 @@ abstract class ActiveModel extends ModelBase implements EventListener
     /**
      * {@inheritdoc}
      */
-    public function firstSelection(ReadSelectionBuilder $selection)
-    {
-        $resultSet = $this->source->readSelection($selection->limit(1));
-        if (! $resultSet->hasRows()) {
-            return null;
-        }
-        return $this->createExisting($resultSet->fetchAssoc(), $selection);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function lastSelection(ReadSelectionBuilder $selection)
-    {
-        $resultSet = $this->source->readSelection($selection->reverseOrder()
-            ->limit(1));
-        if (! $resultSet->hasRows()) {
-            return null;
-        }
-        return $this->createExisting($resultSet->fetchAssoc(), $selection);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function read(ReadSelectionBuilder $selection)
-    {
-        $resultSet = $this->source->readSelection($selection);
-        return new ResultSetIterator($this, $resultSet, $selection);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function readCustom(ReadSelectionBuilder $selection, $model = null)
-    {
-        return $this->source->readCustom($selection, $model);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function insert($data, $replace = false)
+    public function insert(array $data, $replace = false)
     {
         return $this->source->insert($data, $replace);
     }
@@ -837,9 +670,14 @@ abstract class ActiveModel extends ModelBase implements EventListener
     /**
      * {@inheritdoc}
      */
-    public function insertMultiple($data, $replace = false)
+    public function insertMultiple(array $records, $replace = false)
     {
-        return $this->source->insertMultiple($data, $replace);
+        return $this->source->insertMultiple($records, $replace);
+    }
+
+    public function readSelection(ReadSelection $selection)
+    {
+        return new RecordIterator($this->source->readSelection($selection), $this, $selection);
     }
 
     /**

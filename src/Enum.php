@@ -92,7 +92,7 @@ abstract class Enum
                 throw new InvalidEnumException('Enum class not found: ' . $class);
             }
             $class = self::$classes[$class];
-            Assume::isSubclassOf($class, 'Jivoo\Models\Enum');
+            Assume::isSubclassOf($class, 'Jivoo\Data\Enum');
             $ref = new \ReflectionClass($class);
             self::$values[$class] = array_flip($ref->getConstants());
             if (count(self::$values[$class]) < 1) {

@@ -66,6 +66,5 @@ class SelectionBaseTest extends \Jivoo\TestCase
         $this->assertTrue($copy->getPredicate()->__invoke($record));
         $this->assertEquals([['foo', false], ['bar', true]], $copy->getOrdering());
         $this->assertEquals(10, $copy->getLimit());
-        
     }
 }

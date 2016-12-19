@@ -43,7 +43,7 @@ abstract class ModelBase implements \IteratorAggregate, Model
     /**
      * {@inheritDoc}
      */
-    public function create(array $data = array(), $allowedFields = null)
+    public function create(array $data = [], $allowedFields = null)
     {
         return RecordBuilder::create($this, $data, $allowedFields);
     }

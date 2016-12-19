@@ -5,7 +5,6 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data;
 
-use Jivoo\Models\Validation\ValidatorField;
 use Jivoo\InvalidPropertyException;
 
 /**
@@ -83,7 +82,7 @@ class EnumDataType extends DataType
     /**
      * {@inheritdoc}
      */
-    public function createValidationRules(ValidatorField $validator)
+    public function createValidationRules(Validation\ValidatorField $validator)
     {
         $validator = $validator->ruleDataType;
         if (! $this->null) {

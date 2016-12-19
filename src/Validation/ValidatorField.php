@@ -82,6 +82,11 @@ class ValidatorField
     {
         $this->remove($rule);
     }
+    
+    public function __call($rule, array $arguments)
+    {
+        return $this->add($rule, isset($argument[0]) ? $argument[0] : true);
+    }
 
     /**
      * Get a single rule.

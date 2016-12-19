@@ -5,17 +5,14 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\ActiveModel;
 
-use Jivoo\Models\Record;
-use Jivoo\Models\ActionRecord;
-use Jivoo\Routing\Linkable;
+use Jivoo\Data\Record;
 use Jivoo\InvalidMethodException;
 use Jivoo\InvalidPropertyException;
-use Jivoo\Assume;
 
 /**
  * An active record, see also {@see ActiveModel}.
  */
-class ActiveRecord implements Record, ActionRecord, Linkable
+class ActiveRecord implements Record
 {
 
     /**
@@ -109,7 +106,7 @@ class ActiveRecord implements Record, ActionRecord, Linkable
      *            Name of custom record class.
      * @return ActiveRecord New unsaved record.
      */
-    public static function createNew(ActiveModel $model, $data = array(), $allowedFields = null, $class = null)
+    public static function create(ActiveModel $model, $data = array(), $allowedFields = null, $class = null)
     {
         if (isset($class)) {
             $record = new $class($model, $data, $allowedFields);
@@ -135,7 +132,7 @@ class ActiveRecord implements Record, ActionRecord, Linkable
      *            Name of custom record class.
      * @return ActiveRecord A record.
      */
-    public static function createExisting(ActiveModel $model, $data = array(), $virtual = array(), $class = null)
+    public static function open(ActiveModel $model, $data = array(), $virtual = array(), $class = null)
     {
         if (isset($class)) {
             $record = new $class($model, $data);
@@ -174,7 +171,7 @@ class ActiveRecord implements Record, ActionRecord, Linkable
     public function addData(array $data, $allowedFields = null)
     {
         if (! isset($allowedFields)) {
-            $allowedFields = $this->model->getFields();
+            $allowedFields = $this->model->getDefinition->getFields();
         }
         if (is_array($allowedFields)) {
             $allowedFields = array_flip($allowedFields);

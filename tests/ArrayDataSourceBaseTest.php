@@ -66,7 +66,6 @@ class ArrayDataSourceBaseTest extends \Jivoo\TestCase
         foreach ($projection as $record) {
             $this->assertEquals(['n'], array_keys($record));
         }
-        
     }
     
     public function testUpdate()
