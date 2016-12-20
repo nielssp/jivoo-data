@@ -171,7 +171,7 @@ class ActiveRecord implements Record
     public function addData(array $data, $allowedFields = null)
     {
         if (! isset($allowedFields)) {
-            $allowedFields = $this->model->getDefinition->getFields();
+            $allowedFields = $this->model->getDefinition()->getFields();
         }
         if (is_array($allowedFields)) {
             $allowedFields = array_flip($allowedFields);

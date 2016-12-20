@@ -29,8 +29,24 @@ use Jivoo\Utilities;
 /**
  * An active model containing active records, see also {@see ActiveRecord}.
  */
-abstract class ActiveModel extends ModelBase
+abstract class ActiveModel extends ModelBase implements \Jivoo\EventSubject
 {
+    use \Jivoo\EventSubjectTrait;
+
+    /**
+     * ActiveModel events.
+     * 
+     * @var string[]
+     */
+    protected $events = array(
+        'beforeSave',
+        'afterSave',
+        'beforeValidate',
+        'afterValidate',
+        'afterCreate',
+        'afterLoad',
+        'beforeDelete'
+    );
 
     /**
      * @var string Name of database table used by model, null for default based
@@ -120,6 +136,7 @@ abstract class ActiveModel extends ModelBase
      */
     final public function __construct(Schema $schema)
     {
+        $this->e = new \Jivoo\EventManager($this);
         $this->name = Utilities::getClassName(get_class($this));
         $this->schema = $schema;
         if (! isset($this->table)) {
@@ -175,6 +192,14 @@ abstract class ActiveModel extends ModelBase
      */
     protected function init()
     {
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function getEvents()
+    {
+        return $this->events;
     }
 
     /**
