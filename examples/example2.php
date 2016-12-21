@@ -1,4 +1,6 @@
 <?php
+// Example 2: Describing table definitions and using active records
+
 use Jivoo\Data\Database\DatabaseDefinitionBuilder;
 use Jivoo\Data\Database\DatabaseSchema;
 use Jivoo\Data\Database\Loader;

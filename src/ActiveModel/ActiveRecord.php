@@ -385,22 +385,6 @@ class ActiveRecord implements Record
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getRoute()
-    {
-        return $this->model->getRoute($this);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function action($action)
-    {
-        return $this->model->getAction($this, $action);
-    }
-
-    /**
      * Save record.
      *
      * @param bool $validate

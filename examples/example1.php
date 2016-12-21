@@ -1,5 +1,5 @@
 <?php
-// Example: Using dynamic table definitions
+// Example 1: Using dynamic table definitions
 
 use Jivoo\Data\Database\DatabaseDefinitionBuilder;
 use Jivoo\Data\Database\DatabaseSchema;

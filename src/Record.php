@@ -37,13 +37,28 @@ interface Record extends \ArrayAccess
      * @return Model Model.
      */
     public function getModel();
+    
+    /**
+     * Get the data definition.
+     *
+     * @return Definition Definition.
+     */
+    public function getDefinition();
 
     /**
-     * Get all data as an associative array.
+     * Get non-virtual data as an associative array.
      *
      * @return array Array of data.
      */
     public function getData();
+    
+    /**
+     * Get virtual data as an associative array. Virtual data can be accessed
+     * with the getters and setters like non-virtual data, but is not saved.
+     *
+     * @return array Array of data.
+     */
+    public function getVirtualData();
 
     /**
      * Set value of a field.

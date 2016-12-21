@@ -114,6 +114,13 @@ class RecordBuilder implements Record
     /**
      * {@inheritdoc}
      */
+    public function getDefinition()
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function addData(array $data, $allowedFields = null)
     {
         if (! is_array($data)) {
@@ -137,6 +144,11 @@ class RecordBuilder implements Record
     public function getData()
     {
         return $this->data;
+    }
+    
+    public function getVirtualData()
+    {
+        return $this->virtual;
     }
 
     /**

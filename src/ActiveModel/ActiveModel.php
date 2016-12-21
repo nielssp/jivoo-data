@@ -7,10 +7,9 @@ namespace Jivoo\Data\ActiveModel;
 
 use Jivoo\Assume;
 use Jivoo\Data\Database\InvalidTableException;
-use Jivoo\Data\Database\Table;
 use Jivoo\Data\DataSource;
 use Jivoo\Data\DataType;
-use Jivoo\Data\Definition;
+use Jivoo\Data\Model;
 use Jivoo\Data\ModelBase;
 use Jivoo\Data\Query\Builders\SelectionBuilder;
 use Jivoo\Data\Query\ReadSelection;
@@ -18,10 +17,11 @@ use Jivoo\Data\Query\Selection;
 use Jivoo\Data\Query\UpdateSelection;
 use Jivoo\Data\Record;
 use Jivoo\Data\RecordBuilder;
-use Jivoo\Data\RecordIterator;
 use Jivoo\Data\Schema;
 use Jivoo\Data\Validation\Validator;
-use Jivoo\Data\Validation\ValidatorBuilder;
+use Jivoo\EventManager;
+use Jivoo\EventSubject;
+use Jivoo\EventSubjectTrait;
 use Jivoo\I18n\I18n;
 use Jivoo\InvalidMethodException;
 use Jivoo\Utilities;
@@ -29,13 +29,13 @@ use Jivoo\Utilities;
 /**
  * An active model containing active records, see also {@see ActiveRecord}.
  */
-abstract class ActiveModel extends ModelBase implements \Jivoo\EventSubject
+abstract class ActiveModel extends ModelBase implements EventSubject
 {
-    use \Jivoo\EventSubjectTrait;
+    use EventSubjectTrait;
 
     /**
      * ActiveModel events.
-     * 
+     *
      * @var string[]
      */
     protected $events = array(
@@ -55,7 +55,7 @@ abstract class ActiveModel extends ModelBase implements \Jivoo\EventSubject
     protected $table = null;
 
     /**
-     * @var \Jivoo\Data\Model Model source.
+     * @var Model Model source.
      */
     private $source;
 
@@ -136,7 +136,7 @@ abstract class ActiveModel extends ModelBase implements \Jivoo\EventSubject
      */
     final public function __construct(Schema $schema)
     {
-        $this->e = new \Jivoo\EventManager($this);
+        $this->e = new EventManager($this);
         $this->name = Utilities::getClassName(get_class($this));
         $this->schema = $schema;
         if (! isset($this->table)) {
@@ -200,6 +200,79 @@ abstract class ActiveModel extends ModelBase implements \Jivoo\EventSubject
     public function getEvents()
     {
         return $this->events;
+    }
+    
+
+    /**
+     * {@inheritdoc}
+     */
+    public function countSelection(ReadSelection $selection)
+    {
+        return $this->source->countSelection($selection);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteSelection(Selection $selection)
+    {
+        return $this->source->deleteSelection($selection);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefinition()
+    {
+        return $this->definition;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function insert(array $data, $replace = false)
+    {
+        return $this->source->insert($data, $replace);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function insertMultiple(array $records, $replace = false)
+    {
+        return $this->source->insertMultiple($records, $replace);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function joinWith(DataSource $other)
+    {
+        return $this->source->joinWith($other);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function readSelection(ReadSelection $selection)
+    {
+        return $this->source->readSelection($selection);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function updateSelection(UpdateSelection $selection)
+    {
+        return $this->source->updateSelection($selection);
     }
 
     /**
@@ -292,15 +365,7 @@ abstract class ActiveModel extends ModelBase implements \Jivoo\EventSubject
      */
     public function convert(Record $record)
     {
-        return ActiveRecord::open($this, $record->getData(), [], $this->record);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function joinWith(DataSource $other)
-    {
-        return $this->source->joinWith($other);
+        return ActiveRecord::open($this, $record->getData(), $record->getVirtualData());
     }
 
     /**
@@ -592,22 +657,6 @@ abstract class ActiveModel extends ModelBase implements \Jivoo\EventSubject
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefinition()
-    {
-        return $this->definition;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getValidator()
     {
         return $this->validator;
@@ -658,51 +707,6 @@ abstract class ActiveModel extends ModelBase implements \Jivoo\EventSubject
             $this->labels[$field] = ucfirst(strtolower(preg_replace('/([A-Z])/', ' $1', lcfirst($field))));
         }
         return I18n::get($this->labels[$field]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function updateSelection(UpdateSelection $selection)
-    {
-        return $this->source->updateSelection($selection);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteSelection(Selection $selection)
-    {
-        return $this->source->deleteSelection($selection);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function countSelection(ReadSelection $selection)
-    {
-        return $this->source->countSelection($selection);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function insert(array $data, $replace = false)
-    {
-        return $this->source->insert($data, $replace);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function insertMultiple(array $records, $replace = false)
-    {
-        return $this->source->insertMultiple($records, $replace);
-    }
-
-    public function readSelection(ReadSelection $selection)
-    {
-        return new RecordIterator($this->source->readSelection($selection), $this, $selection);
     }
 
     /**

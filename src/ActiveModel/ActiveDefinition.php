@@ -5,24 +5,29 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\ActiveModel;
 
+use Jivoo\Data\DataType;
+use Jivoo\Data\Definition;
+use Jivoo\Data\DefinitionBuilder;
+use Jivoo\Data\Validation\ValidatorBuilder;
+
 /**
  * Description of ActiveDefinition
  */
-class ActiveDefinition extends \Jivoo\Data\DefinitionBuilder
+class ActiveDefinition extends DefinitionBuilder
 {
     private $name;
     private $validator;
     private $virtual = [];
     private $labels = [];
     
-    public function __construct($name, \Jivoo\Data\Definition $copy = null)
+    public function __construct($name, Definition $copy = null)
     {
         $this->name = $name;
-        $this->validator = new \Jivoo\Data\Validation\ValidatorBuilder();
+        $this->validator = new ValidatorBuilder();
         parent::__construct($copy);
     }
     
-    public function __set($field, \Jivoo\Data\DataType $type)
+    public function __set($field, DataType $type)
     {
         parent::__set($field, $type);
         $type->createValidationRules($this->validator->$field);
@@ -38,16 +43,19 @@ class ActiveDefinition extends \Jivoo\Data\DefinitionBuilder
         $this->labels[$field] = $label;
     }
     
-    public function addVirtual($field, \Jivoo\Data\DataType $type = null)
+    public function addVirtual($field, DataType $type = null)
     {
+        $this->virtual[$field] = $type;
     }
     
     public function hasAndBelongsToMany($field, $model, array $association = [])
     {
+        $this->virtual[$field] = DataType::object();
     }
     
     public function hasMany($field, $model, array $association = [])
     {
+        $this->virtual[$field] = DataType::object();
     }
     
     public function hasOne($field, $model, $thisKey = null)
@@ -55,6 +63,7 @@ class ActiveDefinition extends \Jivoo\Data\DefinitionBuilder
         if (!isset($thisKey)) {
             $thisKey = lcfirst($this->name) . 'Id';
         }
+        $this->virtual[$field] = DataType::object();
     }
     
     public function belongsTo($field, $model, $otherKey = null)
@@ -62,6 +71,7 @@ class ActiveDefinition extends \Jivoo\Data\DefinitionBuilder
         if (!isset($otherKey)) {
             $otherKey = $field . 'Id';
         }
+        $this->virtual[$field] = DataType::object();
     }
     
     public function getValidator()
