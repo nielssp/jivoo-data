@@ -5,16 +5,15 @@
 // See the LICENSE file or http://opensource.org/licenses/MIT for more information.
 namespace Jivoo\Data\ActiveModel;
 
-use Jivoo\Models\ModelBase;
-use Jivoo\Models\Selection\Selection;
-use Jivoo\Models\Selection\UpdateSelectionBuilder;
-use Jivoo\Models\Selection\DeleteSelectionBuilder;
-use Jivoo\Models\Selection\ReadSelectionBuilder;
-use Jivoo\Models\Selection\BasicSelection;
-use Jivoo\Models\Selection\ReadSelection;
-use Jivoo\Models\Selection\SelectionBuilder;
-use Jivoo\Models\Condition\Condition;
 use Jivoo\Assume;
+use Jivoo\Data\Model;
+use Jivoo\Data\ModelBase;
+use Jivoo\Data\Query\Builders\DeleteSelectionBuilder;
+use Jivoo\Data\Query\Builders\ReadSelectionBuilder;
+use Jivoo\Data\Query\Builders\SelectionBuilder;
+use Jivoo\Data\Query\Builders\UpdateSelectionBuilder;
+use Jivoo\Data\Query\ReadSelection;
+use Jivoo\Data\Query\Selection;
 
 /**
  * A special model representing an association collection as result from for
@@ -113,18 +112,18 @@ class ActiveCollection extends ModelBase
      * Prepare selection, e.g.
      * by joining with join table.
      *
-     * @param BasicSelection $selection
+     * @param \Jivoo\Data\Query\Selectable $selection
      *            Input selection or null for source.
-     * @return ReadSelection Resulting selection.
+     * @return \Jivoo\Data\Query\Readable Resulting selection.
      */
-    private function prepareSelection(BasicSelection $selection = null)
+    private function prepareSelection(\Jivoo\Data\Query\Selectable $selection = null)
     {
         if (! isset($selection)) {
             return $this->source;
         }
         $selection->alias($this->alias);
         if (isset($this->join)) {
-            Assume::that($selection instanceof ReadSelection);
+            Assume::that($selection instanceof \Jivoo\Data\Query\Readable);
             $selection = $selection
                 ->leftJoin($this->join, $this->otherPrimary . '= J.' . $this->otherKey, 'J')
                 ->where('J.' . $this->thisKey . ' = ?', $this->recordId);
@@ -167,7 +166,7 @@ class ActiveCollection extends ModelBase
      * @param Selection $selection
      *            Selection of records.
      */
-    public function addAll(Selection $selection)
+    public function addAll(\Jivoo\Data\Query\Selectable $selection)
     {
         if (isset($this->join)) {
             $pk = $this->otherPrimary;
@@ -249,7 +248,7 @@ class ActiveCollection extends ModelBase
      * @param Selection $selection
      *            A selection of records.
      */
-    public function removeAll(Selection $selection = null)
+    public function removeAll(\Jivoo\Data\Query\Selectable $selection = null)
     {
         $selection = $this->prepareSelection($selection);
         if (isset($this->join)) {
@@ -275,15 +274,15 @@ class ActiveCollection extends ModelBase
     /**
      * {@inheritdoc}
      */
-    public function getSchema()
+    public function getDefinition()
     {
-        return $this->other->getSchema();
+        return $this->other->getDefinition();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function create($data = array(), $allowedFields = null)
+    public function create(array $data = array(), $allowedFields = null)
     {
         $record = $this->other->create($data, $allowedFields);
         if (! isset($this->join)) {
@@ -296,15 +295,15 @@ class ActiveCollection extends ModelBase
     /**
      * {@inheritdoc}
      */
-    public function createExisting(array $data, ReadSelectionBuilder $selection)
+    public function open(array $data, ReadSelection $selection)
     {
-        return $this->other->createExisting($data, $selection);
+        return $this->other->open($data, $selection);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function updateSelection(UpdateSelectionBuilder $selection)
+    public function updateSelection(\Jivoo\Data\Query\UpdateSelection $selection)
     {
         if (! isset($this->join)) {
             return $this->other->updateSelection($selection->where($this->thisKey . ' = ?', $this->recordId));
@@ -324,7 +323,7 @@ class ActiveCollection extends ModelBase
     /**
      * {@inheritdoc}
      */
-    public function deleteSelection(DeleteSelectionBuilder $selection)
+    public function deleteSelection(Selection $selection)
     {
         if (! isset($this->join)) {
             return $this->other->deleteSelection($this->prepareSelection($selection));
@@ -349,7 +348,7 @@ class ActiveCollection extends ModelBase
     /**
      * {@inheritdoc}
      */
-    public function countSelection(ReadSelectionBuilder $selection)
+    public function countSelection(ReadSelection $selection)
     {
         return $this->other->countSelection($selection);
     }
@@ -357,39 +356,15 @@ class ActiveCollection extends ModelBase
     /**
      * {@inheritdoc}
      */
-    public function firstSelection(ReadSelectionBuilder $selection)
+    public function readSelection(ReadSelection $selection)
     {
-        return $this->other->firstSelection($this->prepareSelection($selection));
+        return $this->other->readSelection($this->prepareSelection($selection));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function lastSelection(ReadSelectionBuilder $selection)
-    {
-        return $this->other->lastSelection($this->prepareSelection($selection));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function read(ReadSelectionBuilder $selection)
-    {
-        return $this->other->read($this->prepareSelection($selection));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function readCustom(ReadSelectionBuilder $selection)
-    {
-        return $this->other->readCustom($this->prepareSelection($selection));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function insert($data, $replace = false)
+    public function insert(array $data, $replace = false)
     {
         if (! isset($this->join)) {
             $data[$this->thisKey] = $this->recordId;
@@ -411,12 +386,16 @@ class ActiveCollection extends ModelBase
     /**
      * {@inheritdoc}
      */
-    public function insertMultiple($records, $replace = false)
+    public function insertMultiple(array $records, $replace = false)
     {
         $id = null;
         foreach ($records as $data) {
             $id = $this->insert($data, $replace);
         }
         return $id;
+    }
+
+    public function joinWith(\Jivoo\Data\DataSource $other)
+    {
     }
 }

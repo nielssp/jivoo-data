@@ -26,6 +26,15 @@ interface Definition
      * @return DataType|null Type of field or null if not defined.
      */
     public function getType($field);
+    
+    /**
+     * Whether the field is virtual.
+     *
+     * @param string $field
+     *            Field name.
+     * @return bool True if field is virtual.
+     */
+    public function isVirtual($field);
 
     /**
      * Get fields of primary key.

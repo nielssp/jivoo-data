@@ -283,4 +283,12 @@ class DefinitionBuilder implements Definition
         }
         return $definition;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isVirtual($field)
+    {
+        return false;
+    }
 }

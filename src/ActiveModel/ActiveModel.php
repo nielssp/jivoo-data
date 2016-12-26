@@ -482,47 +482,23 @@ abstract class ActiveModel extends ModelBase implements EventSubject
      */
     private function createAssociations()
     {
-        foreach (array(
-            'hasOne',
-            'belongsTo',
-            'hasMany',
-            'hasAndBelongsToMany'
-        ) as $type) {
-            foreach ($this->$type as $name => $options) {
-                if (! is_string($name)) {
-                    if (! is_string($options) or ! ($type == 'belongsTo' or $type == 'hasOne')) {
-                        throw new InvalidAssociationException('Invalid "' . $type . '"-association in ' . $this->name);
-                    }
-                    $name = lcfirst($options);
-                    $options = array(
-                        'model' => $options
-                    );
-                }
-                if (is_string($options)) {
-                    $options = array(
-                        'model' => $options
-                    );
-                }
-                $this->createAssociation($type, $name, $options);
-            }
+        $associations = $this->definition->getAssociations();
+        foreach ($associations as $options) {
+            $this->createAssociation($options);
         }
     }
 
     /**
      * Create a single association.
      *
-     * @param string $type
-     *            Type of association.
-     * @param string $name
-     *            Name of association
      * @param array $options
      *            Array of options for association.
      * @throws InvalidAssociationException
      */
-    private function createAssociation($type, $name, $options)
+    private function createAssociation($options)
     {
-        $options['type'] = $type;
-        $options['name'] = $name;
+        $name = $options['name'];
+        $type = $options['type'];
         $otherModel = $options['model'];
         if (! isset($this->schema->$otherModel)) {
             throw new InvalidAssociationException('Model ' . $otherModel . ' not found in ' . $this->name);

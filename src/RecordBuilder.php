@@ -32,6 +32,11 @@ class RecordBuilder implements Record
      * @var Model Model.
      */
     private $model;
+    
+    /**
+     * @var Definition Definition.
+     */
+    private $definition;
 
     /**
      * @var string[] Associative array of field names and error messages.
@@ -81,6 +86,7 @@ class RecordBuilder implements Record
         $record = new RecordBuilder($model, $data, $allowedFields);
         $record->new = true;
         $record->saved = false;
+        $record->definition = $model->getDefinition();
         return $record;
     }
 
@@ -116,6 +122,7 @@ class RecordBuilder implements Record
      */
     public function getDefinition()
     {
+        return $this->definition;
     }
 
     /**
@@ -264,7 +271,8 @@ class RecordBuilder implements Record
             $pk = $this->model->getDefinition()->getPrimaryKey();
             if (count($pk) == 1) {
                 $pk = $pk[0];
-                if ($this->model->getDefinition()->getType($pk)->serial) {
+                $type = $this->model->getDefinition()->getType($pk);
+                if ($type->isInteger() and $type->serial) {
                     $this->data[$pk] = $insertId;
                 }
             }

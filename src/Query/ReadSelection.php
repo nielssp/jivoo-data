@@ -46,10 +46,10 @@ interface ReadSelection extends Selection
      * Each array is of the following format:
      * <code>
      * array(
-     * 'source' => ..., // Data source to join with ({@see \Jivoo\Data\DataSource})
-     * 'type' => ..., // Type of join: 'INNER', 'RIGHT' or 'LEFT'
-     * 'alias' => ..., // Alias for other data source (string|null)
-     * 'predicate' => ... // Join predicate ({@see Expression})
+     *   'source' => ..., // Data source to join with ({@see \Jivoo\Data\DataSource})
+     *   'type' => ..., // Type of join: 'INNER', 'RIGHT' or 'LEFT'
+     *   'alias' => ..., // Alias for other data source (string|null)
+     *   'predicate' => ... // Join predicate ({@see Expression})
      * );
      * </code>
      *
@@ -84,7 +84,7 @@ interface ReadSelection extends Selection
      *   'alias' => ... // Alias (string)
      *   'expression' => ..., // Expression (string)
      *   'type' => ... // Type (DataType|null)
-     *   'model' => ... // Model (BasicModel|null)
+     *   'model' => ... // Model (Model|null)
      *   'record' => ... // Record field (string|null)
      * )
      * </code>

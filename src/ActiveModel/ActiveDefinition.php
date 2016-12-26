@@ -15,14 +15,13 @@ use Jivoo\Data\Validation\ValidatorBuilder;
  */
 class ActiveDefinition extends DefinitionBuilder
 {
-    private $name;
     private $validator;
     private $virtual = [];
     private $labels = [];
+    private $associations = [];
     
-    public function __construct($name, Definition $copy = null)
+    public function __construct(Definition $copy = null)
     {
-        $this->name = $name;
         $this->validator = new ValidatorBuilder();
         parent::__construct($copy);
     }
@@ -51,19 +50,29 @@ class ActiveDefinition extends DefinitionBuilder
     public function hasAndBelongsToMany($field, $model, array $association = [])
     {
         $this->virtual[$field] = DataType::object();
+        $association['type'] = 'hasAndBelongsToMany';
+        $association['name'] = $field;
+        $association['model'] = $model;
+        $this->associations[] = $association;
     }
     
     public function hasMany($field, $model, array $association = [])
     {
         $this->virtual[$field] = DataType::object();
+        $association['type'] = 'hasMany';
+        $association['name'] = $field;
+        $association['model'] = $model;
+        $this->associations[] = $association;
     }
     
     public function hasOne($field, $model, $thisKey = null)
     {
-        if (!isset($thisKey)) {
-            $thisKey = lcfirst($this->name) . 'Id';
-        }
         $this->virtual[$field] = DataType::object();
+        $association['type'] = 'hasOne';
+        $association['name'] = $field;
+        $association['model'] = $model;
+        $association['thisKey'] = $thisKey;
+        $this->associations[] = $association;
     }
     
     public function belongsTo($field, $model, $otherKey = null)
@@ -72,11 +81,21 @@ class ActiveDefinition extends DefinitionBuilder
             $otherKey = $field . 'Id';
         }
         $this->virtual[$field] = DataType::object();
+        $association['type'] = 'hasOne';
+        $association['name'] = $field;
+        $association['model'] = $model;
+        $association['otherKey'] = $otherKey;
+        $this->associations[] = $association;
     }
     
     public function getValidator()
     {
         return $this->validator;
+    }
+    
+    public function getAssociations()
+    {
+        return $this->associations;
     }
     
     public function validate($field)

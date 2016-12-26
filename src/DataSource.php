@@ -28,7 +28,7 @@ interface DataSource
 
     /**
      * Insert multiple data records directly into model.
-     * Each record-array MUST cotain the same fields and order of fields.
+     * Each record-array MUST contain the same fields and order of fields.
      *
      * @param array[] $records
      *            List of associative arrays of record data.
@@ -61,7 +61,7 @@ interface DataSource
      *
      * @param Selection $selection
      *            Update selection.
-     * @return int Number of updated records if availabble.
+     * @return int Number of updated records if available.
      */
     public function updateSelection(UpdateSelection $selection);
 
@@ -70,7 +70,7 @@ interface DataSource
      *
      * @param Selection $selection
      *            Selection.
-     * @return int Number of deleted records if availabble.
+     * @return int Number of deleted records if available.
      */
     public function deleteSelection(Selection $selection);
 
@@ -78,7 +78,7 @@ interface DataSource
      * Join two data sources.
      *
      * @param DataSource $other
-     *            Other data sorce.
+     *            Other data source.
      * @return DataSource|null A compatible data source or null if join not
      *         possible.
      */

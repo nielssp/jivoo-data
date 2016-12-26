@@ -54,6 +54,14 @@ class VirtualDefinition implements Definition
     /**
      * {@inheritdoc}
      */
+    public function isVirtual($field)
+    {
+        return isset($this->fields[$field]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getType($field)
     {
         if (! isset($this->fields[$field])) {

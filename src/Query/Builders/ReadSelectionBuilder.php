@@ -167,8 +167,7 @@ class ReadSelectionBuilder extends SelectionBase implements \IteratorAggregate, 
                 'alias' => $alias
             );
         }
-        $result = $clone->source->readSelection($clone);
-        return $result;
+        return $clone->source->readSelection($clone);
     }
 
     /**
@@ -185,8 +184,6 @@ class ReadSelectionBuilder extends SelectionBase implements \IteratorAggregate, 
             'expression' => $expression,
             'type' => $type
         );
-        // TODO: virtual fields defined in source?
-//        $clone->source->addVirtual($field, $type);
         return $clone;
     }
 
@@ -196,15 +193,18 @@ class ReadSelectionBuilder extends SelectionBase implements \IteratorAggregate, 
     public function withRecord($field, Definition $definition)
     {
         $clone = clone $this;
-        foreach ($definition->getFields() as $schemaField) {
-            $alias = $field . '_' . $schemaField;
+        foreach ($definition->getFields() as $defField) {
+            if ($definition->isVirtual($defField)) {
+                continue;
+            }
+            $alias = $field . '_' . $defField;
             $clone->additionalFields[$alias] = array(
                 'alias' => $alias,
-                'expression' => $field . '.' . $schemaField,
-                'type' => $definition->getType($schemaField),
+                'expression' => $field . '.' . $defField,
+                'type' => $definition->getType($defField),
                 'definition' => $definition,
                 'record' => $field,
-                'recordField' => $schemaField
+                'recordField' => $defField
             );
         }
         return $clone;

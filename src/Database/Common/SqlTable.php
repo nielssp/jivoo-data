@@ -10,12 +10,12 @@ use Jivoo\Data\Database\ResultSetIterator;
 use Jivoo\Data\Database\Table;
 use Jivoo\Data\DataSource;
 use Jivoo\Data\Definition;
+use Jivoo\Data\Query\Builders\ReadSelectionBuilder;
 use Jivoo\Data\Query\E;
+use Jivoo\Data\Query\Expression;
 use Jivoo\Data\Query\ReadSelection;
 use Jivoo\Data\Query\Selection;
 use Jivoo\Data\Query\UpdateSelection;
-use Jivoo\Models\Condition\ConditionBuilder;
-use Jivoo\Models\Selection\ReadSelectionBuilder;
 
 /**
  * A table in an SQL database.
@@ -62,7 +62,8 @@ class SqlTable implements Table
     {
         $pk = $this->definition->getPrimaryKey();
         if (count($pk) == 1) {
-            if ($this->definition->getType($pk[0])->serial) {
+            $type = $this->definition->getType($pk[0]);
+            if ($type->isInteger() and $type->serial) {
                 return $pk[0];
             }
         }
@@ -298,7 +299,7 @@ class SqlTable implements Table
                     $sqlString .= ',';
                 }
                 $sqlString .= ' ' . $key . ' = ';
-                if ($value instanceof \Jivoo\Data\Query\Expression) {
+                if ($value instanceof Expression) {
                     $sqlString .= $value->toString($this->owner);
                 } else {
                     $sqlString .= $typeAdapter->encode($this->getType($key), $value);

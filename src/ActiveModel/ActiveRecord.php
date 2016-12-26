@@ -395,9 +395,10 @@ class ActiveRecord implements Record
     {
         $this->model->triggerEvent('beforeSave', new ActiveModelEvent($this));
         if ($validate and ! $this->isValid()) {
-            foreach ($this->getErrors() as $field => $error) {
-                $this->model->getLogger()->info('Form error (' . $field . '): ' . $error);
-            }
+            // TODO: logging?
+//            foreach ($this->getErrors() as $field => $error) {
+//                $this->model->getLogger()->info('Form error (' . $field . '): ' . $error);
+//            }
             return false;
         }
         if ($this->isNew()) {
@@ -486,5 +487,10 @@ class ActiveRecord implements Record
     public function offsetUnset($field)
     {
         $this->__unset($field);
+    }
+
+    public function getDefinition()
+    {
+        return $this->model->getDefinition();
     }
 }
